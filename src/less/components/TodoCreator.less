@@ -1,0 +1,53 @@
+& {
+    padding: 8px 15px;
+    background-color: #f1f2f5;
+}
+
+.current-mode {
+    margin: 0;
+    margin-bottom: 5px;
+}
+
+.input-block {
+    margin-bottom: 15px;
+}
+
+.submit {
+    width: 100%;
+}
+
+textarea {
+    resize: vertical;
+}
+
+.selected-tag,
+.common-tag {
+    border-radius: 100px;
+    padding: 0 10px;
+    margin-bottom: 5px;
+    margin-right: 5px;
+}
+
+.selected-tags {
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: white;
+    padding: 10px 10px 6px;
+    @color: #5cb85c;
+    .selected-tag {
+        border: 1px solid @color;
+        color: @color;
+    }
+}
+
+.common-tags {
+    @color: #888;
+    padding: 10px 10px 0px;
+    .common-tag {
+        border: 1px solid @color;
+        color: @color;
+        border-radius: 100px;
+        padding: 0 10px;
+        margin-bottom: 5px;
+    }
+}

@@ -1,24 +1,19 @@
 <template>
-    <div class="top-page-wrap todo-page">
-        <TodoCreator></TodoCreator>
-        <TodoList></TodoList>
-        <TodoInfo></TodoInfo>
+    <div class="info-panel root-panel todo-info-component">
+    
     </div>
 </template>
 
 <script>
 import $ from "jquery";
-import socket from "./io";
+import socket from "../io";
 
-import eventHub from './eventHub';
-import settings from './settings';
+import eventHub from '../eventHub';
+import settings from '../settings';
 import datepicker from 'vue-date';
-import TodoCreator from './components/TodoCreator';
-import TodoList from './components/TodoList';
-import TodoInfo from './components/TodoInfo';
 
 export default {
-    name: 'Todo',
+    name: 'TodoInfo',
     created() {
 
     },
@@ -47,9 +42,7 @@ export default {
 
     },
     components: {
-        TodoCreator,
-        TodoList,
-        TodoInfo
+        datepicker
     }
 
 }
