@@ -1,0 +1,86 @@
+width: @left-tabs-width;
+position: absolute;
+left: 0;
+top: 0;
+bottom: 0;
+background-color: rgba(12, 137, 255, .9);
+.bg-image {
+    position: absolute;
+    width: 100%;
+    &.top {
+        top: @left-tabs-width;
+    }
+    &.bottom {
+        bottom: 0;
+    }
+}
+
+.middle {
+    position: absolute;
+    top: @left-tabs-width + 10px;
+    bottom: 9px;
+    left: 0;
+    right: 0;
+    img {
+        height: 100%;
+    }
+}
+
+.avatar {
+    .square(@left-tabs-width);
+    .abs-fill;
+    left: 0px;
+    bottom: auto;
+    top: 0px;
+    padding: 8px;
+    box-sizing: border-box;
+    img {
+        &:not(.active) {
+            filter: grayscale(100%);
+        }
+        width: 100%;
+        background-color: wheat;
+    }
+}
+
+.tabs {
+    margin-top: 150px;
+    text-align: center;
+    color: white;
+    i {
+        color: white;
+        font-size: 29px;
+    }
+    [data-tab-name] {
+        font-size: 23px;
+        margin: auto;
+        margin-top: 20px;
+        text-align: center;
+        display: block;
+        position: relative;
+        height: 40px;
+        width: 40px;
+        border-style: solid;
+        border-width: 0;
+        opacity: 0.7;
+        &.active {
+            opacity: 1;
+        }
+        &:active {
+            opacity: 0.5;
+        }
+        &:hover {
+            text-shadow: white 0px 0px 18px;
+        }
+        &.router-link-active {
+            opacity: 1;
+            &:hover {
+                text-shadow: white 0px 0px 0px;
+            }
+        }
+        &:focus {}
+    }
+}
+
+//    84 88 187 714
+.tools {}

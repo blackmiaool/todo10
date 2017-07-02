@@ -1,0 +1,88 @@
+@res-folder: "../../assets";
+@splitter: rgba(245, 222, 179, 0.3);
+height:100%;
+//display:flex;
+//justify-content:center;
+//align-items:center;
+>main {
+    .fill;
+    position: relative;
+}
+
+.deep-panel {
+    .transform-center;
+    transition: all 0.5s;
+    padding: 50px;
+    .accept {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        margin: auto;
+        bottom: -37px;
+        zoom: 1.5;
+    }
+    >header {
+        @pos: -20px;
+        display: inline-block;
+        position: absolute;
+        top: 0;
+        left: @pos;
+        right: @pos;
+        margin: auto;
+        text-align: center;
+        pointer-events: none;
+        .text {
+            height: 30%;
+            .abs-fill;
+            margin: auto;
+        }
+        >deep-header {}
+    }
+    &.top {
+        transform: translate(-50%, -100%);
+        opacity: 0;
+        pointer-events: none;
+    }
+    &.bottom {
+        transform: translate(-50%, 0%);
+        opacity: 0;
+        pointer-events: none;
+    }
+}
+
+.config-panel {
+    text-align: center;
+}
+
+.room-panel {
+    text-align: center;
+    padding-bottom: 80px;
+    .input-block {
+        position: relative;
+        margin-top: 20px;
+        text-align: left;
+        .descr {
+            margin-left: 10px;
+            font-size: 14px;
+        }
+        .err {
+            color: rgb(198, 66, 33);
+            margin-left: 22px;
+        }
+    }
+    .select-room-action {
+        margin-bottom: 10px;
+    }
+    input {
+        height: 30px;
+    }
+}
+
+.setting-tab-header-wrap {
+    .vertical-center;
+    left: 0;
+    .setting-tab-header {
+        margin: 10px 0;
+    }
+}

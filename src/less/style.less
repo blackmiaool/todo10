@@ -1,0 +1,80 @@
+@import "bootstrap/input-groups.less";
+@import "bootstrap/buttons.less";
+@import "bootstrap/button-groups.less";
+@import "bootstrap/variables.less";
+@import "bootstrap/mixins.less";
+@import "bootstrap/glyphicons.less";
+@import "bootstrap/forms.less";
+@import "bootstrap/dropdowns.less";
+@import "bootstrap/progress-bars.less";
+@import "bootstrap/tables.less";
+@import "bootstrap/navs.less";
+@import "bootstrap/scaffolding.less";
+@import "bootstrap/panels.less";
+@import "bootstrap/utilities.less";
+@import "bootstrap/close.less";
+@import "bootstrap/forms.less";
+@import "font-awesome/less/font-awesome.less";
+@import "variables.less";
+@import "mixin.less";
+// @import "deep-ui.less";
+@left-tabs-width: 60px;
+html,
+body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+}
+
+body {
+    //    background: url(/res/deep_ui/bg.png) center top no-repeat;
+    background-color: #eee;
+    background-size: cover;
+    font-family: Arial, Verdana, "微软雅黑", "黑体", serif;
+    -webkit-font-smoothing: subpixel-antialiased;
+    font-smoothing: subpixel-antialiased;
+    height: 100%;
+}
+
+span {
+    display: inline-block;
+}
+
+#app {
+    .fill;
+}
+
+.top-page-wrap {
+    overflow: hidden;
+    margin-left: 60px;
+    height: 100%;
+    position: relative;
+}
+
+.login-page {
+    @import "page/login.less";
+}
+
+.settings-page {
+    @import "page/settings.less";
+}
+
+.todo-page {
+    @import "page/todo.less";
+}
+
+.avatar-img {
+    background-position: center center;
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-color: wheat;
+}
+
+.left-tabs-wrap {
+    z-index: 1;
+    @import "left-tabs-wrap.less";
+}
+
+.setting-tab-header {
+    @import "components/settingTabHeader.less";
+}

@@ -1,0 +1,111 @@
+@res-folder: "../../assets";
+@splitter: rgba(245, 222, 179, 0.3);
+height:100%;
+>main {
+    .fill;
+    position: relative;
+}
+
+.top-half-panel {
+    background-color: white;
+    padding: 20px 30px 7px;
+}
+
+.bottom-half-panel {
+    position: relative;
+    border-top: 1px solid #e4e4e4;
+    background: #f7f7f7;
+    padding: 15px 30px 15px;
+}
+
+.login-panel {
+    display: inline-block;
+    text-align: center;
+    .transform-center;
+    padding: 50px;
+    padding-top: 70px;
+    .go-register {
+        position: absolute;
+        left: 13px;
+        bottom: 21px;
+        background-color: transparent;
+        border: none;
+        font-size: 15px;
+        outline: none;
+        color: #333;
+    }
+    .accept {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        margin: auto;
+        bottom: -37px;
+        zoom: 1.5;
+    }
+    .deep-select {
+        position: relative;
+    }
+    .avatar-preview {
+        height: 44px;
+        width: 44px;
+        position: relative;
+        background-size: contain;
+        margin: auto;
+        margin-bottom: 10px;
+    }
+    .remember {
+        text-align: center;
+        display: inline-block;
+        height: 28px;
+        margin: 0;
+        margin-top: 3px;
+        input {
+            .square(20px);
+            display: inline-block;
+            vertical-align: middle;
+            margin: 0;
+            margin-right: 2px;
+        }
+        [for="remember"] {
+            margin: 0;
+            vertical-align: middle;
+        }
+    }
+    .input-block {
+        position: relative;
+        .err {
+            color: rgb(198, 66, 33);
+            margin-left: 22px;
+        }
+    }
+    padding-bottom: 80px;
+    .submit {
+        position: absolute;
+        right: 18px;
+    }
+}
+
+input {
+    border: 1px solid #aaa;
+    @color: rgb(67, 57, 57);
+    height: 40px;
+    width: 300px;
+    font-size: 20px;
+    margin-bottom: 15px; // &:-webkit-autofill {
+    //     background-color: transparent !important;
+    //     color: wheat !important;
+    //     -webkit-box-shadow: 0 0 0px 1000px #fff inset !important;
+    //     border-color: transparent!important;
+    //     -webkit-text-fill-color: wheat !important;
+    //     transition: background-color 5000s ease-in-out 0s !important;
+    // }
+    // &:autofill {
+    //     background-color: transparent !important;
+    //     color: wheat !important;
+    //     -webkit-box-shadow: 0 0 0px 1000px #fff inset !important;
+    //     border-color: transparent!important;
+    //     -webkit-text-fill-color: wheat !important;
+    //     transition: background-color 5000s ease-in-out 0s !important;
+    // }
+}

@@ -1,0 +1,9 @@
+{
+    "brackets-file-tree-exclude.excludeList": [
+        "/.git/",
+        "/dist/",
+        "/dist_third/",
+        "/node_modules/"
+    ],
+    "bb.beautify.onSave": true
+}
