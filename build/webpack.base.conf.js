@@ -27,8 +27,17 @@ module.exports = {
             'src': path.resolve(__dirname, '../src'),
             'common': path.resolve(__dirname, '../common'),
             'assets': path.resolve(__dirname, '../src/assets'),
-            'components': path.resolve(__dirname, '../src/components')
-        }
+            'components': path.resolve(__dirname, '../src/components'),
+            'config': path.resolve(__dirname, '../config'),
+            'io': path.resolve(__dirname, '../src/io'),
+            'eventHub': path.resolve(__dirname, '../src/eventHub'),
+            'settings': path.resolve(__dirname, '../src/settings'),
+        },
+        modules: [
+            path.resolve('../src'),
+            path.resolve('./node_modules'),
+            path.resolve('../')
+        ],
     },
     resolveLoader: {
         fallback: [path.join(__dirname, '../node_modules')]

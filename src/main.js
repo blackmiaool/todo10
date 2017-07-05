@@ -2,9 +2,9 @@
 // (runtime-only or standalone) has been set in webpack.base.conf with an alias.
 import Vue from 'vue'
 // import Chat from './Chat'
-import Login from './Login'
-import Todo from './Todo'
-import Settings from './Settings'
+import Login from './pages/Login'
+import Todo from './pages/Todo'
+import Settings from './pages/Settings'
 import socket from './io';
 
 import LeftTabs from './components/LeftTabs';

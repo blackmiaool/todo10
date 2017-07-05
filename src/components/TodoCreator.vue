@@ -3,41 +3,53 @@
         <h2 class="current-mode">{{mode}}</h2>
         <div class="input-block">
             <label for="new-todo-title">Todo Title</label>
-            <input type="text" id="new-todo-title" class="form-control">
+            <input v-if="mode==='Create'" type="text" id="new-todo-title" class="form-control" placeholder="Describe the task within a few words" v-model="title">
+            <p v-if="mode==='View'">{{title}}</p>
         </div>
         <div class="input-block">
             <label for="new-todo-content">Todo Content</label>
-            <textarea type="text" id="new-todo-content" class="form-control"></textarea>
+            <textarea v-if="mode==='Create'" type="text" id="new-todo-content" class="form-control" placeholder="Write some details about the task" v-model="content"></textarea>
+            <p v-if="mode==='View'">{{content}}</p>
         </div>
         <div class="input-block">
             <label>Tags</label>
-            <div class="selected-tags">
-                <span :key="tag" v-for="tag in selectedTags" class="selected-tag clickable">{{tag}}</span>
+            <div v-if="mode==='Create'" :data-mode="mode" class="selected-tags">
+                <span :key="tag" v-for="tag in selectedTags" class="selected-tag clickable" @click="removeTag(tag)">{{tag}}</span>
             </div>
-            <div class="common-tags">
-                <span :key="tag" v-for="tag in commonTags" class="common-tag clickable">{{tag}}</span>
-    
+            <div v-if="mode==='Create'" :data-mode="mode" class="common-tags">
+                <span :key="tag" v-for="tag in commonTags" class="common-tag clickable" @click="selectTag(tag)">{{tag}}</span>
+            </div>
+            <div v-if="mode==='View'" :data-mode="mode" class="selected-tags">
+                <span :key="tag" v-for="tag in commonTags" class="selected-tag clickable" @click="selectTag(tag)">{{tag}}</span>
             </div>
         </div>
         <div class="input-block">
             <label for="choose-priority">Priority</label>
-            <select id="choose-priority" class="form-control" v-model="priority">
-                <option value="verbose">delay it as u want(~)</option>
-                <option value="normal">do it when u have time(.)</option>
-                <option value="warn">do it as soon as possible(!)</option>
-                <option value="danger">do it right now(!!!)</option>
+            <select v-if="mode==='Create'" id="choose-priority" class="form-control" v-model="priority">
+                <option value="verbose">{{priorityMap.verbose}}</option>
+                <option value="normal">{{priorityMap.normal}}</option>
+                <option value="warn">{{priorityMap.warn}}</option>
+                <option value="danger">{{priorityMap.danger}}</option>
             </select>
+            <p v-if="mode==='View'">{{priorityMap[priority]}}</p>
         </div>
         <div class="input-block">
             <label for="choose-deadline">Deadline (not recommanded)</label>
-            <datepicker v-model="today"></datepicker>
+            <datepicker v-if="mode==='Create'" v-model="deadline"></datepicker>
+            <p v-if="mode==='View'">{{formattedDeadline}}</p>
+        </div>
+        <div class="input-block">
+            <label for="choose-assigner">Creator</label>
+            <input v-if="mode==='Create'" readonly type="text" id="choose-creator" class="form-control" v-model="creator">
+            <p v-if="mode==='View'">{{creator}}</p>
         </div>
         <div class="input-block">
             <label for="choose-assignee">Assignee</label>
-            <input type="text" id="choose-assignee" class="form-control" v-model="assignee">
+            <input v-if="mode==='Create'" type="text" id="choose-assignee" class="form-control" v-model="assignee">
+            <p v-if="mode==='View'">{{assignee}}</p>
         </div>
         <div class="input-block">
-            <button class="btn btn-primary submit">Create</button>
+            <button class="btn btn-primary submit" @click="create">Create</button>
         </div>
     </div>
 </template>
@@ -67,22 +79,60 @@ export default {
     mounted() {
 
     },
+
     data() {
         return {
-            today: (new Date()).format("yyyy-MM-dd"),
+            title: "abc",
+            content: "abc",
+            creator: "Yourself",
+            deadline: "",
             assignee: "Yourself",
-            mode: "Create",
             priority: "normal",
             selectedTags: ["编辑器", "活动", "app-rn"],
-            commonTags: ["有品", '老米家', '微信', 'PC站', '小程序']
+            commonTags: ["有品", '老米家', '微信', 'PC站', '小程序'],
+            priorityMap: {
+                verbose: 'delay it as u want(~)',
+                normal: 'do it when u have time(.)',
+                warn: 'do it as soon as possible(!)',
+                danger: 'do it right now(!!!)',
+            },
         }
     },
+    computed: {
+        formattedDeadline() {
+            return new Date(this.deadline).format("yyyy-MM-dd hh:mm:ss");
+        }
+    },
+    props: ['onCreate', 'mode', 'editing'],
     watch: {
-
+        editing(v) {
+            Object.assign(this, v);
+            console.log(v);
+        },
     },
     methods: {
-
-
+        selectTag(tag) {
+            const index = this.commonTags.indexOf(tag);
+            this.selectedTags.push(tag);
+            this.commonTags.splice(index, 1);
+        },
+        removeTag(tag) {
+            const index = this.selectedTags.indexOf(tag);
+            this.commonTags.push(tag);
+            this.selectedTags.splice(index, 1);
+        },
+        create() {
+            let deadline;
+            if (this.deadline) {
+                deadline = new Date(this.deadline).getTime();
+            }
+            this.$emit('create', {
+                assignee: this.assignee,
+                deadline: deadline,
+                priority: this.priority,
+                selectedTags: this.selectedTags
+            });
+        }
     },
     components: {
         datepicker

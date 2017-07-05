@@ -34,11 +34,11 @@ import $ from "jquery";
 import md5 from 'md5';
 import {
     registerCheck
-} from '../common/check';
+} from 'common/check';
 import Vue from 'vue';
-import socket from "./io";
-const config = require("../config.js");
-import eventHub from './eventHub';
+import socket from "io";
+const config = require("config");
+import eventHub from 'eventHub';
 
 const href = window.location.href;
 let firstPage = href.match(/\/#\/(\w+)/);

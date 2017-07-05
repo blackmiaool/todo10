@@ -11,11 +11,11 @@
 
 <script>
 import $ from "jquery";
-import socket from "./io";
-import SettingTabHeader from './components/SettingTabHeader';
-import ConfigPanel from './components/ConfigPanel';
+import socket from "../io";
+import SettingTabHeader from 'components/SettingTabHeader';
+import ConfigPanel from 'components/ConfigPanel';
+import config from "config";
 
-const config = require("../config.js");
 
 export default {
     name: 'settings',

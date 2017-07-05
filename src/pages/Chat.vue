@@ -67,21 +67,21 @@
 
 <script>
 import $ from "jquery";
-import socket from "./io";
-import Room from './components/Room';
-import eventHub from './eventHub';
-import ClientIcon from './components/ClientIcon';
+import socket from "io";
+import Room from 'components/Room';
+import eventHub from 'eventHub';
+import ClientIcon from 'components/ClientIcon';
 
-import settings from './settings';
+import settings from 'settings';
 
-const CodeMirror = require('./codemirror/lib/codemirror.js');
-require('./codemirror/mode/javascript/javascript.js');
-require('./codemirror/mode/go/go.js');
-require('./codemirror/mode/css/css.js');
-require('./codemirror/mode/htmlmixed/htmlmixed.js');
+const CodeMirror = require('codemirror/lib/codemirror.js');
+require('codemirror/mode/javascript/javascript.js');
+require('.codemirror/mode/go/go.js');
+require('codemirror/mode/css/css.js');
+require('codemirror/mode/htmlmixed/htmlmixed.js');
 
-require('./codemirror/lib/codemirror.css');
-require('./codemirror/theme/monokai.css');
+require('codemirror/lib/codemirror.css');
+require('codemirror/theme/monokai.css');
 
 require(`assets/avatar.gif`);
 $(document.body).on("mouseover", function () {

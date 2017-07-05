@@ -5,18 +5,12 @@
             </header>
             <section id="main">
                 <ul id="todo-list">
-                    <li class="pending">
+                    <li class="pending" v-for="li in list" :key="li.id" @click="edit(li)" :class="{selected:li.id===selecting}">
                         <div class="drag-handle"></div>
-                        <label>更新产品模块</label>
+                        <label>{{li.title}}</label>
                         <button class="top tool clickable" title="top"></button>
                         <button class=" tool finish clickable" title="finish"></button>
     
-                    </li>
-                    <li class="pending selected">
-                        <div class="drag-handle"></div>
-                        <label>首页四大金刚rn=1</label>
-                        <button class="top tool clickable" title="top"></button>
-                        <button class=" tool finish clickable" title="finish"></button>
                     </li>
                 </ul>
             </section>
@@ -38,32 +32,27 @@ export default {
     created() {
 
     },
-    beforeRouteEnter(to, from, next) {
-        next(vm => {
-            console.log('socket', socket.context.logged)
-            if (!socket.context.logged) {
-                router.replace("/login")
-                return;
-            }
-        });
-    },
     mounted() {
 
     },
+    props: ['list'],
     data() {
         return {
-            today: (new Date()).format("yyyy-MM-dd")
+            selecting: "",
         }
     },
     watch: {
 
     },
     methods: {
-
+        edit(item) {
+            this.selecting = item.id;
+            this.$emit("select", item);
+        }
 
     },
     components: {
-        datepicker
+
     }
 
 }
