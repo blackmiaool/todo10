@@ -1,6 +1,6 @@
 <template>
     <div class="top-page-wrap todo-page">
-        <TodoCreator @create="onCreate" :mode="mode" :editing="editing"></TodoCreator>
+        <TodoPanel ref="creator" @create="onCreate" :mode="mode" :editing="editing" @edit="onEdit"></TodoPanel>
         <TodoList :list="list" @select="onSelect"></TodoList>
         <TodoInfo></TodoInfo>
     </div>
@@ -13,7 +13,7 @@ import socket from "../io";
 import eventHub from 'eventHub';
 import settings from 'settings';
 import datepicker from 'vue-date';
-import TodoCreator from 'components/TodoCreator';
+import TodoPanel from 'components/TodoPanel';
 import TodoList from 'components/TodoList';
 import TodoInfo from 'components/TodoInfo';
 
@@ -41,6 +41,8 @@ export default {
             list: [
                 {
                     title: "测试1",
+                    description: "测试1的描述",
+                    creator: 'a',
                     assignee: "abc",
                     deadline: 1499257423548,
                     priority: "normal",
@@ -49,7 +51,9 @@ export default {
                 },
                 {
                     title: "测试2",
-                    assignee: "lll",
+                    description: "测试2的描述",
+                    creator: 'b',
+                    assignee: "blackmiaool",
                     deadline: 1499257423548,
                     priority: "warn",
                     selectedTags: ["活动", "app-rn"],
@@ -57,6 +61,8 @@ export default {
                 },
                 {
                     title: "测试3",
+                    description: "测试3的描述",
+                    creator: 'c',
                     assignee: "sdfs",
                     deadline: 1499257563708,
                     priority: "danger",
@@ -77,11 +83,21 @@ export default {
         onSelect(item) {
             this.mode = "View";
             this.editing = item;
-            console.log('item', item);
+            setTimeout(() => {
+                this.$refs.creator.set(item);
+            });
+
+            console.log('onSelect item', item);
+        },
+        onEdit() {
+            this.mode = "Edit";
+            setTimeout(() => {
+                this.$refs.creator.set(this.editing);
+            });
         }
     },
     components: {
-        TodoCreator,
+        TodoPanel,
         TodoList,
         TodoInfo
     }

@@ -39,7 +39,7 @@ import Vue from 'vue';
 import socket from "io";
 const config = require("config");
 import eventHub from 'eventHub';
-
+import store from 'store';
 const href = window.location.href;
 let firstPage = href.match(/\/#\/(\w+)/);
 if (firstPage) {
@@ -131,6 +131,7 @@ export default {
             });
         },
         onSuccess(data) {
+            store.commit("setUser", { avatar: data.avatar, name: data.name })
             this.$root.avatar = data.avatar;
             this.$root.userName = data.name;
             this.$root.connected = true;
