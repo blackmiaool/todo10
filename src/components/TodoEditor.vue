@@ -6,7 +6,7 @@
         </div>
         <div class="input-block">
             <label for="new-todo-content">Todo Content</label>
-            <textarea type="text" id="new-todo-content" class="form-control" placeholder="Write some details about the task" v-model="content"></textarea>
+            <textarea type="text" id="new-todo-content" class="form-control" placeholder="Write some details about the task" v-model="description"></textarea>
     
         </div>
         <div class="input-block">
@@ -30,7 +30,7 @@
     
         </div>
         <div class="input-block">
-            <label for="choose-deadline">Deadline (not recommanded)</label>
+            <label for="choose-deadline">Deadline (not recommended)</label>
             <datepicker v-model="deadlineText"></datepicker>
     
         </div>
@@ -54,7 +54,7 @@ import datepicker from 'vue-date';
 
 const properties = {
     title: "",
-    content: "bc",
+    description: "bc",
     creator: "",
     deadline: "",
     deadlineText: "",
@@ -105,7 +105,7 @@ export default {
     computed: {
 
     },
-    props: ["change"],
+    props: ["change", 'mode'],
     watch: {
         deadline(v) {
             console.log('v', v);
@@ -123,28 +123,33 @@ export default {
             this.commonTags.push(tag);
             this.selectedTags.splice(index, 1);
         },
-        edit() {
-            console.log(store.state.user.name, this.assignee);
-            if (this.creator !== store.state.user.name && this.assignee !== store.state.user.name) {
-                alert("Only creator or assignee can mutate it");
-                return;
-            }
-            this.$emit("edit");
-        },
-        fork() {
-
-        },
-        create() {
-            let deadline;
-            if (this.deadline) {
+        getDeadline() {
+            let deadline = 0;
+            if (this.deadlineText) {
                 deadline = new Date(this.deadlineText).getTime();
             }
-            this.$emit('create', {
-                assignee: this.assignee,
-                deadline: deadline,
-                priority: this.priority,
-                selectedTags: this.selectedTags
-            });
+            return deadline;
+        },
+        get() {
+            if (this.mode === 'Create') {
+                return ({
+                    title: this.title,
+                    content: this.content,
+                    deadline: this.getDeadline(),
+                    priority: this.priority,
+                    selectedTags: this.selectedTags,
+                    assignee: this.assignee,
+                });
+            } else if (this.mode === 'Edit') {
+                return ({
+                    title: this.title,
+                    content: this.content,
+                    deadline: this.getDeadline(),
+                    priority: this.priority,
+                    selectedTags: this.selectedTags,
+                    assignee: this.assignee,
+                });
+            }
         },
         set(info) {
             Object.assign(this, info);

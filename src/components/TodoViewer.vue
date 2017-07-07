@@ -19,7 +19,7 @@
             <p>{{priorityMap[priority]}}</p>
         </div>
         <div class="input-block">
-            <label for="choose-deadline">Deadline (not recommanded)</label>
+            <label for="choose-deadline">Deadline (not recommended)</label>
             <p>{{formattedDeadline}}</p>
         </div>
         <div class="input-block">

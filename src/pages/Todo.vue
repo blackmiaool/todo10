@@ -1,6 +1,6 @@
 <template>
     <div class="top-page-wrap todo-page">
-        <TodoPanel ref="creator" @create="onCreate" :mode="mode" :editing="editing" @edit="onEdit"></TodoPanel>
+        <TodoPanel ref="creator" @create="onCreate" :editing="editing" @save="onSave"></TodoPanel>
         <TodoList :list="list" @select="onSelect"></TodoList>
         <TodoInfo></TodoInfo>
     </div>
@@ -48,6 +48,7 @@ export default {
                     priority: "normal",
                     selectedTags: ["编辑器", "活动", "app-rn"],
                     id: 1234,
+                    status: 'pending',
                 },
                 {
                     title: "测试2",
@@ -58,6 +59,7 @@ export default {
                     priority: "warn",
                     selectedTags: ["活动", "app-rn"],
                     id: 1231,
+                    status: 'pending',
                 },
                 {
                     title: "测试3",
@@ -68,33 +70,32 @@ export default {
                     priority: "danger",
                     selectedTags: ["app-rn", "小程序"],
                     id: 456,
+                    status: 'done',
                 }
             ],
+
             today: (new Date()).format("yyyy-MM-dd")
         }
     },
     watch: {
 
     },
+
     methods: {
         onCreate(item) {
-            console.log(item);
+            item = JSON.parse(JSON.stringify(item));
+            item.id = parseInt(Math.random() * 1000);
+            this.list.push(item);
+        },
+        onSave(item) {
+            console.log('onSave', item);
         },
         onSelect(item) {
-            this.mode = "View";
+            this.$refs.creator.view(item);
             this.editing = item;
-            setTimeout(() => {
-                this.$refs.creator.set(item);
-            });
 
             console.log('onSelect item', item);
         },
-        onEdit() {
-            this.mode = "Edit";
-            setTimeout(() => {
-                this.$refs.creator.set(this.editing);
-            });
-        }
     },
     components: {
         TodoPanel,

@@ -5,7 +5,7 @@
             <span v-if="unsaved && mode==='Edit'" class="unsaved">(unsaved)</span>
         </h2>
         <TodoViewer ref="viewer" v-if="mode==='View'" :editing="editing"></TodoViewer>
-        <TodoEditor ref="editor" v-if="mode==='Edit'||mode==='Create'" @change="onChange"></TodoEditor>
+        <TodoEditor ref="editor" v-if="mode==='Edit'||mode==='Create'" @change="onChange" :mode="mode"></TodoEditor>
     
         <div class="input-block">
             <button v-if="mode==='Create'" class="btn btn-success submit" @click="create">Create</button>
@@ -49,6 +49,7 @@ export default {
 
     data() {
         return {
+            mode: "Create",
             info: {
                 title: "abc",
                 content: "abc",
@@ -71,13 +72,26 @@ export default {
     computed: {
 
     },
-    props: ['onCreate', 'mode', 'editing'],
+    props: ['editing'],
     watch: {
         mode() {
             this.unsaved = false;
         },
     },
     methods: {
+        view(info) {
+            this.mode = 'View';
+            setTimeout(() => {
+                this.set(info);
+            });
+
+        },
+        setMode(mode) {
+            if (mode === 'Edit') {
+                this.edit();
+            }
+            this.mode = mode;
+        },
         onChange() {
             console.log('onChange')
             this.unsaved = true;
@@ -103,25 +117,25 @@ export default {
                 alert("Only creator or assignee can mutate it");
                 return;
             }
-            this.$emit("edit");
+            this.mode = 'Edit';
+            setTimeout(() => {
+                this.set();
+            });
         },
         fork() {
 
         },
         save() {
             this.unsaved = false;
-        },
-        create() {
-            let deadline;
-            if (this.deadline) {
-                deadline = new Date(this.deadlineText).getTime();
-            }
-            this.$emit('create', {
+            this.$emit('save', {
                 assignee: this.assignee,
-                deadline: deadline,
+                deadline: this.getDeadline(),
                 priority: this.priority,
                 selectedTags: this.selectedTags
             });
+        },
+        create() {
+            this.$emit('create', this.$refs.editor.get());
         },
     },
     components: {

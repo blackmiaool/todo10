@@ -26,14 +26,32 @@ import socket from "../io";
 import eventHub from '../eventHub';
 import settings from '../settings';
 import datepicker from 'vue-date';
+import store from 'store';
 
 export default {
     name: 'TodoList',
     created() {
 
     },
+    computed: {
+        listPending() {
+            return this.list.filter((item) => {
+                return item.assignee === store.state.user.name && item.status === 'pending';
+            });
+        },
+        listCreated() {
+            return this.list.filter((item) => {
+                return item.creator === store.state.user.name;
+            });
+        },
+        listDone() {
+            return this.list.filter((item) => {
+                return item.assignee === store.state.user.name && item.status === 'done';
+            });
+        }
+    },
     mounted() {
-
+        console.log(this)
     },
     props: ['list'],
     data() {
