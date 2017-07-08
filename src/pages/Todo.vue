@@ -1,7 +1,7 @@
 <template>
     <div class="top-page-wrap todo-page">
-        <TodoPanel ref="creator" @create="onCreate" :editing="editing" @save="onSave"></TodoPanel>
-        <TodoList :list="list" @select="onSelect"></TodoList>
+        <TodoPanel v-if="userName" ref="creator" @create="onCreate" :editing="editing" @save="onSave" @fork="onFork"></TodoPanel>
+        <TodoList :list="list" ref="list" @select="onSelect"></TodoList>
         <TodoInfo></TodoInfo>
     </div>
 </template>
@@ -16,11 +16,11 @@ import datepicker from 'vue-date';
 import TodoPanel from 'components/TodoPanel';
 import TodoList from 'components/TodoList';
 import TodoInfo from 'components/TodoInfo';
+import store from 'store';
 
 export default {
     name: 'Todo',
     created() {
-
     },
     beforeRouteEnter(to, from, next) {
         next(vm => {
@@ -29,9 +29,20 @@ export default {
                 router.replace("/login")
                 return;
             }
+            setTimeout(() => {
+                if (!vm.$refs.creator) {
+                    return;
+                }
+                vm.$refs.creator.set(vm.list[0]);
+                vm.$refs.creator.setMode("Create");
+            }, 100);
         });
     },
+    computed: {
+        userName: () => store.state.user && store.state.user.name
+    },
     mounted() {
+
 
     },
     data() {
@@ -43,7 +54,7 @@ export default {
                     title: "测试1",
                     description: "测试1的描述",
                     creator: 'a',
-                    assignee: "abc",
+                    assignee: "blackmiaool",
                     deadline: 1499257423548,
                     priority: "normal",
                     selectedTags: ["编辑器", "活动", "app-rn"],
@@ -53,7 +64,7 @@ export default {
                 {
                     title: "测试2",
                     description: "测试2的描述",
-                    creator: 'b',
+                    creator: 'blackmiaool',
                     assignee: "blackmiaool",
                     deadline: 1499257423548,
                     priority: "warn",
@@ -64,8 +75,8 @@ export default {
                 {
                     title: "测试3",
                     description: "测试3的描述",
-                    creator: 'c',
-                    assignee: "sdfs",
+                    creator: 'blackmiaool2',
+                    assignee: "blackmiaool",
                     deadline: 1499257563708,
                     priority: "danger",
                     selectedTags: ["app-rn", "小程序"],
@@ -89,6 +100,28 @@ export default {
         },
         onSave(item) {
             console.log('onSave', item);
+            this.list.some((v, i) => {
+                if (v.id === item.id) {
+                    Object.assign(v, item);
+                    this.$refs.creator.view(v);
+                    return true;
+                }
+
+            });
+
+        },
+        onFork(item) {
+            item = JSON.parse(JSON.stringify(item));
+            item.id = parseInt(Math.random() * 1000);
+            this.list.push(item);
+
+            setTimeout(() => {
+                this.$refs.list.edit(item, false);    // body
+                setTimeout(() => {
+                    this.$refs.creator.setMode("Edit");
+                });
+            });
+
         },
         onSelect(item) {
             this.$refs.creator.view(item);

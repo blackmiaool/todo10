@@ -1,19 +1,64 @@
 <template>
     <div class="current-panel root-panel todo-list-component">
-        <div id="todoapp">
-            <header id="header">
-            </header>
-            <section id="main">
-                <ul id="todo-list">
-                    <li class="pending" v-for="li in list" :key="li.id" @click="edit(li)" :class="{selected:li.id===selecting}">
-                        <div class="drag-handle"></div>
-                        <label>{{li.title}}</label>
-                        <button class="top tool clickable" title="top"></button>
-                        <button class=" tool finish clickable" title="finish"></button>
+        <div>
     
-                    </li>
-                </ul>
+            <section class="todoapp">
+                <h3>Pending</h3>
+                <div class="todo-wrap">
+                    <header class="list-header">
+    
+                    </header>
+                    <section class="list-main">
+                        <ul class="todo-list">
+                            <li class="pending" v-for="li in listPending" :key="li.id" @click="edit(li)" :class="{selected:li.id===selecting}">
+                                <div class="drag-handle"></div>
+                                <label>{{li.title}}</label>
+                                <button class="top tool clickable" title="top"></button>
+                                <button class=" tool finish clickable" title="finish"></button>
+    
+                            </li>
+                        </ul>
+                    </section>
+                </div>
             </section>
+    
+            <section class="todoapp">
+                <h3>Created</h3>
+                <div class="todo-wrap">
+                    <header class="list-header"></header>
+                    <section class="list-main">
+                        <ul class="todo-list">
+                            <li class="pending" v-for="li in listCreated" :key="li.id" @click="edit(li)" :class="{selected:li.id===selecting}">
+                                <div class="drag-handle"></div>
+                                <label>{{li.title}}</label>
+                                <button class="top tool clickable" title="top"></button>
+                                <button class=" tool finish clickable" title="finish"></button>
+    
+                            </li>
+                        </ul>
+                    </section>
+                </div>
+            </section>
+    
+            <section class="todoapp">
+                <h3>Finished</h3>
+                <div class="todo-wrap">
+                    <header class="list-header"></header>
+                    <section class="list-main">
+                        <ul class="todo-list">
+                            <li class="finished" v-for="li in listDone" :key="li.id" @click="edit(li)" :class="{selected:li.id===selecting}">
+                                <div class="drag-handle"></div>
+                                <label>{{li.title}}</label>
+                                <button class="top tool clickable" title="top"></button>
+                                <button class=" tool finish clickable" title="finish"></button>
+    
+                            </li>
+                        </ul>
+                    </section>
+                </div>
+    
+            </section>
+    
         </div>
     
     </div>

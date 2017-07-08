@@ -3,6 +3,7 @@
         <div class="input-block">
             <label for="new-todo-title">Todo Title</label>
             <p>{{title}}</p>
+            <span class="id-detail">id:{{id}}</span>
         </div>
         <div class="input-block">
             <label for="new-todo-content">Todo Description</label>
@@ -60,6 +61,7 @@ export default {
 
     data() {
         return {
+            id: 0,
             title: "",
             description: "",
             creator: "",

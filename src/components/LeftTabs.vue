@@ -6,7 +6,7 @@
         </div>
         <div class="tabs">
     
-            <router-link to="/chat" data-tab-name="groups" class="clickable">
+            <router-link to="/todo" data-tab-name="groups" class="clickable">
                 <i class="fa fa-user-circle"></i>
             </router-link>
             <router-link to="/settings" data-tab-name="settings" class="clickable">

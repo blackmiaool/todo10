@@ -3,9 +3,10 @@
         <div class="input-block">
             <label for="new-todo-title">Todo Title</label>
             <input type="text" id="new-todo-title" class="form-control" placeholder="Describe the task within a few words" v-model="title">
+            <span class="id-detail">id:{{id}}</span>
         </div>
         <div class="input-block">
-            <label for="new-todo-content">Todo Content</label>
+            <label for="new-todo-content">Todo Description</label>
             <textarea type="text" id="new-todo-content" class="form-control" placeholder="Write some details about the task" v-model="description"></textarea>
     
         </div>
@@ -53,8 +54,9 @@ import $ from "jquery";
 import datepicker from 'vue-date';
 
 const properties = {
+    id: "",
     title: "",
-    description: "bc",
+    description: "",
     creator: "",
     deadline: "",
     deadlineText: "",
@@ -134,7 +136,7 @@ export default {
             if (this.mode === 'Create') {
                 return ({
                     title: this.title,
-                    content: this.content,
+                    description: this.description,
                     deadline: this.getDeadline(),
                     priority: this.priority,
                     selectedTags: this.selectedTags,
@@ -142,8 +144,9 @@ export default {
                 });
             } else if (this.mode === 'Edit') {
                 return ({
+                    id: this.id,
                     title: this.title,
-                    content: this.content,
+                    description: this.description,
                     deadline: this.getDeadline(),
                     priority: this.priority,
                     selectedTags: this.selectedTags,

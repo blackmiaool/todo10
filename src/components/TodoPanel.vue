@@ -1,5 +1,5 @@
 <template>
-    <div class="generate-panel root-panel todo-creator-component">
+    <div class="generate-panel root-panel todo-panel-component">
         <h2 class="current-mode">
             <span>{{mode}}</span>
             <span v-if="unsaved && mode==='Edit'" class="unsaved">(unsaved)</span>
@@ -51,14 +51,7 @@ export default {
         return {
             mode: "Create",
             info: {
-                title: "abc",
-                content: "abc",
-                creator: "Yourself",
-                deadline: 1499257423548,
-                assignee: "Yourself",
-                priority: "normal",
-                selectedTags: ["编辑器", "活动", "app-rn"],
-                commonTags: ["有品", '老米家', '微信', 'PC站', '小程序'],
+
             },
             unsaved: false,
             priorityMap: {
@@ -123,16 +116,11 @@ export default {
             });
         },
         fork() {
-
+            this.$emit('fork', this.info);
         },
         save() {
             this.unsaved = false;
-            this.$emit('save', {
-                assignee: this.assignee,
-                deadline: this.getDeadline(),
-                priority: this.priority,
-                selectedTags: this.selectedTags
-            });
+            this.$emit('save', this.$refs.editor.get());
         },
         create() {
             this.$emit('create', this.$refs.editor.get());
