@@ -8,10 +8,14 @@
         <TodoEditor ref="editor" v-if="mode==='Edit'||mode==='Create'" @change="onChange" :mode="mode"></TodoEditor>
     
         <div class="input-block">
-            <button v-if="mode==='Create'" class="btn btn-success submit" @click="create">Create</button>
-            <button v-if="mode==='View'" class="btn btn-primary submit" @click="edit">Edit</button>
-            <button v-if="mode==='View'" class="btn btn-success submit" @click="fork">Copy and Create (fork)</button>
-            <button v-if="mode==='Edit'" class="btn btn-success submit" @click="save">Save</button>
+            <button v-if="mode==='Create'" class="btn btn-success submit" @click="create">
+                <i class="fa fa-arrow-circle-o-up"></i> Create</button>
+            <button v-if="mode==='View'" class="btn btn-primary submit" @click="edit">
+                <i class="fa fa-pencil-square-o"></i> Edit</button>
+            <button v-if="mode==='View'" class="btn btn-success submit" @click="fork">
+                <i class="fa fa-code-fork"></i> Copy and Create (fork)</button>
+            <button v-if="mode==='Edit'" class="btn btn-success submit" @click="save">
+                <i class="fa fa-save"></i> Save</button>
         </div>
     </div>
 </template>
@@ -105,9 +109,9 @@ export default {
             this.selectedTags.splice(index, 1);
         },
         edit() {
-            console.log(store.state.user.name, this.info.assignee);
-            if (this.info.creator !== store.state.user.name && this.info.assignee !== store.state.user.name) {
-                alert("Only creator or assignee can mutate it");
+            console.log(store.state.user.name, this.info.owner);
+            if (this.info.requestor !== store.state.user.name && this.info.owner !== store.state.user.name) {
+                alert("Only requestor or owner can mutate it");
                 return;
             }
             this.mode = 'Edit';

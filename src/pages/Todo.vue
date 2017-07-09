@@ -1,6 +1,6 @@
 <template>
     <div class="top-page-wrap todo-page">
-        <TodoPanel v-if="userName" ref="creator" @create="onCreate" :editing="editing" @save="onSave" @fork="onFork"></TodoPanel>
+        <TodoPanel v-if="userName" ref="todoPanel" @create="onCreate" :editing="editing" @save="onSave" @fork="onFork"></TodoPanel>
         <TodoList :list="list" ref="list" @select="onSelect"></TodoList>
         <TodoInfo></TodoInfo>
     </div>
@@ -30,11 +30,15 @@ export default {
                 return;
             }
             setTimeout(() => {
-                if (!vm.$refs.creator) {
+                if (!vm.$refs.todoPanel) {
                     return;
                 }
-                vm.$refs.creator.set(vm.list[0]);
-                vm.$refs.creator.setMode("Create");
+                vm.$refs.todoPanel.set(vm.list[0]);
+                vm.$refs.todoPanel.setMode("Create");
+                socket.emit("getList", {}, (result) => {
+                    console.log('result', result)
+                    vm.list = result;
+                });
             }, 100);
         });
     },
@@ -42,7 +46,7 @@ export default {
         userName: () => store.state.user && store.state.user.name
     },
     mounted() {
-
+        store.commit("setCommonTags", ['编辑器', '活动', 'app-rn', '小程序'])
 
     },
     data() {
@@ -53,8 +57,8 @@ export default {
                 {
                     title: "测试1",
                     description: "测试1的描述",
-                    creator: 'a',
-                    assignee: "blackmiaool",
+                    requestor: 'a',
+                    owner: "blackmiaool",
                     deadline: 1499257423548,
                     priority: "normal",
                     selectedTags: ["编辑器", "活动", "app-rn"],
@@ -64,8 +68,8 @@ export default {
                 {
                     title: "测试2",
                     description: "测试2的描述",
-                    creator: 'blackmiaool',
-                    assignee: "blackmiaool",
+                    requestor: 'blackmiaool',
+                    owner: "blackmiaool",
                     deadline: 1499257423548,
                     priority: "warn",
                     selectedTags: ["活动", "app-rn"],
@@ -75,8 +79,8 @@ export default {
                 {
                     title: "测试3",
                     description: "测试3的描述",
-                    creator: 'blackmiaool2',
-                    assignee: "blackmiaool",
+                    requestor: 'blackmiaool2',
+                    owner: "blackmiaool",
                     deadline: 1499257563708,
                     priority: "danger",
                     selectedTags: ["app-rn", "小程序"],
@@ -95,15 +99,21 @@ export default {
     methods: {
         onCreate(item) {
             item = JSON.parse(JSON.stringify(item));
-            item.id = parseInt(Math.random() * 1000);
-            this.list.push(item);
+            item.status = 'pending';
+            socket.emit("create", item, (result) => {
+                this.list = result;
+                console.log('result', result)
+            });
+
+            // item.id = parseInt(Math.random() * 1000);
+            // this.list.push(item);
         },
         onSave(item) {
             console.log('onSave', item);
             this.list.some((v, i) => {
                 if (v.id === item.id) {
                     Object.assign(v, item);
-                    this.$refs.creator.view(v);
+                    this.$refs.todoPanel.view(v);
                     return true;
                 }
 
@@ -118,13 +128,13 @@ export default {
             setTimeout(() => {
                 this.$refs.list.edit(item, false);    // body
                 setTimeout(() => {
-                    this.$refs.creator.setMode("Edit");
+                    this.$refs.todoPanel.setMode("Edit");
                 });
             });
 
         },
         onSelect(item) {
-            this.$refs.creator.view(item);
+            this.$refs.todoPanel.view(item);
             this.editing = item;
 
             console.log('onSelect item', item);

@@ -3,7 +3,10 @@
         <div>
     
             <section class="todoapp">
-                <h3>Pending</h3>
+                <h3>
+                    <i class="fa fa-tasks"></i>
+                    Pending
+                </h3>
                 <div class="todo-wrap">
                     <header class="list-header">
     
@@ -13,7 +16,6 @@
                             <li class="pending" v-for="li in listPending" :key="li.id" @click="edit(li)" :class="{selected:li.id===selecting}">
                                 <div class="drag-handle"></div>
                                 <label>{{li.title}}</label>
-                                <button class="top tool clickable" title="top"></button>
                                 <button class=" tool finish clickable" title="finish"></button>
     
                             </li>
@@ -23,7 +25,10 @@
             </section>
     
             <section class="todoapp">
-                <h3>Created</h3>
+                <h3>
+                    <i class="fa fa-feed"></i>
+                    Created
+                </h3>
                 <div class="todo-wrap">
                     <header class="list-header"></header>
                     <section class="list-main">
@@ -31,9 +36,7 @@
                             <li class="pending" v-for="li in listCreated" :key="li.id" @click="edit(li)" :class="{selected:li.id===selecting}">
                                 <div class="drag-handle"></div>
                                 <label>{{li.title}}</label>
-                                <button class="top tool clickable" title="top"></button>
-                                <button class=" tool finish clickable" title="finish"></button>
-    
+                                <button v-if="li.status==='pending'" class=" tool finish clickable" title="finish"></button>
                             </li>
                         </ul>
                     </section>
@@ -41,7 +44,10 @@
             </section>
     
             <section class="todoapp">
-                <h3>Finished</h3>
+                <h3>
+                    <i class="fa fa-trash"></i>
+                    Finished
+                </h3>
                 <div class="todo-wrap">
                     <header class="list-header"></header>
                     <section class="list-main">
@@ -49,8 +55,8 @@
                             <li class="finished" v-for="li in listDone" :key="li.id" @click="edit(li)" :class="{selected:li.id===selecting}">
                                 <div class="drag-handle"></div>
                                 <label>{{li.title}}</label>
-                                <button class="top tool clickable" title="top"></button>
-                                <button class=" tool finish clickable" title="finish"></button>
+                                <button class=" tool restore clickable" title="restore"></button>
+                                <button class=" tool destroy clickable" title="destroy"></button>
     
                             </li>
                         </ul>
@@ -81,17 +87,17 @@ export default {
     computed: {
         listPending() {
             return this.list.filter((item) => {
-                return item.assignee === store.state.user.name && item.status === 'pending';
+                return item.owner === store.state.user.name && item.status === 'pending';
             });
         },
         listCreated() {
             return this.list.filter((item) => {
-                return item.creator === store.state.user.name;
+                return item.requestor === store.state.user.name;
             });
         },
         listDone() {
             return this.list.filter((item) => {
-                return item.assignee === store.state.user.name && item.status === 'done';
+                return item.owner === store.state.user.name && item.status === 'done';
             });
         }
     },

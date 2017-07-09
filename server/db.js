@@ -17,6 +17,15 @@ db.serialize(function () {
         );
     `, function (e) {});
 
+    db.run(`CREATE TABLE todo (
+        id INTEGER PRIMARY KEY,
+        Data TEXT,
+        Requestor TEXT,
+        Owner TEXT,      
+        FOREIGN KEY (Requestor) REFERENCES user(Name)
+        FOREIGN KEY (Owner) REFERENCES user(Name)
+        );
+    `, function (e) {});
     db.run(`CREATE TABLE room (
         Name VARCHAT(32),
         Admin VARCHAT(32),
@@ -44,18 +53,58 @@ db.serialize(function () {
     }, function (e) {
 
     });
-    //    db.run(`DELETE FROM user WHERE Name=$r;`, {
-    //        $r: 'robot10'
-    //    }, function (e) {
-    //        console.log(e);
-    //    });
-
-    //    db.all(`SELECT * FROM message ORDER BY id DESC LIMIT 1;
-    //            `, function (e, data) {
-    //        console.log(e, data)
-    //    });
 });
-//db.close();
+
+async function create($data, $requestor, $owner) {
+    let result;
+    result = await new Promise(function (resolve, reject) {
+        db.serialize(function () {
+            db.run(`INSERT INTO todo (Data,Requestor,Owner) VALUES ($data,$requestor,$owner);`, {
+                $data,
+                $requestor,
+                $owner,
+            }, function (e) {
+                if (e) {
+                    console.log(e);
+                    resolve(e);
+                } else {
+                    resolve(false);
+                }
+            });
+        });
+    });
+    return result;
+}
+
+async function getList($name) {
+    let result;
+    result = await new Promise(function (resolve, reject) {
+        db.serialize(function () {
+            db.all(`SELECT Data as data,Requestor as requestor,Owner as owner,id as id FROM todo WHERE Requestor=$name OR Owner=$name ;`, {
+                $name,
+            }, function (e, result) {
+                if (e) {
+                    console.log(e);
+                    reject(e);
+                } else {
+                    result.forEach((v) => {
+                        const parsed = JSON.parse(v.data);
+                        delete parsed.id;
+                        Object.assign(v, parsed);
+                        delete v.data;
+                    });
+                    if (!result) {
+                        reject(true);
+                    } else {
+                        resolve(result);
+                    }
+                }
+            });
+        });
+    });
+    return result;
+}
+
 async function login($name, $password) {
     let result;
     result = await new Promise(function (resolve, reject) {
@@ -113,33 +162,15 @@ async function getAvatar($name) {
     avatarCache[$name] = promise;
     return await promise;
 }
-async function getRoomsHistoryLength($room) {
-    let promise1 = new Promise(function (resolve, reject) {
-        db.all(`SELECT id FROM message WHERE Room = $room ORDER BY id DESC `, {
-            $room
-        }, function (e, data) {
-            if (e) {
-                console.log(e);
-                reject(e);
-            } else {
-                if (data) {
-                    resolve(data.length);
-                } else {
-                    resolve(0);
-                }
-            }
-        });
-    });
-    return await promise1;
-};
+
 async function getRoomsHistory($room, $id = Infinity, $num) {
     let promise = new Promise(function (resolve, reject) {
         db.all(`SELECT Content as content,Time as time,Type as type,Name as name,id FROM message WHERE Room = $room And id < $id ORDER BY id DESC LIMIT 0,$num;
                     `, {
-                        $room,
-                        $id,
-                        $num,
-                    }, function (e, data) {
+            $room,
+            $id,
+            $num,
+        }, function (e, data) {
             if (e) {
                 console.log(e);
                 reject(e);
@@ -421,5 +452,7 @@ export {
     joinRoom,
     saveMessage,
     getRoomsHistory,
-    setRoomInfo
+    setRoomInfo,
+    getList,
+    create
 }

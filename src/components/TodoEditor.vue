@@ -1,17 +1,26 @@
 <template>
     <div class="todo-editor">
         <div class="input-block">
-            <label for="new-todo-title">Todo Title</label>
+            <label for="new-todo-title">
+                <i class="fa fa-pencil"></i>
+                Todo Title
+            </label>
             <input type="text" id="new-todo-title" class="form-control" placeholder="Describe the task within a few words" v-model="title">
             <span class="id-detail">id:{{id}}</span>
         </div>
         <div class="input-block">
-            <label for="new-todo-content">Todo Description</label>
+            <label for="new-todo-content">
+                <i class="fa fa-paint-brush"></i>
+                Todo Description
+            </label>
             <textarea type="text" id="new-todo-content" class="form-control" placeholder="Write some details about the task" v-model="description"></textarea>
     
         </div>
         <div class="input-block">
-            <label>Tags</label>
+            <label>
+                <i class="fa fa-tags"></i>
+                Tags
+            </label>
             <div data-mode="Edit" class="selected-tags">
                 <span :key="tag" v-for="tag in selectedTags" class="selected-tag clickable" @click="removeTag(tag)">{{tag}}</span>
             </div>
@@ -21,7 +30,10 @@
     
         </div>
         <div class="input-block">
-            <label for="choose-priority">Priority</label>
+            <label for="choose-priority">
+                <i class="fa fa-bomb"></i>
+                Priority
+            </label>
             <select id="choose-priority" class="form-control" v-model="priority">
                 <option value="verbose">{{priorityMap.verbose}}</option>
                 <option value="normal">{{priorityMap.normal}}</option>
@@ -31,18 +43,27 @@
     
         </div>
         <div class="input-block">
-            <label for="choose-deadline">Deadline (not recommended)</label>
+            <label for="choose-deadline">
+                <i class="fa fa-calendar-o"></i>
+                Deadline (not recommended)
+            </label>
             <datepicker v-model="deadlineText"></datepicker>
     
         </div>
         <div class="input-block">
-            <label for="choose-assigner">Creator</label>
-            <input readonly type="text" id="choose-creator" class="form-control" v-model="creator">
+            <label for="choose-assigner">
+                <i class="fa fa-user-o"></i>
+                Requestor
+            </label>
+            <input readonly type="text" id="choose-requestor" class="form-control" v-model="realRequestor">
     
         </div>
         <div class="input-block">
-            <label for="choose-assignee">Assignee</label>
-            <input type="text" id="choose-assignee" class="form-control" v-model="assignee">
+            <label for="choose-owner">
+                <i class="fa fa-user-circle-o"></i>
+                Owner
+            </label>
+            <input type="text" id="choose-owner" class="form-control" v-model="owner">
     
         </div>
     
@@ -52,15 +73,15 @@
 <script>
 import $ from "jquery";
 import datepicker from 'vue-date';
-
+import store from 'store';
 const properties = {
     id: "",
     title: "",
     description: "",
-    creator: "",
+    requestor: "",
     deadline: "",
     deadlineText: "",
-    assignee: "",
+    owner: "",
     priority: "",
     selectedTags: [],
     commonTags: [],
@@ -105,7 +126,10 @@ export default {
         }
     },
     computed: {
-
+        userName: () => store.state.user.name,
+        realRequestor: function () {
+            return this.mode === 'Edit' ? this.requestor : this.userName;
+        }
     },
     props: ["change", 'mode'],
     watch: {
@@ -140,7 +164,7 @@ export default {
                     deadline: this.getDeadline(),
                     priority: this.priority,
                     selectedTags: this.selectedTags,
-                    assignee: this.assignee,
+                    owner: this.owner,
                 });
             } else if (this.mode === 'Edit') {
                 return ({
@@ -150,13 +174,26 @@ export default {
                     deadline: this.getDeadline(),
                     priority: this.priority,
                     selectedTags: this.selectedTags,
-                    assignee: this.assignee,
+                    owner: this.owner,
                 });
             }
         },
         set(info) {
             Object.assign(this, info);
             this.preventEdit = true;
+
+            this.commonTags = JSON.parse(JSON.stringify(store.state.commonTags));
+            if (info.selectedTags) {
+                info.selectedTags.forEach((v) => {
+                    const index = this.commonTags.indexOf(v);
+                    if (index > -1) {
+                        this.commonTags.splice(index, 1);
+                    }
+
+                });
+            }
+
+
             setTimeout(() => {
                 this.preventEdit = false;
             });

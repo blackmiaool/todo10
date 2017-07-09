@@ -1,35 +1,57 @@
 <template>
     <div class="todo-viewer">
         <div class="input-block">
-            <label for="new-todo-title">Todo Title</label>
+            <label for="new-todo-title">
+                <i class="fa fa-pencil"></i>
+                Todo Title
+            </label>
             <p>{{title}}</p>
             <span class="id-detail">id:{{id}}</span>
         </div>
         <div class="input-block">
-            <label for="new-todo-content">Todo Description</label>
+            <label for="new-todo-content">
+                <i class="fa fa-paint-brush"></i>
+                Todo Description
+            </label>
             <p>{{description}}</p>
         </div>
         <div class="input-block">
-            <label>Tags</label>
+            <label>
+                <i class="fa fa-tags"></i>
+                Tags
+            </label>
             <div data-mode="View" class="selected-tags">
                 <span :key="tag" v-for="tag in selectedTags" class="selected-tag clickable" @click="removeTag(tag)">{{tag}}</span>
             </div>
         </div>
         <div class="input-block">
-            <label for="choose-priority">Priority</label>
+    
+            <label for="choose-priority">
+                <i class="fa fa-bomb"></i>
+                Priority
+            </label>
             <p>{{priorityMap[priority]}}</p>
         </div>
         <div class="input-block">
-            <label for="choose-deadline">Deadline (not recommended)</label>
+            <label for="choose-deadline">
+                <i class="fa fa-calendar-o"></i>
+                Deadline (not recommended)
+            </label>
             <p>{{formattedDeadline}}</p>
         </div>
         <div class="input-block">
-            <label for="choose-assigner">Creator</label>
-            <p>{{creator}}</p>
+            <label for="choose-assigner">
+                <i class="fa fa-user-o"></i>
+                Requestor
+            </label>
+            <p>{{requestor}}</p>
         </div>
         <div class="input-block">
-            <label for="choose-assignee">Assignee</label>
-            <p>{{assignee}}</p>
+            <label for="choose-owner">
+                <i class="fa fa-user-circle-o"></i>
+                owner
+            </label>
+            <p>{{owner}}</p>
         </div>
     </div>
 </template>
@@ -64,10 +86,10 @@ export default {
             id: 0,
             title: "",
             description: "",
-            creator: "",
+            requestor: "",
             deadline: 0,
             deadlineText: "",
-            assignee: "",
+            owner: "",
             priority: "",
             unsaved: true,
             selectedTags: "",
@@ -96,9 +118,9 @@ export default {
             Object.assign(this, info);
         },
         edit() {
-            console.log(store.state.user.name, this.assignee);
-            if (this.creator !== store.state.user.name && this.assignee !== store.state.user.name) {
-                alert("Only creator or assignee can mutate it");
+            console.log(store.state.user.name, this.owner);
+            if (this.requestor !== store.state.user.name && this.owner !== store.state.user.name) {
+                alert("Only requestor or owner can mutate it");
                 return;
             }
             this.$emit("edit");

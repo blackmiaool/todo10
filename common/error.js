@@ -51,6 +51,9 @@ const map = {
     "17": {
         msg: "Priority needed"
     },
+    "18": {
+        msg: "Requestor needed"
+    },
 
 }
 for (const i in map) {
