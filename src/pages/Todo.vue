@@ -1,7 +1,7 @@
 <template>
     <div class="top-page-wrap todo-page">
         <TodoPanel v-if="userName" ref="todoPanel" @create="onCreate" :editing="editing" @save="onSave" @fork="onFork"></TodoPanel>
-        <TodoList :list="list" ref="list" @select="onSelect"></TodoList>
+        <TodoList :list="list" ref="list" @select="onSelect" @finish="onFinish"></TodoList>
         <TodoInfo></TodoInfo>
     </div>
 </template>
@@ -23,17 +23,15 @@ export default {
     created() {
     },
     beforeRouteEnter(to, from, next) {
+        if (!socket.context.logged) {
+            return next("/login");
+        }
         next(vm => {
-            console.log('socket', socket.context.logged)
-            if (!socket.context.logged) {
-                router.replace("/login")
-                return;
-            }
             setTimeout(() => {
                 if (!vm.$refs.todoPanel) {
                     return;
                 }
-                vm.$refs.todoPanel.set(vm.list[0]);
+                // vm.$refs.todoPanel.set(vm.list[0]);
                 vm.$refs.todoPanel.setMode("Create");
                 socket.emit("getList", {}, (result) => {
                     console.log('result', result)
@@ -97,6 +95,14 @@ export default {
     },
 
     methods: {
+        onFinish(item) {
+            item = JSON.parse(JSON.stringify(item));
+            item.status = 'done';
+            socket.emit("edit", item, (result) => {
+                this.list = result;
+                console.log('result', result)
+            });
+        },
         onCreate(item) {
             item = JSON.parse(JSON.stringify(item));
             item.status = 'pending';
@@ -104,20 +110,31 @@ export default {
                 this.list = result;
                 console.log('result', result)
             });
-
-            // item.id = parseInt(Math.random() * 1000);
-            // this.list.push(item);
         },
         onSave(item) {
             console.log('onSave', item);
-            this.list.some((v, i) => {
-                if (v.id === item.id) {
-                    Object.assign(v, item);
-                    this.$refs.todoPanel.view(v);
-                    return true;
+            const id = item.id;
+            socket.emit("edit", item, (result) => {
+                this.list = result;
+                console.log('result', result)
+                const target = this.list.find(li => li.id === id);
+                console.log('target', id, target)
+                if (target) {
+                    this.$refs.todoPanel.view(target);
+                    this.editing = target;
                 }
-
             });
+
+
+            // this.editing = item;
+            // this.list.some((v, i) => {
+            //     if (v.id === item.id) {
+            //         Object.assign(v, item);
+            //         this.$refs.todoPanel.view(v);
+            //         return true;
+            //     }
+
+            // });
 
         },
         onFork(item) {

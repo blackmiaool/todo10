@@ -79,6 +79,21 @@ function init(io) {
                 return;
             }
         });
+        socket.on('edit', async(data, cb) => {
+            if (!socket.context.name) {
+                cb(errorMap[13]);
+                return;
+            }
+            const id = data.id;
+            const owner = data.owner;
+            const requestor = data.requestor;
+            delete data.id;
+            delete data.owner;
+            delete data.requestor;
+            await db.edit(id, JSON.stringify(data), requestor, owner);
+            const list = await db.getList(socket.context.name);
+            cb(list);
+        });
         let user;
         socket.on('create', async(data, cb) => {
             if (!socket.context.name) {

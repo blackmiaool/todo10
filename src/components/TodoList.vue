@@ -16,7 +16,7 @@
                             <li class="pending" v-for="li in listPending" :key="li.id" @click="edit(li)" :class="{selected:li.id===selecting}">
                                 <div class="drag-handle"></div>
                                 <label>{{li.title}}</label>
-                                <button class=" tool finish clickable" title="finish"></button>
+                                <button class=" tool finish clickable" title="finish" @click="finish(li,$event)"></button>
     
                             </li>
                         </ul>
@@ -36,7 +36,7 @@
                             <li class="pending" v-for="li in listCreated" :key="li.id" @click="edit(li)" :class="{selected:li.id===selecting}">
                                 <div class="drag-handle"></div>
                                 <label>{{li.title}}</label>
-                                <button v-if="li.status==='pending'" class=" tool finish clickable" title="finish"></button>
+                                <button v-if="li.status==='pending'" class=" tool finish clickable" title="finish" @click="finish(li,$event)"></button>
                             </li>
                         </ul>
                     </section>
@@ -114,6 +114,10 @@ export default {
 
     },
     methods: {
+        finish(item, $event) {
+            this.$emit("finish", item);
+            $event.stopPropagation();
+        },
         edit(item) {
             this.selecting = item.id;
             this.$emit("select", item);

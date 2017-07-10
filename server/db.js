@@ -55,6 +55,28 @@ db.serialize(function () {
     });
 });
 
+async function edit($id, $data, $requestor, $owner) {
+    let result;
+    result = await new Promise(function (resolve, reject) {
+        db.serialize(function () {
+            db.run(`UPDATE todo SET Data=$data,Requestor=$requestor,Owner=$owner WHERE id=$id;`, {
+                $id,
+                $data,
+                $requestor,
+                $owner,
+            }, function (e) {
+                if (e) {
+                    console.log(e);
+                    resolve(e);
+                } else {
+                    resolve(false);
+                }
+            });
+        });
+    });
+    return result;
+}
+
 async function create($data, $requestor, $owner) {
     let result;
     result = await new Promise(function (resolve, reject) {
@@ -454,5 +476,6 @@ export {
     getRoomsHistory,
     setRoomInfo,
     getList,
-    create
+    create,
+    edit
 }

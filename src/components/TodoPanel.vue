@@ -6,14 +6,20 @@
         </h2>
         <TodoViewer ref="viewer" v-if="mode==='View'" :editing="editing"></TodoViewer>
         <TodoEditor ref="editor" v-if="mode==='Edit'||mode==='Create'" @change="onChange" :mode="mode"></TodoEditor>
-    
-        <div class="input-block">
+        <!--<div class="create-btn">
+                                                    <i class="fa fa-plus-square-o"></i>
+                                                </div>-->
+        <div>
             <button v-if="mode==='Create'" class="btn btn-success submit" @click="create">
                 <i class="fa fa-arrow-circle-o-up"></i> Create</button>
             <button v-if="mode==='View'" class="btn btn-primary submit" @click="edit">
                 <i class="fa fa-pencil-square-o"></i> Edit</button>
             <button v-if="mode==='View'" class="btn btn-success submit" @click="fork">
                 <i class="fa fa-code-fork"></i> Copy and Create (fork)</button>
+            <button v-if="mode==='View'" class="btn btn-default submit" @click="newOne">
+                <i class="fa fa-plus-square-o"></i>
+                New
+            </button>
             <button v-if="mode==='Edit'" class="btn btn-success submit" @click="save">
                 <i class="fa fa-save"></i> Save</button>
         </div>
@@ -129,6 +135,9 @@ export default {
         create() {
             this.$emit('create', this.$refs.editor.get());
         },
+        newOne() {
+            this.setMode('Create');
+        }
     },
     components: {
         datepicker,

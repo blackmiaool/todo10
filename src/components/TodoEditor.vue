@@ -174,6 +174,7 @@ export default {
                     deadline: this.getDeadline(),
                     priority: this.priority,
                     selectedTags: this.selectedTags,
+                    requestor: this.requestor,
                     owner: this.owner,
                 });
             }
