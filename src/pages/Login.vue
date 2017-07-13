@@ -16,7 +16,13 @@
                 </div>
             </div>
             <div class="bottom-half-panel">
-                <div v-if="mode==='register'" @click="refreshAvatar()" class="avatar-preview" :style="{'background-image':'url('+avatar+')'}"></div>
+                <div class="middle" :class="{'third-support':third.length,middle:true}">
+                    <div v-if="mode==='register'" @click="refreshAvatar()" class="avatar-preview clickable" :style="{'background-image':'url('+avatar+')'}"></div>
+                    <div class="thrid-entry clickable" v-for="thirdWay in third" :key="thirdWay" @click="thirdWay.cb(onThird(thirdWay.name))">
+                        <img :src="thirdWay.icon" alt="">
+                    </div>
+                </div>
+    
                 <label class="remember">
                     <input v-model="remember" type="checkbox"> Remember me
                 </label>
@@ -68,7 +74,9 @@ export default {
             remember: true,
         }
     },
-    computed: {},
+    computed: {
+        third: () => store.state.port.login
+    },
     mounted() {
         this.refreshAvatar();
 
@@ -149,6 +157,18 @@ export default {
             }
 
         },
+        onThird(mode) {
+            return (data) => {
+                console.log('onthird', mode, data)
+                console.log(data);
+                $.post(`//${location.hostname}:${config.serverPort}/third`, {
+                    mode,
+                    data
+                }, (result) => {
+                });
+            }
+
+        },
         send() {
 
             this.webError = {};
@@ -165,7 +185,7 @@ export default {
 
 
             if (this.mode === "register") {
-                $.post("//" + location.hostname + `:${config.serverPort}/${this.mode}`, {
+                $.post(`//${location.hostname}:${config.serverPort}/${this.mode}`, {
                     name: this.name,
                     password: handlePwd(this.password),
                     avatar: this.avatar

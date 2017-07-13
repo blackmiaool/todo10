@@ -1,7 +1,7 @@
 <template>
     <div class="top-page-wrap todo-page">
-        <TodoPanel v-if="userName" ref="todoPanel" @create="onCreate" :editing="editing" @save="onSave" @fork="onFork"></TodoPanel>
-        <TodoList :list="list" ref="list" @select="onSelect" @finish="onFinish"></TodoList>
+        <TodoPanel v-if="userName" ref="todoPanel" @create="onCreate" :editing="editing" @save="onSave" @fork="onFork" @newOne="onNew"></TodoPanel>
+        <TodoList :list="list" ref="list" @select="onSelect" @finish="onFinish" @restore="onRestore"></TodoList>
         <TodoInfo></TodoInfo>
     </div>
 </template>
@@ -18,9 +18,16 @@ import TodoList from 'components/TodoList';
 import TodoInfo from 'components/TodoInfo';
 import store from 'store';
 
+function e() {
+    console.log(e)
+    return this.d;
+}
 export default {
     name: 'Todo',
     created() {
+        setTimeout(() => {
+
+        }, 100);
     },
     beforeRouteEnter(to, from, next) {
         if (!socket.context.logged) {
@@ -28,29 +35,32 @@ export default {
         }
         next(vm => {
             setTimeout(() => {
-                if (!vm.$refs.todoPanel) {
-                    return;
-                }
-                // vm.$refs.todoPanel.set(vm.list[0]);
-                vm.$refs.todoPanel.setMode("Create");
-                socket.emit("getList", {}, (result) => {
-                    console.log('result', result)
-                    vm.list = result;
-                });
+                vm.init.call(vm);
             }, 100);
         });
     },
     computed: {
-        userName: () => store.state.user && store.state.user.name
+        userName: () => store.state.user && store.state.user.name,
+        a: function () {
+            if (this.b) {
+                return this.c;
+            } else {
+                return e.call(this);
+            }
+        }
     },
     mounted() {
-        store.commit("setCommonTags", ['编辑器', '活动', 'app-rn', '小程序'])
-
+        this.init();
+        store.commit("setCommonTags", ['编辑器', '活动', 'app-rn', '小程序', 'rnrender'])
     },
     data() {
         return {
+            b: true,
+            c: 2,
+            d: 3,
             mode: "Create",
             editing: undefined,
+            initialized: false,
             list: [
                 {
                     title: "测试1",
@@ -95,6 +105,29 @@ export default {
     },
 
     methods: {
+        init() {
+            if (this.initialized) {
+                return;
+            }
+            if (!this.$refs.todoPanel) {
+                return;
+            }
+            this.initialized = true;
+            // vm.$refs.todoPanel.set(vm.list[0]);
+            this.$refs.todoPanel.setMode("Create");
+            socket.emit("getList", {}, (result) => {
+                console.log('result', result)
+                this.list = result;
+            });
+        },
+        onRestore(item) {
+            item = JSON.parse(JSON.stringify(item));
+            item.status = 'pending';
+            socket.emit("edit", item, (result) => {
+                this.list = result;
+                console.log('result', result)
+            });
+        },
         onFinish(item) {
             item = JSON.parse(JSON.stringify(item));
             item.status = 'done';
@@ -139,22 +172,26 @@ export default {
         },
         onFork(item) {
             item = JSON.parse(JSON.stringify(item));
-            item.id = parseInt(Math.random() * 1000);
-            this.list.push(item);
-
+            delete item.id;
+            this.$refs.todoPanel.setMode("Create");
+            this.$refs.list.clear();
+            console.log(item)
             setTimeout(() => {
-                this.$refs.list.edit(item, false);    // body
-                setTimeout(() => {
-                    this.$refs.todoPanel.setMode("Edit");
-                });
+                this.$refs.todoPanel.set(item);
             });
-
         },
         onSelect(item) {
             this.$refs.todoPanel.view(item);
             this.editing = item;
 
             console.log('onSelect item', item);
+        },
+        onNew() {
+            this.$refs.todoPanel.setMode('Create');
+            this.$refs.list.clear();
+            setTimeout(() => {
+                this.$refs.todoPanel.set({});
+            })
         },
     },
     components: {

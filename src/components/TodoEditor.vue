@@ -152,7 +152,7 @@ export default {
         getDeadline() {
             let deadline = 0;
             if (this.deadlineText) {
-                deadline = new Date(this.deadlineText).getTime();
+                deadline = new Date(this.deadlineText + " 00:00:00").getTime();
             }
             return deadline;
         },
@@ -165,6 +165,7 @@ export default {
                     priority: this.priority,
                     selectedTags: this.selectedTags,
                     owner: this.owner,
+                    status: this.status,
                 });
             } else if (this.mode === 'Edit') {
                 return ({
@@ -176,10 +177,14 @@ export default {
                     selectedTags: this.selectedTags,
                     requestor: this.requestor,
                     owner: this.owner,
+                    status: this.status,
                 });
             }
         },
         set(info) {
+            if (!info.deadline) {
+                info.deadline = '';
+            }
             Object.assign(this, info);
             this.preventEdit = true;
 

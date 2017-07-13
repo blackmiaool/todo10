@@ -46,20 +46,33 @@ height:100%;
     .deep-select {
         position: relative;
     }
-    .avatar-preview {
-        height: 44px;
-        width: 44px;
-        position: relative;
-        background-size: contain;
-        margin: auto;
-        margin-bottom: 10px;
+    .middle {
+        text-align: center;
+        &.third-support {
+            text-align: left;
+        }
+        .thrid-entry {
+            float: right;
+            .square(44px);
+            img {
+                .fill;
+            }
+        }
+        .avatar-preview {
+            height: 44px;
+            width: 44px;
+            position: relative;
+            background-size: contain;
+            display: inline-block;
+            margin-bottom: 10px;
+        }
     }
     .remember {
         text-align: center;
         display: inline-block;
         height: 28px;
         margin: 0;
-        margin-top: 3px;
+        margin-top: 5px;
         input {
             .square(20px);
             display: inline-block;

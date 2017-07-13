@@ -13,7 +13,7 @@
                 <i class="fa fa-paint-brush"></i>
                 Todo Description
             </label>
-            <p>{{description}}</p>
+            <pre>{{description}}</pre>
         </div>
         <div class="input-block">
             <label>
@@ -21,7 +21,7 @@
                 Tags
             </label>
             <div data-mode="View" class="selected-tags">
-                <span :key="tag" v-for="tag in selectedTags" class="selected-tag clickable" @click="removeTag(tag)">{{tag}}</span>
+                <span :key="tag" v-for="tag in selectedTags" class="selected-tag clickable">{{tag}}</span>
             </div>
         </div>
         <div class="input-block">
@@ -104,10 +104,18 @@ export default {
     },
     computed: {
         formattedDeadline() {
-            return new Date(this.deadline).format("yyyy-MM-dd hh:mm:ss");
+            if (this.deadline) {
+                return new Date(this.deadline).format("yyyy-MM-dd hh:mm:ss");
+            } else {
+                return "No deadline"
+            }
+
         },
         editMode: function () {
             return this.mode === 'Create' || this.mode === 'Edit';
+        },
+        descriptionHandled: function () {
+            return this.description.replace(/\n/g, "<br/>")
         }
     },
     props: [],

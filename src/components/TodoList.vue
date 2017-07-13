@@ -33,7 +33,7 @@
                     <header class="list-header"></header>
                     <section class="list-main">
                         <ul class="todo-list">
-                            <li class="pending" v-for="li in listCreated" :key="li.id" @click="edit(li)" :class="{selected:li.id===selecting}">
+                            <li class="pending" v-for="li in listCreated" :key="li.id" @click="edit(li)" :class="{selected:li.id===selecting,finished:li.status==='done'}">
                                 <div class="drag-handle"></div>
                                 <label>{{li.title}}</label>
                                 <button v-if="li.status==='pending'" class=" tool finish clickable" title="finish" @click="finish(li,$event)"></button>
@@ -55,8 +55,8 @@
                             <li class="finished" v-for="li in listDone" :key="li.id" @click="edit(li)" :class="{selected:li.id===selecting}">
                                 <div class="drag-handle"></div>
                                 <label>{{li.title}}</label>
-                                <button class=" tool restore clickable" title="restore"></button>
-                                <button class=" tool destroy clickable" title="destroy"></button>
+                                <button class=" tool restore clickable" title="restore" @click="restore(li,$event)"></button>
+                                <button class=" tool destroy clickable" title="destroy" @click="destroy(li,$event)"></button>
     
                             </li>
                         </ul>
@@ -118,11 +118,21 @@ export default {
             this.$emit("finish", item);
             $event.stopPropagation();
         },
+        restore(item, $event) {
+            this.$emit("restore", item);
+            $event.stopPropagation();
+        },
+        destroy(item, $event) {
+            this.$emit("destroy", item);
+            $event.stopPropagation();
+        },
         edit(item) {
             this.selecting = item.id;
             this.$emit("select", item);
-        }
-
+        },
+        clear(item) {
+            this.selecting = undefined;
+        },
     },
     components: {
 

@@ -33,6 +33,7 @@ module.exports = {
             'eventHub': path.resolve(__dirname, '../src/eventHub'),
             'settings': path.resolve(__dirname, '../src/settings'),
             'store': path.resolve(__dirname, '../src/store'),
+            'port': path.resolve(__dirname, '../port'),
         },
         modules: [
             path.resolve('../src'),

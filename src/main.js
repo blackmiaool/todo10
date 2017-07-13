@@ -9,7 +9,7 @@ import socket from './io';
 
 import LeftTabs from './components/LeftTabs';
 import VueRouter from 'vue-router';
-
+require("port");
 require("./less/style.less");
 
 /* eslint-disable no-new */
