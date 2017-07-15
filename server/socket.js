@@ -8,17 +8,12 @@ import {
 } from "../common/error.js";
 // const md5 = require('md5');
 const db = require('./db.js');
+const fs = require('fs');
+const randtoken = require('rand-token');
 // const roomMap = {};
 // const fs = require('fs');
-// const config = require("../config.js");
+const config = require("../config.js");
 const uaParser = require('ua-parser-js');
-
-function isEmptyObject(a) {
-    for (var i in a) {
-        return false;
-    }
-    return true;
-}
 
 const userMap = {}
 class User {
@@ -69,16 +64,7 @@ function doNothing() {
 function init(io) {
     io.on('connection', function (socket) {
         socket.context = {};
-        socket.on('message', function ({
-            room: roomName,
-            type,
-            content
-        }, cb = doNothing) {
-            if (!socket.context.name) {
-                cb(errorMap[13]);
-                return;
-            }
-        });
+
         socket.on('edit', async(data, cb) => {
             if (!socket.context.name) {
                 cb(errorMap[13]);
@@ -103,9 +89,12 @@ function init(io) {
             const owner = data.owner;
             data.status = 'pending';
             delete data.owner;
-            await db.create(JSON.stringify(data), socket.context.name, owner);
+            const id = await db.create(JSON.stringify(data), socket.context.name, owner);
             const list = await db.getList(socket.context.name);
-            cb(list);
+            cb({
+                id,
+                list
+            });
         });
         socket.on('getList', async(data, cb) => {
             if (!socket.context.name) {
@@ -115,16 +104,91 @@ function init(io) {
             const list = await db.getList(socket.context.name);
             cb(list);
         });
-        socket.on('login', (data, cb) => {
-            const checkResult = registerCheck("server", data.name, data.password);
-            //            console.log(data.name, socket.handshake.headers['user-agent'])
+        async function register({
+            name,
+            email,
+            password,
+            avatar,
+            mode
+        }, cb) {
+            if (!mode) { //just check data input by user
+                const checkResult = registerCheck("server", 'register', name, email, password);
 
-            if (checkResult) {
-                checkResult.code = 1;
-                cb(checkResult);
-                return;
+                if (checkResult) {
+                    checkResult.code = 1;
+                    cb(checkResult);
+                    return;
+                }
             }
-            db.login(data.name, data.password).then(function (result) {
+            let avatarSrc;
+            let buf;
+            if (!mode) {
+                avatarSrc = `//${config.domain}:${config.serverPort}/avatar/${name}.png`; //TODO must use config file to determine domain
+                buf = Buffer.from(avatar.slice(22), 'base64');
+            } else {
+                avatarSrc = avatar;
+                password = randtoken.generate(32);
+            }
+
+            const result = await db.register(name, email, password, avatarSrc);
+            if (!result) {
+                if (!mode) {
+                    fs.writeFileSync(`${__dirname}/public/avatar/${name}.png`, buf);
+                }
+                cb(successData({
+                    password,
+                    name,
+                    avatar,
+                }));
+            } else {
+                if (result.code === 'SQLITE_CONSTRAINT') {
+                    cb({
+                        key: "name",
+                        msg: "Username exists",
+                    })
+                } else {
+                    cb({
+                        key: "name",
+                        msg: "Fail to write into db",
+                    })
+                }
+            }
+        }
+        socket.on('register', register);
+        socket.on('login', async(data, cb) => {
+            //            console.log(data.name, socket.handshake.headers['user-agent'])
+            let name;
+            let avatar;
+            let email = data.email;
+            const mode = data.mode;
+            if (!data.mode) {
+                email = data.email;
+                const checkResult = registerCheck("server", 'login',
+                    data.name, data.email, data.password);
+                if (checkResult) {
+                    checkResult.code = 1;
+                    cb(checkResult);
+                    return;
+                }
+            } else {
+                const {
+                    getInfo
+                } = require(`../port/login/${data.mode}/server.js`);
+                const result = await getInfo(data.data);
+                name = result.name;
+                avatar = result.avatar;
+                email = result.email;
+            }
+            console.log('try', {
+                email,
+                password: data.password,
+                mode
+            })
+            db.login({
+                email,
+                password: data.password,
+                mode
+            }).then(function (result) {
                 if (socket.context.name) { //already logged in
                     const user = User.getUser(socket.context.name);
                     user.disconnectClient(socket);
@@ -140,17 +204,31 @@ function init(io) {
                 cb(successData({
                     name: user.name,
                     avatar: user.avatar,
+                    password: result.password,
+                    email,
                 }));
             }).catch(function (result) {
                 let ret;
-                console.log(result);
-                if (result === true) {
-                    ret = getError(6);
-                    ret.key = "password";
+                console.log(1, result);
+                if (!data.mode) {
+                    if (result === -1 || result === -2) {
+                        ret = getError(6);
+                        ret.key = "password";
+                    } else {
+                        ret = errorMap[1];
+                    }
+                    cb(ret);
                 } else {
-                    ret = errorMap[1];
+                    if (result === -1) {
+                        console.log('register');
+                        register({
+                            name,
+                            email,
+                            mode,
+                            avatar
+                        }, cb)
+                    }
                 }
-                cb(ret);
             });
         })
     });

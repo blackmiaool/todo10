@@ -2,9 +2,13 @@
     <div class="top-page-wrap login-page">
         <div class="login-panel">
             <div class="top-half-panel">
-                <div class="input-block">
+                <div class="input-block" v-if="mode==='register'">
                     <input name="name" class="form-control" type="text" placeholder="Username" v-model="name">
                     <div class="err" v-if="webError.name">{{webError.name}}</div>
+                </div>
+                <div class="input-block">
+                    <input name="email" class="form-control" type="email" placeholder="Email" v-model="email">
+                    <div class="err" v-if="webError.email">{{webError.email}}</div>
                 </div>
                 <div class="input-block">
                     <input name="password" class="form-control" type="password" placeholder="Password" v-model="password">
@@ -72,6 +76,7 @@ export default {
             serverError: {},
             webError: {},
             remember: true,
+            email: "",
         }
     },
     computed: {
@@ -80,16 +85,13 @@ export default {
     mounted() {
         this.refreshAvatar();
 
-        const {
-                name,
-            password
-            } = JSON.parse(localStorage.getItem("god-account")) || {};
+        const { email, password } = JSON.parse(localStorage.getItem("god-account")) || {};
 
         socket.on("connect", () => {
             if (cacheLoginInfo) {
-                this.doLogin(cacheLoginInfo.name, cacheLoginInfo.password);
-            } else if (name) {
-                this.doLogin(name, password);
+                this.doLogin(cacheLoginInfo.email, cacheLoginInfo.password);
+            } else if (email) {
+                this.doLogin(email, password);
             }
         });
         socket.on("disconnect", () => {
@@ -107,39 +109,10 @@ export default {
             this.mode = mode;
             this.webError = {};
         },
-        doLogin(name, password) {
-            socket.emit("login", {
-                name: name || this.name,
-                password: password || handlePwd(this.password)
-            }, (result) => {
 
-                if (!result.code) {
-                    if (!name) { //login with input info
-                        cacheLoginInfo = {
-                            name: this.name,
-                            password: handlePwd(this.password)
-                        };
-                        if (this.remember) {
-                            localStorage.setItem("god-account", JSON.stringify({
-                                name: this.name,
-                                password: handlePwd(this.password)
-                            }));
-                        }
-                    }
-                    this.onSuccess(result.data);
-                } else if (result.key) {
-                    this.webError = {
-                        [result.key]: result.msg
-                    }
-                } else if (result.msg) {
-                    alert(result.msg);
-                } else {
-                    alert("error");
-                }
-            });
-        },
         onSuccess(data) {
-            store.commit("setUser", { avatar: data.avatar, name: data.name })
+            console.log('onSuccess')
+            store.commit("setUser", { avatar: data.avatar, name: data.name, email: data.email })
             this.$root.avatar = data.avatar;
             this.$root.userName = data.name;
             this.$root.connected = true;
@@ -161,19 +134,77 @@ export default {
             return (data) => {
                 console.log('onthird', mode, data)
                 console.log(data);
-                $.post(`//${location.hostname}:${config.serverPort}/third`, {
-                    mode,
-                    data
-                }, (result) => {
-                });
+                this.doLogin(data.email, data.password, mode);
+                socket.emit("login", {
+                    data,
+                    mode
+                }, this.onLogin.bind(this));
+                // $.post(`//${location.hostname}:${config.serverPort}/third`, {
+                //     mode,
+                //     data
+                // }, (result) => {
+                // });
             }
 
+        },
+        onLogin(result) {
+            console.log('login', result)
+            if (!result.code) {
+                if (true) { //login with input info
+                    cacheLoginInfo = {
+                        email: this.email,
+                        password: handlePwd(this.password)
+                    };
+                    if (this.remember) {
+                        localStorage.setItem("god-account", JSON.stringify({
+                            email: result.data.email,
+                            password: result.data.password
+                        }));
+                    }
+                }
+                this.onSuccess(result.data);
+            } else if (result.key) {
+                this.webError = {
+                    [result.key]: result.msg
+                }
+            } else if (result.msg) {
+                alert(result.msg);
+            } else {
+                alert("error");
+            }
+        },
+        doLogin(email, password, mode) {
+            socket.emit("login", {
+                email: email || this.email,
+                password: password || handlePwd(this.password),
+                mode
+            }, this.onLogin.bind(this));
+        },
+        doRegister() {
+            socket.emit("register", {
+                name: this.name,
+                email: this.email,
+                password: handlePwd(this.password),
+                avatar: this.avatar
+            }, (result) => {
+                if (result.code === 0) {
+                    this.doLogin();
+                } else if (result.key) {
+                    this.webError = {
+                        [result.key]: result.msg
+                    }
+                } else if (result.msg) {
+                    alert(result.msg);
+                } else {
+                    alert("error");
+                }
+            })
         },
         send() {
 
             this.webError = {};
 
-            const checkResult = registerCheck("web", this.name, md5(this.password), this.password2 && this.mode === "register" ? md5(this.password2) : '');
+            const checkResult = registerCheck("web", this.mode, this.name, this.email, md5(this.password), this.password2 && this.mode === "register" ? md5(this.password2) : '');
 
             if (checkResult) {
                 this.webError = {
@@ -182,27 +213,26 @@ export default {
                 return;
             }
 
-
-
             if (this.mode === "register") {
-                $.post(`//${location.hostname}:${config.serverPort}/${this.mode}`, {
-                    name: this.name,
-                    password: handlePwd(this.password),
-                    avatar: this.avatar
-                }, (result) => {
-                    if (!result.code) {
-                        this.doLogin();
-                    } else if (result.key) {
-                        this.webError = {
-                            [result.key]: result.msg
-                        }
-                    } else if (result.msg) {
-                        alert(result.msg);
-                    } else {
-                        alert("error");
-                    }
+                this.doRegister();
+                // $.post(`//${location.hostname}:${config.serverPort}/${this.mode}`, {
+                //     name: this.name,
+                //     password: handlePwd(this.password),
+                //     avatar: this.avatar
+                // }, (result) => {
+                //     if (!result.code) {
+                //         this.doLogin();
+                //     } else if (result.key) {
+                //         this.webError = {
+                //             [result.key]: result.msg
+                //         }
+                //     } else if (result.msg) {
+                //         alert(result.msg);
+                //     } else {
+                //         alert("error");
+                //     }
 
-                });
+                // });
             } else {
                 this.doLogin();
             }

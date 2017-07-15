@@ -139,9 +139,9 @@ export default {
         onCreate(item) {
             item = JSON.parse(JSON.stringify(item));
             item.status = 'pending';
-            socket.emit("create", item, (result) => {
-                this.list = result;
-                console.log('result', result)
+            socket.emit("create", item, ({ id, list }) => {
+                this.list = list;
+                this.$refs.list.edit(list.find(li => li.id === id));
             });
         },
         onSave(item) {

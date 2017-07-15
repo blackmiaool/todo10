@@ -54,6 +54,12 @@ const map = {
     "18": {
         msg: "Requestor needed"
     },
+    "19": {
+        msg: "Invalid mode"
+    },
+    "20": {
+        msg: 'Username exist'
+    },
 
 }
 for (const i in map) {
@@ -74,7 +80,7 @@ function getError(index, extra) {
     return ret;
 }
 
-function successData(data) {
+function successData(data = {}) {
     const ret = JSON.parse(JSON.stringify(map[0]));
     ret.data = data;
     return ret;

@@ -33,10 +33,6 @@ var avatar = require('./avatar-generator')({
     //    convert: 'convert' //Path to imagemagick convert
 });
 
-
-app.use(convert(views(__dirname + '/views', {
-    extension: 'jade'
-})));
 //
 //avatar(Math.random() + "", 'male', 20)
 //    .toBuffer(function (err, buffer) {
@@ -51,7 +47,6 @@ router.post('/avatar', async(ctx, next) => {
                 resolve();
             });
     });
-
 });
 
 function getFileName(name) {
@@ -100,7 +95,6 @@ router.post('/login', async(ctx, next) => {
                 code: 2,
                 msg: "Fail to access db",
             }
-
         }
     }
 
@@ -118,7 +112,6 @@ router.post('/register', async(ctx, next) => {
         const buf = Buffer.from(avatar.slice(22), 'base64');
         const avatarSrc = "//" + config.domain + `:${config.serverPort}/avatar/${name}.png`; //TODO must use config file to determine domain
         console.log(avatarSrc, "avatarSrc");
-
 
         const result = await db.register(name, password, avatarSrc);
         if (!result) {
@@ -140,7 +133,6 @@ router.post('/register', async(ctx, next) => {
                     msg: "Fail to write into db",
                 }
             }
-
         }
     }
 
@@ -157,9 +149,8 @@ app.use(router.routes())
 
 app.on('error', function (err, ctx) {
     console.log(err)
-        //    logger.error('server error', err, ctx);
+    //    logger.error('server error', err, ctx);
 });
-
 
 console.log((new Date()).toLocaleTimeString());
 var server = require('http').createServer(app.callback());

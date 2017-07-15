@@ -11,6 +11,5 @@ module.exports = {
         const handle = window.open("http://support.io.mi.srv/miot_editor/tools/login.html");
     },
     title: name + "登录",
-    icon: require("./logo.png")
-
+    icon: require("./logo.png"),
 }

@@ -37,6 +37,9 @@
                                 <div class="drag-handle"></div>
                                 <label>{{li.title}}</label>
                                 <button v-if="li.status==='pending'" class=" tool finish clickable" title="finish" @click="finish(li,$event)"></button>
+    
+                                <button v-if="li.status==='done'" class=" tool restore clickable" title="restore" @click="restore(li,$event)"></button>
+                                <button v-if="li.status==='done'" class=" tool destroy clickable" title="destroy" @click="destroy(li,$event)"></button>
                             </li>
                         </ul>
                     </section>
