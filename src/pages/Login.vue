@@ -111,7 +111,6 @@ export default {
         },
 
         onSuccess(data) {
-            console.log('onSuccess')
             store.commit("setUser", { avatar: data.avatar, name: data.name, email: data.email })
             this.$root.avatar = data.avatar;
             this.$root.userName = data.name;
@@ -132,23 +131,13 @@ export default {
         },
         onThird(mode) {
             return (data) => {
-                console.log('onthird', mode, data)
-                console.log(data);
-                this.doLogin(data.email, data.password, mode);
                 socket.emit("login", {
                     data,
                     mode
                 }, this.onLogin.bind(this));
-                // $.post(`//${location.hostname}:${config.serverPort}/third`, {
-                //     mode,
-                //     data
-                // }, (result) => {
-                // });
             }
-
         },
         onLogin(result) {
-            console.log('login', result)
             if (!result.code) {
                 if (true) { //login with input info
                     cacheLoginInfo = {

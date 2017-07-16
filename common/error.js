@@ -60,6 +60,9 @@ const map = {
     "20": {
         msg: 'Username exist'
     },
+    "21": {
+        msg: 'Third login failed'
+    },
 
 }
 for (const i in map) {

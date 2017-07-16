@@ -161,7 +161,7 @@ function init(io) {
             let avatar;
             let email = data.email;
             const mode = data.mode;
-            if (!data.mode) {
+            if (!mode) {
                 email = data.email;
                 const checkResult = registerCheck("server", 'login',
                     data.name, data.email, data.password);
@@ -178,6 +178,9 @@ function init(io) {
                 name = result.name;
                 avatar = result.avatar;
                 email = result.email;
+            }
+            if (mode && !name) {
+                return cb(errorMap[21]);
             }
             console.log('try', {
                 email,
