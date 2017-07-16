@@ -1,7 +1,7 @@
 <template>
     <div class="top-page-wrap todo-page">
         <TodoPanel v-if="userName" ref="todoPanel" @create="onCreate" :editing="editing" @save="onSave" @fork="onFork" @newOne="onNew"></TodoPanel>
-        <TodoList :list="list" ref="list" @select="onSelect" @finish="onFinish" @restore="onRestore"></TodoList>
+        <TodoList :list="list" ref="list" @select="onSelect" @finish="onFinish" @restore="onRestore" @destroy="onDestroy"></TodoList>
         <TodoInfo></TodoInfo>
     </div>
 </template>
@@ -116,30 +116,40 @@ export default {
             // vm.$refs.todoPanel.set(vm.list[0]);
             this.$refs.todoPanel.setMode("Create");
             socket.emit("getList", {}, (result) => {
-                console.log('result', result)
                 this.list = result;
             });
         },
         onRestore(item) {
             item = JSON.parse(JSON.stringify(item));
             item.status = 'pending';
-            socket.emit("edit", item, (result) => {
-                this.list = result;
-                console.log('result', result)
+            socket.emit("edit", item, ({ data: { list } }) => {
+                this.list = list;
             });
         },
         onFinish(item) {
             item = JSON.parse(JSON.stringify(item));
             item.status = 'done';
-            socket.emit("edit", item, (result) => {
-                this.list = result;
-                console.log('result', result)
+            socket.emit("edit", item, ({ data: { list } }) => {
+                this.list = list;
+            });
+        },
+        onDestroy(item) {
+            if (!confirm("Delete it?"))
+                return;
+            item = JSON.parse(JSON.stringify(item));
+            delete item.watchers[store.state.user.uid];
+            socket.emit("edit", item, ({ data: { list } }) => {
+                this.list = list;
             });
         },
         onCreate(item) {
             item = JSON.parse(JSON.stringify(item));
             item.status = 'pending';
-            socket.emit("create", item, ({ id, list }) => {
+            socket.emit("create", item, ({ code, msg, data: { id, list } }) => {
+                if (code) {
+                    alert(msg);
+                    return;
+                }
                 this.list = list;
                 this.$refs.list.edit(list.find(li => li.id === id));
             });
@@ -147,9 +157,9 @@ export default {
         onSave(item) {
             console.log('onSave', item);
             const id = item.id;
-            socket.emit("edit", item, (result) => {
-                this.list = result;
-                console.log('result', result)
+            socket.emit("edit", item, ({ data: { list } }) => {
+                this.list = list;
+
                 const target = this.list.find(li => li.id === id);
                 console.log('target', id, target)
                 if (target) {

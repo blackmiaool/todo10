@@ -63,7 +63,9 @@
                 <i class="fa fa-user-circle-o"></i>
                 Owner
             </label>
-            <input type="text" id="choose-owner" class="form-control" v-model="owner">
+            <v-select :value.sync="targetOwner" :options="userList" placeholder="search..." :onChange="onSelectOwner">
+            </v-select>
+            <!--<input type="text" id="choose-owner" class="form-control" v-model="owner">-->
     
         </div>
     
@@ -74,6 +76,8 @@
 import $ from "jquery";
 import datepicker from 'vue-date';
 import store from 'store';
+import VueSelect from "vue-select";
+import socket from "../io";
 const properties = {
     id: "",
     title: "",
@@ -110,7 +114,6 @@ export default {
                 // });
             });
         });
-
     },
 
     data() {
@@ -118,20 +121,22 @@ export default {
             ...properties,
             preventEdit: false,
             priorityMap: {
-                verbose: 'delay it as u want(~)',
-                normal: 'do it when u have time(.)',
-                warn: 'do it as soon as possible(!)',
-                danger: 'do it right now(!!!)',
+                verbose: 'delay it as u want~',
+                normal: 'do it when u have time.',
+                warn: 'do it as soon as possible!',
+                danger: 'do it right now!!!',
             },
+            watchers: {},
+            targetOwner: ""
         }
     },
     computed: {
         userName: () => store.state.user.name,
         realRequestor: function () {
-            return this.mode === 'Edit' ? this.requestor : this.userName;
+            return this.mode === 'Edit' ? this.uid2name(this.requestor) : this.userName;
         }
     },
-    props: ["change", 'mode'],
+    props: ["change", 'mode', 'userList'],
     watch: {
         deadline(v) {
             console.log('v', v);
@@ -139,6 +144,23 @@ export default {
         }
     },
     methods: {
+        uid2name(uid) {
+            const user = this.userList.find((user) => user.value == uid);
+            if (user) {
+                return user.label;
+            } else {
+                return 'not found'
+            }
+        },
+        onSelectOwner(owner) {
+            if (owner) {
+                this.owner = owner.value;
+            } else {
+                this.owner = undefined;
+            }
+            console.log('onSelectOwner', owner)
+
+        },
         selectTag(tag) {
             const index = this.commonTags.indexOf(tag);
             this.selectedTags.push(tag);
@@ -157,8 +179,10 @@ export default {
             return deadline;
         },
         get() {
+            console.log('this.owner', this.owner)
             if (this.mode === 'Create') {
-                return ({
+                console.log(this.owner, this.requestor);
+                const ret = {
                     title: this.title,
                     description: this.description,
                     deadline: this.getDeadline(),
@@ -166,7 +190,13 @@ export default {
                     selectedTags: this.selectedTags,
                     owner: this.owner,
                     status: this.status,
-                });
+                    requestor: store.state.user.uid
+                };
+                ret.watchers = {
+                    [ret.owner]: true,
+                    [ret.requestor]: true
+                }
+                return ret;
             } else if (this.mode === 'Edit') {
                 return ({
                     id: this.id,
@@ -178,10 +208,12 @@ export default {
                     requestor: this.requestor,
                     owner: this.owner,
                     status: this.status,
+                    watchers: this.watchers
                 });
             }
         },
         set(info) {
+            console.log('set', JSON.stringify(info))
             if (!info.deadline) {
                 info.deadline = '';
             }
@@ -198,6 +230,9 @@ export default {
 
                 });
             }
+            if (info.owner) {
+                this.targetOwner = this.userList.find((user) => user.value == info.owner)
+            }
 
 
             setTimeout(() => {
@@ -206,7 +241,8 @@ export default {
         }
     },
     components: {
-        datepicker
+        datepicker,
+        'v-select': VueSelect
     }
 
 }

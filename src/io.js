@@ -16,11 +16,11 @@ function saveLocal(key, value) {
         value
     };
     item2save = JSON.stringify(item2save);
-    window.localStorage.setItem("god-" + key, item2save);
+    window.localStorage.setItem(`god-${key}`, item2save);
 }
 
 function loadLocal(key) {
-    let item = window.localStorage.getItem("god-" + key);
+    let item = window.localStorage.getItem(`god-${key}`);
     if (!item) {
         return;
     }

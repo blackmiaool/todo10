@@ -6,23 +6,21 @@ import {
     getError,
     successData
 } from "../common/error.js";
+const todo = require("./todo");
 // const md5 = require('md5');
 const db = require('./db.js');
 const fs = require('fs');
 const randtoken = require('rand-token');
-// const roomMap = {};
 // const fs = require('fs');
 const config = require("../config.js");
 const uaParser = require('ua-parser-js');
 
 const userMap = {}
 class User {
-    constructor(name, avatar) {
+    constructor(info) {
         Object.assign(this, {
-            avatar,
-            name,
             clients: []
-        });
+        }, info);
     }
     connectClient(socket, info) {
         const item = {
@@ -42,22 +40,18 @@ class User {
             }
         });
     }
-    static addUser(name, avatar) {
-        if (!userMap[name]) {
-            userMap[name] = new User(name, avatar);
+    static addUser(info) {
+        if (!userMap[info.id]) {
+            userMap[info.id] = new User(info);
         }
-        return userMap[name];
+        return userMap[info.id];
     }
-    static getUser(name) {
-        return userMap[name];
+    static getUser(id) {
+        return userMap[id];
     }
-    static getAvatar(name) {
-        return userMap[name] && userMap[name].avatar;
+    static getAvatar(id) {
+        return userMap[id] && userMap[id].avatar;
     }
-
-}
-
-function doNothing() {
 
 }
 
@@ -66,42 +60,45 @@ function init(io) {
         socket.context = {};
 
         socket.on('edit', async(data, cb) => {
-            if (!socket.context.name) {
+            if (!socket.context.uid) {
                 cb(errorMap[13]);
                 return;
             }
             const id = data.id;
-            const owner = data.owner;
-            const requestor = data.requestor;
-            delete data.id;
-            delete data.owner;
-            delete data.requestor;
-            await db.edit(id, JSON.stringify(data), requestor, owner);
-            const list = await db.getList(socket.context.name);
-            cb(list);
-        });
-        let user;
-        socket.on('create', async(data, cb) => {
-            if (!socket.context.name) {
-                cb(errorMap[13]);
-                return;
-            }
-            const owner = data.owner;
-            data.status = 'pending';
-            delete data.owner;
-            const id = await db.create(JSON.stringify(data), socket.context.name, owner);
-            const list = await db.getList(socket.context.name);
-            cb({
+            await todo.edit(id, data);
+            const list = await todo.getList(socket.context.uid);
+            cb(successData({
                 id,
                 list
-            });
+            }));
+        });
+        let user;
+        socket.on('getUserList', async(data, cb) => {
+            if (!socket.context.uid) {
+                return cb(errorMap[13]);
+            }
+            const list = await db.getUserList();
+            cb(successData({
+                list
+            }));
+        });
+        socket.on('create', async(data, cb) => {
+            if (!socket.context.uid) {
+                return cb(errorMap[13]);
+            }
+            data.status = 'pending';
+            const id = await todo.create(data);
+            const list = await todo.getList(socket.context.uid);
+            cb(successData({
+                id,
+                list
+            }));
         });
         socket.on('getList', async(data, cb) => {
-            if (!socket.context.name) {
-                cb(errorMap[13]);
-                return;
+            if (!socket.context.uid) {
+                return cb(errorMap[13]);
             }
-            const list = await db.getList(socket.context.name);
+            const list = todo.getList(socket.context.uid);
             cb(list);
         });
         async function register({
@@ -139,6 +136,7 @@ function init(io) {
                     password,
                     name,
                     avatar,
+                    email
                 }));
             } else {
                 if (result.code === 'SQLITE_CONSTRAINT') {
@@ -155,8 +153,7 @@ function init(io) {
             }
         }
         socket.on('register', register);
-        socket.on('login', async(data, cb) => {
-            //            console.log(data.name, socket.handshake.headers['user-agent'])
+        async function doLogin(data, cb) {
             let name;
             let avatar;
             let email = data.email;
@@ -182,33 +179,30 @@ function init(io) {
             if (mode && !name) {
                 return cb(errorMap[21]);
             }
-            console.log('try', {
-                email,
-                password: data.password,
-                mode
-            })
+
             db.login({
                 email,
                 password: data.password,
                 mode
             }).then(function (result) {
-                if (socket.context.name) { //already logged in
-                    const user = User.getUser(socket.context.name);
+                if (socket.context.uid) { //already logged in
+                    const user = User.getUser(socket.context.uid);
                     user.disconnectClient(socket);
                 }
 
-                user = User.addUser(result.name, result.avatar);
+                user = User.addUser(result);
 
                 const ua = uaParser(socket.handshake.headers['user-agent']);
                 user.connectClient(socket, {
                     os: ua.os.name
                 });
-                socket.context.name = user.name;
+                socket.context.uid = user.id;
                 cb(successData({
                     name: user.name,
                     avatar: user.avatar,
                     password: result.password,
                     email,
+                    uid: user.id,
                 }));
             }).catch(function (result) {
                 let ret;
@@ -229,11 +223,18 @@ function init(io) {
                             email,
                             mode,
                             avatar
-                        }, cb)
+                        }, function (result) {
+                            if (result.code === 0) {
+                                doLogin(data, cb);
+                            } else {
+                                cb(result);
+                            }
+                        });
                     }
                 }
             });
-        })
+        }
+        socket.on('login', doLogin)
     });
 }
 module.exports = {

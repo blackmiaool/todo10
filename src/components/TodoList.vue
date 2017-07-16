@@ -90,17 +90,17 @@ export default {
     computed: {
         listPending() {
             return this.list.filter((item) => {
-                return item.owner === store.state.user.name && item.status === 'pending';
+                return item.owner === store.state.user.uid && item.status === 'pending';
             });
         },
         listCreated() {
             return this.list.filter((item) => {
-                return item.requestor === store.state.user.name;
+                return item.requestor === store.state.user.uid;
             });
         },
         listDone() {
             return this.list.filter((item) => {
-                return item.owner === store.state.user.name && item.status === 'done';
+                return item.owner === store.state.user.uid && item.status === 'done';
             });
         }
     },

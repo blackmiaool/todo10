@@ -22,7 +22,7 @@
             <div class="bottom-half-panel">
                 <div class="middle" :class="{'third-support':third.length,middle:true}">
                     <div v-if="mode==='register'" @click="refreshAvatar()" class="avatar-preview clickable" :style="{'background-image':'url('+avatar+')'}"></div>
-                    <div class="thrid-entry clickable" v-for="thirdWay in third" :key="thirdWay" @click="thirdWay.cb(onThird(thirdWay.name))">
+                    <div class="thrid-entry clickable" v-for="thirdWay in third" :key="thirdWay.name" @click="thirdWay.cb(onThird(thirdWay.name))">
                         <img :src="thirdWay.icon" alt="">
                     </div>
                 </div>
@@ -56,7 +56,6 @@ if (firstPage) {
     firstPage = firstPage[1];
 }
 
-let cacheLoginInfo;
 function handlePwd(pwd) {
     pwd += config.salt;
     return md5(pwd);
@@ -88,9 +87,8 @@ export default {
         const { email, password } = JSON.parse(localStorage.getItem("god-account")) || {};
 
         socket.on("connect", () => {
-            if (cacheLoginInfo) {
-                this.doLogin(cacheLoginInfo.email, cacheLoginInfo.password);
-            } else if (email) {
+            console.log('onconnect');
+            if (email) {
                 this.doLogin(email, password);
             }
         });
@@ -111,7 +109,7 @@ export default {
         },
 
         onSuccess(data) {
-            store.commit("setUser", { avatar: data.avatar, name: data.name, email: data.email })
+            store.commit("setUser", { avatar: data.avatar, name: data.name, email: data.email, uid: data.uid })
             this.$root.avatar = data.avatar;
             this.$root.userName = data.name;
             this.$root.connected = true;
@@ -139,18 +137,14 @@ export default {
         },
         onLogin(result) {
             if (!result.code) {
-                if (true) { //login with input info
-                    cacheLoginInfo = {
-                        email: this.email,
-                        password: handlePwd(this.password)
-                    };
-                    if (this.remember) {
-                        localStorage.setItem("god-account", JSON.stringify({
-                            email: result.data.email,
-                            password: result.data.password
-                        }));
-                    }
+
+                if (this.remember) {
+                    localStorage.setItem("god-account", JSON.stringify({
+                        email: result.data.email,
+                        password: result.data.password
+                    }));
                 }
+
                 this.onSuccess(result.data);
             } else if (result.key) {
                 this.webError = {

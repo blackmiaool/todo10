@@ -4,11 +4,11 @@
             <span>{{mode}}</span>
             <span v-if="unsaved && mode==='Edit'" class="unsaved">(unsaved)</span>
         </h2>
-        <TodoViewer ref="viewer" v-if="mode==='View'"></TodoViewer>
-        <TodoEditor ref="editor" v-if="mode==='Edit'||mode==='Create'" @change="onChange" :mode="mode"></TodoEditor>
+        <TodoViewer :userList="userList" ref="viewer" v-if="mode==='View'"></TodoViewer>
+        <TodoEditor :userList="userList" ref="editor" v-if="mode==='Edit'||mode==='Create'" @change="onChange" :mode="mode"></TodoEditor>
         <!--<div class="create-btn">
-                                                                                <i class="fa fa-plus-square-o"></i>
-                                                                            </div>-->
+                                                                                                            <i class="fa fa-plus-square-o"></i>
+                                                                                                        </div>-->
         <div>
             <button v-if="mode==='Create'" class="btn btn-success submit" @click="create">
                 <i class="fa fa-arrow-circle-o-up"></i> Create</button>
@@ -55,6 +55,9 @@ export default {
         setTimeout(() => {
             this.set();
         });
+        socket.emit("getUserList", {}, ({ code, data: { list } }) => {
+            this.userList = list.map((user) => ({ label: `${user.name}`, value: user.uid }));
+        })
     },
 
     data() {
@@ -63,6 +66,7 @@ export default {
             info: {
 
             },
+            userList: [],
             unsaved: false,
             priorityMap: {
                 verbose: 'delay it as u want(~)',
@@ -118,8 +122,7 @@ export default {
             this.selectedTags.splice(index, 1);
         },
         edit() {
-            console.log(store.state.user.name, this.info.owner);
-            if (this.info.requestor !== store.state.user.name && this.info.owner !== store.state.user.name) {
+            if (this.info.requestor !== store.state.user.uid && this.info.owner !== store.state.user.uid) {
                 alert("Only requestor or owner can mutate it");
                 return;
             }

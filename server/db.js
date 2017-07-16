@@ -21,23 +21,37 @@ db.serialize(function () {
     db.run(`CREATE TABLE todo (
         id INTEGER PRIMARY KEY,
         Data TEXT,
-        Requestor TEXT,
-        Owner TEXT,      
-        FOREIGN KEY (Requestor) REFERENCES user(id)
-        FOREIGN KEY (Owner) REFERENCES user(id)
+        Active BOOLEAN
         );
     `, function (e) {});
 });
 
-async function edit($id, $data, $requestor, $owner) {
-    let result;
-    result = await new Promise(function (resolve, reject) {
+function getUserList() {
+    return new Promise(function (resolve, reject) {
         db.serialize(function () {
-            db.run(`UPDATE todo SET Data=$data,Requestor=$requestor,Owner=$owner WHERE id=$id;`, {
+            db.all(`SELECT id as uid,Name as name,Email as email,Avatar as avatar FROM user;`, {}, function (e, result) {
+                if (e) {
+                    console.log(e);
+                    reject(e);
+                } else {
+                    if (!result) {
+                        reject(true);
+                    } else {
+                        resolve(result);
+                    }
+                }
+            });
+        });
+    });
+}
+
+function edit($id, $data, $active) {
+    return new Promise(function (resolve, reject) {
+        db.serialize(function () {
+            db.run(`UPDATE todo SET Data=$data,Active=$active  WHERE id=$id;`, {
                 $id,
                 $data,
-                $requestor,
-                $owner,
+                $active,
             }, function (e) {
                 if (e) {
                     console.log(e);
@@ -48,20 +62,18 @@ async function edit($id, $data, $requestor, $owner) {
             });
         });
     });
-    return result;
 }
 
-function create($data, $requestor, $owner) {
+function create($data) {
     return new Promise(function (resolve, reject) {
         db.serialize(function () {
-            db.run(`INSERT INTO todo (Data,Requestor,Owner) VALUES ($data,$requestor,$owner);`, {
+            db.run(`INSERT INTO todo (Data,Active) VALUES ($data,$active);`, {
                 $data,
-                $requestor,
-                $owner,
+                $active: true
             }, function (e) {
                 if (e) {
                     console.log(e);
-                    resolve(e);
+                    reject(e);
                 } else {
                     resolve(this.lastID);
                 }
@@ -70,11 +82,11 @@ function create($data, $requestor, $owner) {
     });
 }
 
-function getList($name) {
+function getList($active) {
     return new Promise(function (resolve, reject) {
         db.serialize(function () {
-            db.all(`SELECT Data as data,Requestor as requestor,Owner as owner,id as id FROM todo WHERE Requestor=$name OR Owner=$name ;`, {
-                $name,
+            db.all(`SELECT Data as data,id FROM todo WHERE Active=$active;`, {
+                $active,
             }, function (e, result) {
                 if (e) {
                     console.log(e);
@@ -104,10 +116,9 @@ function login({
 }) {
     return new Promise(function (resolve, reject) {
         db.serialize(function () {
-            db.get(`SELECT Name as name,Email as email,Password as password,Avatar as avatar FROM user WHERE Email=$email;`, {
+            db.get(`SELECT id,Name as name,Email as email,Password as password,Avatar as avatar FROM user WHERE Email=$email;`, {
                 $email,
             }, function (e, result) {
-                console.log('result', result);
                 if (e) {
                     console.log(e);
                     reject(e);
@@ -185,5 +196,6 @@ export {
     getList,
     create,
     edit,
-    getAvatar
+    getAvatar,
+    getUserList,
 }

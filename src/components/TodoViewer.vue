@@ -44,14 +44,14 @@
                 <i class="fa fa-user-o"></i>
                 Requestor
             </label>
-            <p>{{requestor}}</p>
+            <p>{{requestorName}}</p>
         </div>
         <div class="input-block">
             <label for="choose-owner">
                 <i class="fa fa-user-circle-o"></i>
                 owner
             </label>
-            <p>{{owner}}</p>
+            <p>{{ownerName}}</p>
         </div>
     </div>
 </template>
@@ -63,6 +63,7 @@ import socket from "../io";
 import eventHub from '../eventHub';
 import settings from '../settings';
 import store from 'store';
+
 
 export default {
     name: 'TodoViewer',
@@ -95,14 +96,20 @@ export default {
             selectedTags: "",
             commonTags: [],
             priorityMap: {
-                verbose: 'delay it as u want(~)',
-                normal: 'do it when u have time(.)',
-                warn: 'do it as soon as possible(!)',
-                danger: 'do it right now(!!!)',
+                verbose: 'delay it as u want~',
+                normal: 'do it when u have time.',
+                warn: 'do it as soon as possible!',
+                danger: 'do it right now!!!',
             },
         }
     },
     computed: {
+        requestorName() {
+            return this.uid2name(this.requestor);
+        },
+        ownerName() {
+            return this.uid2name(this.owner);
+        },
         formattedDeadline() {
             if (this.deadline) {
                 return new Date(this.deadline).format("yyyy-MM-dd hh:mm:ss");
@@ -118,15 +125,22 @@ export default {
             return this.description.replace(/\n/g, "<br/>")
         }
     },
-    props: [],
+    props: ['userList'],
     watch: {
     },
     methods: {
+        uid2name(uid) {
+            const user = this.userList.find((user) => user.value == uid);
+            if (user) {
+                return user.label;
+            } else {
+                return 'not found'
+            }
+        },
         set(info) {
             Object.assign(this, info);
         },
         edit() {
-            console.log(store.state.user.name, this.owner);
             if (this.requestor !== store.state.user.name && this.owner !== store.state.user.name) {
                 alert("Only requestor or owner can mutate it");
                 return;
