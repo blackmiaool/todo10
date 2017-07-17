@@ -74,12 +74,23 @@ function init(io) {
         });
         let user;
         socket.on('getUserList', async(data, cb) => {
-            if (!socket.context.uid) {
-                return cb(errorMap[13]);
-            }
+            // if (!socket.context.uid) {
+            //     return cb(errorMap[13]);
+            // }
             const list = await db.getUserList();
             cb(successData({
                 list
+            }));
+        });
+        socket.on('getTodo', async(data, cb) => {
+            // if (!socket.context.uid) {
+            //     return cb(errorMap[13]);
+            // }
+            const item = todo.getTodo({
+                id: data.id
+            });
+            cb(successData({
+                item
             }));
         });
         socket.on('create', async(data, cb) => {

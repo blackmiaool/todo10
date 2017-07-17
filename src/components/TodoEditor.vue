@@ -192,9 +192,12 @@ export default {
                     status: this.status,
                     requestor: store.state.user.uid
                 };
-                ret.watchers = {
-                    [ret.owner]: true,
-                    [ret.requestor]: true
+                ret.watchers = {};
+                if (ret.owner) {
+                    ret.watchers[ret.owner] = true;
+                }
+                if (ret.requestor) {
+                    ret.watchers[ret.requestor] = true;
                 }
                 return ret;
             } else if (this.mode === 'Edit') {

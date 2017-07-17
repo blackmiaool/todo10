@@ -7,18 +7,22 @@
         <TodoViewer :userList="userList" ref="viewer" v-if="mode==='View'"></TodoViewer>
         <TodoEditor :userList="userList" ref="editor" v-if="mode==='Edit'||mode==='Create'" @change="onChange" :mode="mode"></TodoEditor>
         <!--<div class="create-btn">
-                                                                                                            <i class="fa fa-plus-square-o"></i>
-                                                                                                        </div>-->
+                                                                                                                                                <i class="fa fa-plus-square-o"></i>
+                                                                                                                                            </div>-->
         <div>
             <button v-if="mode==='Create'" class="btn btn-success submit" @click="create">
                 <i class="fa fa-arrow-circle-o-up"></i> Create</button>
-            <button v-if="mode==='View'" class="btn btn-primary submit" @click="edit">
+            <button v-if="mode==='View'&&page==='todo'" class="btn btn-primary submit" @click="edit">
                 <i class="fa fa-pencil-square-o"></i> Edit</button>
-            <button v-if="mode==='View'" class="btn btn-success submit" @click="fork">
+            <button v-if="mode==='View'&&page==='todo'" class="btn btn-success submit" @click="fork">
                 <i class="fa fa-code-fork"></i> Copy and Create (fork)</button>
-            <button v-if="mode==='View'" class="btn btn-default submit" @click="newOne">
+            <button v-if="mode==='View'&&page==='todo'" class="btn btn-default submit" @click="newOne">
                 <i class="fa fa-plus-square-o"></i>
                 New
+            </button>
+            <button v-if="mode==='View'&&page==='todo'" class="btn btn-warning submit" @click="share">
+                <i class="fa fa-share-alt"></i>
+                Share
             </button>
             <button v-if="mode==='Edit'" class="btn btn-success submit" @click="save">
                 <i class="fa fa-save"></i> Save</button>
@@ -79,13 +83,16 @@ export default {
     computed: {
 
     },
-    props: [],
+    props: ["page"],
     watch: {
         mode() {
             this.unsaved = false;
         },
     },
     methods: {
+        share() {
+            prompt("Copy link to share", `${location.origin}/#/view?id=${this.info.id}`);
+        },
         view(info) {
             this.mode = 'View';
             setTimeout(() => {

@@ -4,6 +4,7 @@ import Vue from 'vue'
 // import Chat from './Chat'
 import Login from './pages/Login'
 import Todo from './pages/Todo'
+import View from './pages/View'
 import Settings from './pages/Settings'
 import socket from './io';
 
@@ -56,6 +57,11 @@ const routes = [{
         path: '/todo',
         component: Todo,
         name: "Todo"
+    },
+    {
+        path: '/view',
+        component: View,
+        name: "View"
     }
 ];
 socket.on("disconnection", function () {

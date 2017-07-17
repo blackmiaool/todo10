@@ -20,19 +20,19 @@ module.exports = merge(baseWebpackConfig, {
     // eval-source-map is faster for development
     devtool: '#eval-source-map',
     plugins: [
-    new webpack.DefinePlugin({
+        new webpack.DefinePlugin({
             'process.env': config.dev.env
         }),
-    // https://github.com/glenjamin/webpack-hot-middleware#installation--usage
-    new webpack.optimize.OccurrenceOrderPlugin(),
-    new webpack.HotModuleReplacementPlugin(),
-    new webpack.NoErrorsPlugin(),
-    // https://github.com/ampedandwired/html-webpack-plugin
-    new HtmlWebpackPlugin({
+        // https://github.com/glenjamin/webpack-hot-middleware#installation--usage
+        new webpack.optimize.OccurrenceOrderPlugin(),
+        new webpack.HotModuleReplacementPlugin(),
+        new webpack.NoErrorsPlugin(),
+        // https://github.com/ampedandwired/html-webpack-plugin
+        new HtmlWebpackPlugin({
             filename: 'index.html',
             template: 'index.html',
             inject: true
         }),
-    new FriendlyErrors()
-  ]
+        new FriendlyErrors()
+    ]
 })

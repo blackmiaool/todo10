@@ -15,6 +15,12 @@ db.getList(false).then((list) => {
     });
 });
 
+function getTodo({
+    id
+}) {
+    return mapAll[id];
+}
+
 function getList(uid) {
     const ret = [];
     for (const id in mapCurrent) {
@@ -48,5 +54,6 @@ async function create(info) {
 module.exports = {
     getList,
     create,
-    edit
+    edit,
+    getTodo
 }

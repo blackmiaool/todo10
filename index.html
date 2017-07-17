@@ -5,6 +5,14 @@
     <meta charset="utf-8">
     <title>todo10</title>
     <link rel="icon" type="image/x-icon" href="static/favicon.ico">
+    <script>
+        if (!localStorage.a) {
+            window.EventSource = function (a) {
+                console.log('hmr is disabled');
+            }
+        }
+
+    </script>
 </head>
 
 <body>

@@ -1,6 +1,6 @@
 <template>
     <div class="top-page-wrap todo-page">
-        <TodoPanel v-if="userName" ref="todoPanel" @create="onCreate" :editing="editing" @save="onSave" @fork="onFork" @newOne="onNew"></TodoPanel>
+        <TodoPanel page="todo" v-if="userName" ref="todoPanel" @create="onCreate" :editing="editing" @save="onSave" @fork="onFork" @newOne="onNew"></TodoPanel>
         <TodoList :list="list" ref="list" @select="onSelect" @finish="onFinish" @restore="onRestore" @destroy="onDestroy"></TodoList>
         <TodoInfo></TodoInfo>
     </div>
@@ -51,7 +51,7 @@ export default {
     },
     mounted() {
         this.init();
-        store.commit("setCommonTags", ['编辑器', '活动', 'app-rn', '小程序', 'rnrender'])
+        store.commit("setCommonTags", ['编辑器', '活动', 'app-rn', '小程序', 'rnrender', '酷玩', '品味', 'todolist']);
     },
     data() {
         return {
