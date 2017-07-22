@@ -94,15 +94,6 @@ export default {
     name: 'TodoViewer',
     created(p) {
     },
-    beforeRouteEnter(to, from, next) {
-        next(vm => {
-            console.log('socket', socket.context.logged)
-            if (!socket.context.logged) {
-                router.replace("/login")
-                return;
-            }
-        });
-    },
     mounted() {
 
     },

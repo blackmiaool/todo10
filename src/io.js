@@ -4,6 +4,7 @@ const socket = io(`:${config.serverPort}`);
 socket.context = {
     logged: false
 };
+
 export default socket;
 
 function saveLocal(key, value) {

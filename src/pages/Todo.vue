@@ -30,7 +30,7 @@ export default {
         }, 100);
     },
     beforeRouteEnter(to, from, next) {
-        if (!socket.context.logged) {
+        if (!store.state.logged) {
             return next("/login");
         }
         next(vm => {

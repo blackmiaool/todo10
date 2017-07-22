@@ -12,6 +12,7 @@ import LeftTabs from './components/LeftTabs';
 import VueRouter from 'vue-router';
 
 import VueI18n from 'vue-i18n'
+import store from 'store';
 
 require("port");
 require("./less/style.less");
@@ -42,8 +43,8 @@ Date.prototype.format = function (format) {
 Vue.use(VueI18n);
 Vue.use(VueRouter);
 const i18n = new VueI18n({
-    // locale: navigator.language, // set locale
-    locale: 'zh-CN', // set locale
+    locale: navigator.language, // set locale
+    // locale: 'zh-CN', // set locale
     silentTranslationWarn: true,
     messages, // set locale messages
 })
@@ -55,7 +56,8 @@ const routes = [{
     },
     {
         path: '/login',
-        component: Login
+        component: Login,
+        name: 'Login'
     },
     {
         path: '/settings',
@@ -73,14 +75,16 @@ const routes = [{
         name: "View"
     }
 ];
-socket.on("disconnection", function () {
-    socket.context.logged = false;
+socket.on("connect", () => {
+    store.commit('setConnectionState', true);
+});
+socket.on("disconnect", () => {
+    store.commit('setConnectionState', false);
 });
 window.router = new VueRouter({
     routes // short for routes: routes
 });
 
-//Vue.component('lefttabs', LeftTabs);
 Vue.filter('messageDate', function (value) {
     return (new Date(value).format('hh:mm'));
 });
@@ -89,10 +93,12 @@ new Vue({
     router: window.router,
     data: {
         avatar: "",
-        connected: false,
     },
     mounted() {
 
+    },
+    computed: {
+        connected: () => store.state.connected
     },
     components: {
         'lefttabs': LeftTabs

@@ -10,8 +10,8 @@
                 <i class="fa fa-user-circle"></i>
             </router-link>
             <!--<router-link to="/settings" data-tab-name="settings" class="clickable">
-                    <i class="fa fa-cog"></i>
-                </router-link>-->
+                                        <i class="fa fa-cog"></i>
+                                    </router-link>-->
             <!--                <div data-tab-name="search" class="clickable"></div>-->
             <!--                <div data-tab-name="other" class="clickable"></div>-->
             <router-link to="/login" data-tab-name="login" class="clickable">
@@ -27,16 +27,19 @@
 </template>
 
 <script>
+import store from 'store';
 export default {
     name: 'leftTabs',
     props: {
-        avatar: String,
-        connected: Boolean
     },
     data() {
         return {
 
         }
+    },
+    computed: {
+        connected: () => store.state.connected,
+        avatar: () => store.state.user.avatar
     },
     methods: {
 

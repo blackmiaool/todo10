@@ -7,8 +7,8 @@
         <TodoViewer :userList="userList" ref="viewer" v-if="mode==='View'"></TodoViewer>
         <TodoEditor :userList="userList" ref="editor" v-if="mode==='Edit'||mode==='Create'" @change="onChange" :mode="mode"></TodoEditor>
         <!--<div class="create-btn">
-                                                                                                                                                                                <i class="fa fa-plus-square-o"></i>
-                                                                                                                                                                            </div>-->
+                                                                                                                                                                                                                                        <i class="fa fa-plus-square-o"></i>
+                                                                                                                                                                                                                                    </div>-->
         <div>
             <button v-if="mode==='Create'" class="btn btn-success submit" @click="create">
                 <i class="fa fa-arrow-circle-o-up"></i>
@@ -34,6 +34,10 @@
                 <i class="fa fa-save"></i>
                 {{$t('Save')}}
             </button>
+            <button v-if="mode==='View'&&page==='view'&&!logged" class="btn btn-success submit" @click="goLogin">
+                <i class="fa fa-save"></i>
+                {{$t('goLogin')}}
+            </button>
         </div>
     </div>
 </template>
@@ -56,8 +60,8 @@ export default {
     },
     beforeRouteEnter(to, from, next) {
         next(vm => {
-            console.log('socket', socket.context.logged)
-            if (!socket.context.logged) {
+            console.log('store.state.logged', store.state.logged)
+            if (!store.state.logged) {
                 router.replace("/login")
                 return;
             }
@@ -94,7 +98,7 @@ export default {
         }
     },
     computed: {
-
+        logged: () => store.state.logged
     },
     props: ["page"],
     watch: {
@@ -164,7 +168,15 @@ export default {
         },
         newOne() {
             this.$emit('newOne');
-        }
+        },
+        goLogin() {
+            window.router.push({
+                name: 'Login',
+                params: {
+                    target: "View"
+                }
+            });
+        },
     },
     components: {
         datepicker,

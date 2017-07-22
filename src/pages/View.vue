@@ -1,6 +1,6 @@
 <template>
     <div class="top-page-wrap view-page">
-        <TodoPanel page="view" ref="todoPanel" @create="onCreate" :editing="editing" @save="onSave" @fork="onFork" @newOne="onNew"></TodoPanel>
+        <TodoPanel page="view" ref="todoPanel" :editing="editing" @fork="onFork"></TodoPanel>
     </div>
 </template>
 
@@ -23,19 +23,10 @@ function e() {
 export default {
     name: 'Todo',
     created() {
-        setTimeout(() => {
 
-        }, 100);
     },
     computed: {
         userName: () => store.state.user && store.state.user.name,
-        a: function () {
-            if (this.b) {
-                return this.c;
-            } else {
-                return e.call(this);
-            }
-        }
     },
     mounted() {
         this.init();
@@ -56,66 +47,14 @@ export default {
                 alert("need id param");
                 return;
             }
+            if (!store.state.logged) {
+                store.dispatch('login').catch(() => {
+                    //ignore
+                });
+            }
             socket.emit("getTodo", { id }, ({ data: { item } }) => {
                 this.$refs.todoPanel.view(item);
             });
-            console.log(this.$route.query.id);
-        },
-        onRestore(item) {
-        },
-        onFinish(item) {
-            item = JSON.parse(JSON.stringify(item));
-            item.status = 'done';
-            socket.emit("edit", item, ({ data: { list } }) => {
-                this.list = list;
-            });
-        },
-        onDestroy(item) {
-            if (!confirm("Delete it?"))
-                return;
-            item = JSON.parse(JSON.stringify(item));
-            delete item.watchers[store.state.user.uid];
-            socket.emit("edit", item, ({ data: { list } }) => {
-                this.list = list;
-            });
-        },
-        onCreate(item) {
-            item = JSON.parse(JSON.stringify(item));
-            item.status = 'pending';
-            socket.emit("create", item, ({ code, msg, data: { id, list } }) => {
-                if (code) {
-                    alert(msg);
-                    return;
-                }
-                this.list = list;
-                this.$refs.list.edit(list.find(li => li.id === id));
-            });
-        },
-        onSave(item) {
-            console.log('onSave', item);
-            const id = item.id;
-            socket.emit("edit", item, ({ data: { list } }) => {
-                this.list = list;
-
-                const target = this.list.find(li => li.id === id);
-                console.log('target', id, target)
-                if (target) {
-                    this.$refs.todoPanel.view(target);
-                    this.editing = target;
-                }
-            });
-
-
-            // this.editing = item;
-            // this.list.some((v, i) => {
-            //     if (v.id === item.id) {
-            //         Object.assign(v, item);
-            //         this.$refs.todoPanel.view(v);
-            //         return true;
-            //     }
-
-            // });
-
         },
         onFork(item) {
             item = JSON.parse(JSON.stringify(item));
@@ -126,18 +65,6 @@ export default {
             setTimeout(() => {
                 this.$refs.todoPanel.set(item);
             });
-        },
-        onSelect(item) {
-            this.$refs.todoPanel.view(item);
-            this.editing = item;
-
-        },
-        onNew() {
-            this.$refs.todoPanel.setMode('Create');
-            this.$refs.list.clear();
-            setTimeout(() => {
-                this.$refs.todoPanel.set({});
-            })
         },
     },
     components: {

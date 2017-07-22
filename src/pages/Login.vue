@@ -46,7 +46,7 @@ import {
     registerCheck
 } from 'common/check';
 import Vue from 'vue';
-import socket from "io";
+import socket, { loadLocal, saveLocal } from "io";
 const config = require("config");
 import eventHub from 'eventHub';
 import store from 'store';
@@ -83,19 +83,11 @@ export default {
     },
     mounted() {
         this.refreshAvatar();
-
-        const { email, password } = JSON.parse(localStorage.getItem("god-account")) || {};
-
-        socket.on("connect", () => {
-            console.log('onconnect');
-            if (email) {
-                this.doLogin(email, password);
-            }
+        store.dispatch("login").then((result) => {
+            this.onLogin(result);
+        }).catch(() => {
+            //ignore it;
         });
-        socket.on("disconnect", () => {
-            this.$root.connected = false;
-        });
-
     },
     methods: {
         refreshAvatar() {
@@ -109,42 +101,34 @@ export default {
         },
 
         onSuccess(data) {
-            store.commit("setUser", { avatar: data.avatar, name: data.name, email: data.email, uid: data.uid })
             this.$root.avatar = data.avatar;
             this.$root.userName = data.name;
-            this.$root.connected = true;
-            socket.context.logged = true;
-            if (firstPage === 'settings') {
-                window.router.push({
-                    name: 'Settings',
-                    params: {}
-                });
-            } else {
-                window.router.push({
-                    name: 'Todo',
-                    params: data
-                });
-            }
+            window.router.push({
+                name: this.$route.params.target || 'Todo',
+                params: {}
+            });
 
         },
         onThird(mode) {
             return (data) => {
-                socket.emit("login", {
+                // socket.emit("login", {
+                //     data,
+                //     mode
+                // }, this.onLogin.bind(this));
+                store.dispatch("login", {
                     data,
-                    mode
-                }, this.onLogin.bind(this));
+                    mode,
+                    remember: this.remember,
+                }).then(result => {
+                    this.onLogin(result);
+                }).catch(result => {
+                    this.onLogin(result);
+                    //ignore it;
+                });
             }
         },
         onLogin(result) {
             if (!result.code) {
-
-                if (this.remember) {
-                    localStorage.setItem("god-account", JSON.stringify({
-                        email: result.data.email,
-                        password: result.data.password
-                    }));
-                }
-
                 this.onSuccess(result.data);
             } else if (result.key) {
                 this.webError = {
@@ -156,12 +140,17 @@ export default {
                 alert("error");
             }
         },
-        doLogin(email, password, mode) {
-            socket.emit("login", {
+        doLogin(email, password) {
+            store.dispatch("login", {
                 email: email || this.email,
                 password: password || handlePwd(this.password),
-                mode
-            }, this.onLogin.bind(this));
+                remember: this.remember,
+            }).then(result => {
+                this.onLogin(result);
+            }).catch(result => {
+                this.onLogin(result);
+                //ignore it;
+            });
         },
         doRegister() {
             socket.emit("register", {
@@ -184,7 +173,6 @@ export default {
             })
         },
         send() {
-
             this.webError = {};
 
             const checkResult = registerCheck("web", this.mode, this.name, this.email, md5(this.password), this.password2 && this.mode === "register" ? md5(this.password2) : '');
@@ -198,24 +186,6 @@ export default {
 
             if (this.mode === "register") {
                 this.doRegister();
-                // $.post(`//${location.hostname}:${config.serverPort}/${this.mode}`, {
-                //     name: this.name,
-                //     password: handlePwd(this.password),
-                //     avatar: this.avatar
-                // }, (result) => {
-                //     if (!result.code) {
-                //         this.doLogin();
-                //     } else if (result.key) {
-                //         this.webError = {
-                //             [result.key]: result.msg
-                //         }
-                //     } else if (result.msg) {
-                //         alert(result.msg);
-                //     } else {
-                //         alert("error");
-                //     }
-
-                // });
             } else {
                 this.doLogin();
             }
