@@ -54,11 +54,37 @@ class User {
     }
 
 }
+const mkdirp = require("mkdirp");
 
 function init(io) {
     io.on('connection', function (socket) {
         socket.context = {};
-
+        socket.on('upload', async({
+            data,
+            name,
+            id,
+        }, cb) => {
+            if (!socket.context.uid) {
+                cb(errorMap[13]);
+                return;
+            }
+            data = data.replace(/^data:\w*\/?[\w\-+]*;base64,/, "");
+            const buff = Buffer.from(data, 'base64');
+            const dir1 = `./public`;
+            const dir2 = `/files/${id}`;
+            const dir = dir1 + dir2;
+            mkdirp(dir, function (err) {
+                if (err) {
+                    console.error(err)
+                } else {
+                    const saveUrl = `${dir1}${dir2}/${name}`
+                    const fileUrl = `//${config.domain}:${config.serverPort}${dir2}/${name}`;
+                    fs.writeFile(saveUrl, buff, () => {
+                        cb(fileUrl);
+                    });
+                }
+            });
+        });
         socket.on('edit', async(data, cb) => {
             if (!socket.context.uid) {
                 cb(errorMap[13]);

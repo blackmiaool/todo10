@@ -3,6 +3,17 @@ const db = require('./db.js');
 const mapCurrent = {};
 const mapAll = {};
 
+// db.getList(true).then((list) => {
+//     list.forEach((li) => {
+//         li.priority = ({
+//             'verbose': 3,
+//             'normal': 2,
+//             'warn': 1,
+//             'danger': 0,
+//         })[li.priority];
+//         edit(li.id, li);
+//     });
+// });
 db.getList(true).then((list) => {
     list.forEach((li) => {
         mapAll[li.id] = li;

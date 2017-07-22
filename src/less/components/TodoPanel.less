@@ -42,9 +42,11 @@ pre {
 .input-block,
 button {
     &:hover {
-        i {
-            transform: scale(1.3);
-            transition: 0.2s all;
+        label>i {
+            &:first-child {
+                transform: scale(1.3);
+                transition: 0.2s all;
+            }
         }
     }
 }

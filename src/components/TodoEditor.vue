@@ -3,25 +3,34 @@
         <div class="input-block">
             <label for="new-todo-title">
                 <i class="fa fa-pencil"></i>
-                Todo Title
+                {{$t("Title")}}
             </label>
-            <input type="text" id="new-todo-title" class="form-control" placeholder="Describe the task within a few words" v-model="title">
+            <input type="text" id="new-todo-title" class="form-control" :placeholder="$t('TitlePlaceholder')" v-model="title">
             <span class="id-detail">id:{{id}}</span>
         </div>
         <div class="input-block">
             <label for="new-todo-content">
                 <i class="fa fa-paint-brush"></i>
-                Todo Description
+                {{$t("Description")}}
             </label>
-            <textarea type="text" id="new-todo-content" class="form-control" placeholder="Write some details about the task" v-model="description"></textarea>
+            <textarea type="text" id="new-todo-content" class="form-control" :placeholder="$t('DescriptionPlaceholder')" v-model="description"></textarea>
     
         </div>
+        <!--<div class="input-block">
+                                                                        <label>
+                                                                            <i class="fa fa-cubes"></i>
+                                                                            Project
+                                                                            <button class="btn btn-primary btn-xs">
+                                                                                <i class="fa fa-plus"></i>
+                                                                            </button>
+                                                                        </label>
+                                                                    </div>-->
         <div class="input-block">
             <label>
                 <i class="fa fa-tags"></i>
-                Tags
+                {{$t('Tags')}}
             </label>
-            <div data-mode="Edit" class="selected-tags">
+            <div data-mode="Edit" class="selected-tags" v-if="selectedTags&&selectedTags.length">
                 <span :key="tag" v-for="tag in selectedTags" class="selected-tag clickable" @click="removeTag(tag)">{{tag}}</span>
             </div>
             <div data-mode="Edit" class="common-tags">
@@ -32,20 +41,20 @@
         <div class="input-block">
             <label for="choose-priority">
                 <i class="fa fa-bomb"></i>
-                Priority
+                {{$t('Priority')}}
             </label>
             <select id="choose-priority" class="form-control" v-model="priority">
-                <option value="verbose">{{priorityMap.verbose}}</option>
-                <option value="normal">{{priorityMap.normal}}</option>
-                <option value="warn">{{priorityMap.warn}}</option>
-                <option value="danger">{{priorityMap.danger}}</option>
+                <option value="3">{{$t('priorityMap[3]')}}</option>
+                <option value="2">{{$t('priorityMap[2]')}}</option>
+                <option value="1">{{$t('priorityMap[1]')}}</option>
+                <option value="0">{{$t('priorityMap[0]')}}</option>
             </select>
     
         </div>
         <div class="input-block">
             <label for="choose-deadline">
                 <i class="fa fa-calendar-o"></i>
-                Deadline (not recommended)
+                {{$t('Deadline (not recommended)')}}
             </label>
             <datepicker v-model="deadlineText"></datepicker>
     
@@ -53,7 +62,7 @@
         <div class="input-block">
             <label for="choose-assigner">
                 <i class="fa fa-user-o"></i>
-                Requestor
+                {{$t('Requestor')}}
             </label>
             <input readonly type="text" id="choose-requestor" class="form-control" v-model="realRequestor">
     
@@ -61,12 +70,18 @@
         <div class="input-block">
             <label for="choose-owner">
                 <i class="fa fa-user-circle-o"></i>
-                Owner
+                {{$t('Owner')}}
             </label>
             <v-select :value.sync="targetOwner" :options="userList" placeholder="search..." :onChange="onSelectOwner">
             </v-select>
-            <!--<input type="text" id="choose-owner" class="form-control" v-model="owner">-->
-    
+        </div>
+        <div class="input-block">
+            <label for="choose-owner">
+                <i class="fa fa-file"></i>
+                {{$t('Attachments (200MB limit)')}}
+            </label>
+            <input @change="fileUpload" type="file" accept="*">
+            <FileList v-model="attachments" mode="edit"></FileList>
         </div>
     
     </div>
@@ -78,6 +93,9 @@ import datepicker from 'vue-date';
 import store from 'store';
 import VueSelect from "vue-select";
 import socket from "../io";
+import Vue from "vue";
+import FileList from 'components/FileList';
+const loadImage = require("blueimp-load-image");
 const properties = {
     id: "",
     title: "",
@@ -89,7 +107,12 @@ const properties = {
     priority: "",
     selectedTags: [],
     commonTags: [],
+    attachments: [],
 }
+Vue.filter('url2fileName', function (value) {
+    const arr = value.split('/');
+    return arr[arr.length - 1];
+});
 export default {
     name: 'TodoEditor',
     created() {
@@ -121,10 +144,10 @@ export default {
             ...properties,
             preventEdit: false,
             priorityMap: {
-                verbose: 'delay it as u want~',
-                normal: 'do it when u have time.',
-                warn: 'do it as soon as possible!',
-                danger: 'do it right now!!!',
+                3: '(C) delay it as u want~',
+                2: '(B) do it when u have time.',
+                1: '(A) do it as soon as possible!',
+                0: '(S) do it right now!!!',
             },
             watchers: {},
             targetOwner: ""
@@ -158,8 +181,6 @@ export default {
             } else {
                 this.owner = undefined;
             }
-            console.log('onSelectOwner', owner)
-
         },
         selectTag(tag) {
             const index = this.commonTags.indexOf(tag);
@@ -190,7 +211,8 @@ export default {
                     selectedTags: this.selectedTags,
                     owner: this.owner,
                     status: this.status,
-                    requestor: store.state.user.uid
+                    requestor: store.state.user.uid,
+                    attachments: this.attachments,
                 };
                 ret.watchers = {};
                 if (ret.owner) {
@@ -211,15 +233,16 @@ export default {
                     requestor: this.requestor,
                     owner: this.owner,
                     status: this.status,
-                    watchers: this.watchers
+                    watchers: this.watchers,
+                    attachments: this.attachments,
                 });
             }
         },
         set(info) {
-            console.log('set', JSON.stringify(info))
             if (!info.deadline) {
                 info.deadline = '';
             }
+            Object.assign(this, properties);
             Object.assign(this, info);
             this.preventEdit = true;
 
@@ -241,11 +264,33 @@ export default {
             setTimeout(() => {
                 this.preventEdit = false;
             });
-        }
+        },
+        fileUpload(e) {
+            const getBase64 = (file) => {
+                var reader = new FileReader();
+                if (!file) {
+                    return;
+                }
+                reader.readAsDataURL(file);
+                reader.onload = () => {
+                    socket.emit("upload", { id: this.id, data: reader.result, name: file.name }, (url) => {
+                        this.attachments.push(url);
+                    });
+                };
+                reader.onerror = function (error) {
+                    console.log('Error: ', error);
+                };
+            }
+
+            const file = e.target.files[0];
+            getBase64(file);
+
+        },
     },
     components: {
         datepicker,
-        'v-select': VueSelect
+        'v-select': VueSelect,
+        FileList
     }
 
 }

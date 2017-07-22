@@ -7,6 +7,7 @@ import {
     successData
 } from "../common/error.js";
 
+//create table
 db.serialize(function () {
     db.run(`CREATE TABLE user (
         id INTEGER PRIMARY KEY,

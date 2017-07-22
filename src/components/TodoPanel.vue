@@ -1,31 +1,39 @@
 <template>
     <div class="generate-panel root-panel todo-panel-component">
         <h2 class="current-mode">
-            <span>{{mode}}</span>
+            <span>{{$t(mode)}}</span>
             <span v-if="unsaved && mode==='Edit'" class="unsaved">(unsaved)</span>
         </h2>
         <TodoViewer :userList="userList" ref="viewer" v-if="mode==='View'"></TodoViewer>
         <TodoEditor :userList="userList" ref="editor" v-if="mode==='Edit'||mode==='Create'" @change="onChange" :mode="mode"></TodoEditor>
         <!--<div class="create-btn">
-                                                                                                                                                <i class="fa fa-plus-square-o"></i>
-                                                                                                                                            </div>-->
+                                                                                                                                                                                <i class="fa fa-plus-square-o"></i>
+                                                                                                                                                                            </div>-->
         <div>
             <button v-if="mode==='Create'" class="btn btn-success submit" @click="create">
-                <i class="fa fa-arrow-circle-o-up"></i> Create</button>
+                <i class="fa fa-arrow-circle-o-up"></i>
+                {{$t('Create')}}
+            </button>
             <button v-if="mode==='View'&&page==='todo'" class="btn btn-primary submit" @click="edit">
-                <i class="fa fa-pencil-square-o"></i> Edit</button>
+                <i class="fa fa-pencil-square-o"></i>
+                {{$t('Edit')}}
+            </button>
             <button v-if="mode==='View'&&page==='todo'" class="btn btn-success submit" @click="fork">
-                <i class="fa fa-code-fork"></i> Copy and Create (fork)</button>
+                <i class="fa fa-code-fork"></i>
+                {{$t('Copy and Create (fork)')}}
+            </button>
             <button v-if="mode==='View'&&page==='todo'" class="btn btn-default submit" @click="newOne">
                 <i class="fa fa-plus-square-o"></i>
-                New
+                {{$t('New')}}
             </button>
             <button v-if="mode==='View'&&page==='todo'" class="btn btn-warning submit" @click="share">
                 <i class="fa fa-share-alt"></i>
-                Share
+                {{$t('Share')}}
             </button>
             <button v-if="mode==='Edit'" class="btn btn-success submit" @click="save">
-                <i class="fa fa-save"></i> Save</button>
+                <i class="fa fa-save"></i>
+                {{$t('Save')}}
+            </button>
         </div>
     </div>
 </template>
@@ -60,8 +68,13 @@ export default {
             this.set();
         });
         socket.emit("getUserList", {}, ({ code, data: { list } }) => {
+            const userMap = {};
+            list.forEach(user => {
+                userMap[user.uid] = user.name;
+            });
             this.userList = list.map((user) => ({ label: `${user.name}`, value: user.uid }));
-        })
+            store.commit("setUserMap", userMap);
+        });
     },
 
     data() {
@@ -111,6 +124,7 @@ export default {
             this.unsaved = true;
         },
         set(info = this.info) {
+            info = JSON.parse(JSON.stringify(info));
             if (!info.priority) {
                 info.priority = "normal";
             }

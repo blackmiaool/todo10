@@ -10,9 +10,12 @@ import socket from './io';
 
 import LeftTabs from './components/LeftTabs';
 import VueRouter from 'vue-router';
+
+import VueI18n from 'vue-i18n'
+
 require("port");
 require("./less/style.less");
-
+const messages = require("./i18n");
 /* eslint-disable no-new */
 Date.prototype.format = function (format) {
     const zeros = ['', '0', '00', '000'];
@@ -36,8 +39,14 @@ Date.prototype.format = function (format) {
     }
     return format;
 };
-
+Vue.use(VueI18n);
 Vue.use(VueRouter);
+const i18n = new VueI18n({
+    // locale: navigator.language, // set locale
+    locale: 'zh-CN', // set locale
+    silentTranslationWarn: true,
+    messages, // set locale messages
+})
 
 const routes = [{
         path: '/',
@@ -76,6 +85,7 @@ Vue.filter('messageDate', function (value) {
     return (new Date(value).format('hh:mm'));
 });
 new Vue({
+    i18n,
     router: window.router,
     data: {
         avatar: "",

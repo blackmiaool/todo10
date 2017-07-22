@@ -131,7 +131,6 @@ export default {
             this.$refs.todoPanel.view(item);
             this.editing = item;
 
-            console.log('onSelect item', item);
         },
         onNew() {
             this.$refs.todoPanel.setMode('Create');

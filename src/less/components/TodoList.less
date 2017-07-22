@@ -165,163 +165,9 @@ label[for='toggle-all'] {
     margin: 0;
     padding: 0;
     list-style: none;
-    &:before {
-        content: '';
-        border-left: 1px solid #f5d6d6;
-        border-right: 1px solid #f5d6d6;
-        width: 2px;
-        position: absolute;
-        top: 0;
-        left: 40px;
-        height: 100%;
-    }
 }
 
-.todo-list li {
-    position: relative;
-    font-size: 20px;
-    border-bottom: 1px dotted #ccc;
-    display: block;
-    &.selected {
-        // border-left: 5px solid rgba(12, 137, 255, 0.9);
-        &:before {
-            content: "";
-            position: absolute;
-            width: 5px;
-            left: 0;
-            top: 0;
-            bottom: 0;
-            background-color: rgba(12, 137, 255, 0.9);
-        }
-    }
-    &:last-child {
-        border-bottom: none;
-    } // &.editing {
-    //     border-bottom: none;
-    //     padding: 0;
-    //     &:last-child {
-    //         margin-bottom: -1px;
-    //     }
-    //     .edit {
-    //         display: block;
-    //         width: 506px;
-    //         padding: 13px 17px 12px 17px;
-    //         margin: 0 0 0 43px;
-    //     }
-    //     .view {
-    //         display: none;
-    //     }
-    // }
-    .toggle {
-        text-align: center;
-        width: 40px;
-        /* auto, since non-WebKit browsers doesn't support input styling */
-        height: auto;
-        position: absolute;
-        top: 0;
-        bottom: 0;
-        margin: auto 0;
-        /* Mobile Safari */
-        border: none;
-        -webkit-appearance: none;
-        -ms-appearance: none;
-        -o-appearance: none;
-        appearance: none;
-        &:before {
-            content: '✓';
-            color: #d9d9d9;
-            line-height: @li-height + 3px;
-            font-size: 20px;
-            display: inline-block;
-            text-shadow: 0 -1px 0 #bfbfbf;
-        }
-        &:checked:before {
-            color: #85ada7;
-            text-shadow: 0 1px 0 #669991;
-            bottom: 1px;
-            position: relative;
-        }
-    }
-    &:hover .tool {
-        display: block;
-    }
-    .edit {
-        display: none;
-    }
-    &.finished label {
-        color: #a9a9a9;
-        text-decoration: line-through;
-    }
-    label {
-        font-weight: normal;
-        word-break: break-all;
-        padding: 5px 5px 5px 15px;
-        margin: 0;
-        margin-left: 45px;
-        margin-right: 60px;
-        display: block;
-        line-height: 1.2;
-        -webkit-transition: color 0.4s;
-        transition: color 0.4s;
-        cursor: pointer;
-    }
-    .drag-handle {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 40px;
-        height: 100%;
-        cursor: -webkit-grab;
-        cursor: grab;
-        &:active {
-            cursor: -webkit-grabbing;
-            cursor: grabbing;
-        }
-    }
-    .tool {
-        display: none;
-        position: absolute;
-        top: 0;
-        bottom: 0;
-        width: @li-height/3*2;
-        height: @li-height;
-        margin: auto 0;
-        font-size: 22px;
-        color: #a88a8a;
-        -webkit-transition: all 0.2s;
-        transition: all 0.2s;
-        &:hover {
-            text-shadow: 0 0 1px #000, 0 0 10px rgba(199, 107, 107, 0.8);
-            -webkit-transform: scale(1.3);
-            -ms-transform: scale(1.3);
-            transform: scale(1.3);
-        }
-    }
-    .restore {
-        right: 35px;
-        &:after {
-            content: '⇐';
-        }
-    }
-    .finish {
-        right: 10px;
-        &:after {
-            content: '➼';
-        }
-    }
-    .destroy {
-        right: 10px;
-        &:after {
-            content: '✖';
-        }
-    }
-    .top {
-        right: 10px + @li-height;
-        &:after {
-            content: '⌅'; //            ⇑↥ ↟⌅⇭ ⇮ ⇯ 
-        }
-    }
-}
+.todo-list li {}
 
 #footer {
     color: #777;
@@ -415,10 +261,9 @@ label[for='toggle-all'] {
     #toggle-all,
     #todo-list li .toggle {
         background: none;
-    }
-    #todo-list li .toggle {
-        height: @li-height;
-    }
+    } // #todo-list li .toggle {
+    //     height: @li-height;
+    // }
     #toggle-all {
         top: -56px;
         left: -15px;

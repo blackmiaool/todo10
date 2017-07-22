@@ -5,7 +5,7 @@
             <section class="todoapp">
                 <h3>
                     <i class="fa fa-tasks"></i>
-                    Pending
+                    {{$t('Pending')}}
                 </h3>
                 <div class="todo-wrap">
                     <header class="list-header">
@@ -13,12 +13,8 @@
                     </header>
                     <section class="list-main">
                         <ul class="todo-list">
-                            <li class="pending" v-for="li in listPending" :key="li.id" @click="edit(li)" :class="{selected:li.id===selecting}">
-                                <div class="drag-handle"></div>
-                                <label>{{li.title}}</label>
-                                <button class=" tool finish clickable" title="finish" @click="finish(li,$event)"></button>
-    
-                            </li>
+                            <TodoLi v-for="li in listPending" :info="li" :selected="li.id===selecting" :key="li.id" @action="liAction" @select="select">
+                            </TodoLi>
                         </ul>
                     </section>
                 </div>
@@ -27,20 +23,14 @@
             <section class="todoapp">
                 <h3>
                     <i class="fa fa-feed"></i>
-                    Created
+                    {{$t('Watching')}}
                 </h3>
                 <div class="todo-wrap">
                     <header class="list-header"></header>
                     <section class="list-main">
                         <ul class="todo-list">
-                            <li class="pending" v-for="li in listCreated" :key="li.id" @click="edit(li)" :class="{selected:li.id===selecting,finished:li.status==='done'}">
-                                <div class="drag-handle"></div>
-                                <label>{{li.title}}</label>
-                                <button v-if="li.status==='pending'" class=" tool finish clickable" title="finish" @click="finish(li,$event)"></button>
-    
-                                <button v-if="li.status==='done'" class=" tool restore clickable" title="restore" @click="restore(li,$event)"></button>
-                                <button v-if="li.status==='done'" class=" tool destroy clickable" title="destroy" @click="destroy(li,$event)"></button>
-                            </li>
+                            <TodoLi v-for="li in listWatching" :info="li" :selected="li.id===selecting" :key="li.id" @action="liAction" @select="select">
+                            </TodoLi>
                         </ul>
                     </section>
                 </div>
@@ -49,19 +39,14 @@
             <section class="todoapp">
                 <h3>
                     <i class="fa fa-trash"></i>
-                    Finished
+                    {{$t('Finished')}}
                 </h3>
                 <div class="todo-wrap">
                     <header class="list-header"></header>
                     <section class="list-main">
                         <ul class="todo-list">
-                            <li class="finished" v-for="li in listDone" :key="li.id" @click="edit(li)" :class="{selected:li.id===selecting}">
-                                <div class="drag-handle"></div>
-                                <label>{{li.title}}</label>
-                                <button class=" tool restore clickable" title="restore" @click="restore(li,$event)"></button>
-                                <button class=" tool destroy clickable" title="destroy" @click="destroy(li,$event)"></button>
-    
-                            </li>
+                            <TodoLi v-for="li in listDone" :info="li" :selected="li.id===selecting" :key="li.id" @action="liAction" @select="select">
+                            </TodoLi>
                         </ul>
                     </section>
                 </div>
@@ -81,6 +66,7 @@ import eventHub from '../eventHub';
 import settings from '../settings';
 import datepicker from 'vue-date';
 import store from 'store';
+import TodoLi from 'components/TodoLi'
 
 export default {
     name: 'TodoList',
@@ -91,17 +77,17 @@ export default {
         listPending() {
             return this.list.filter((item) => {
                 return item.owner === store.state.user.uid && item.status === 'pending';
-            });
+            }).sort((a, b) => a.priority - b.priority);
         },
-        listCreated() {
+        listWatching() {
             return this.list.filter((item) => {
                 return item.requestor === store.state.user.uid;
-            });
+            }).sort((a, b) => a.priority - b.priority);
         },
         listDone() {
             return this.list.filter((item) => {
                 return item.owner === store.state.user.uid && item.status === 'done';
-            });
+            }).sort((a, b) => a.priority - b.priority);
         }
     },
     mounted() {
@@ -117,19 +103,10 @@ export default {
 
     },
     methods: {
-        finish(item, $event) {
-            this.$emit("finish", item);
-            $event.stopPropagation();
+        liAction({ action, info }) {
+            this.$emit(action, info);
         },
-        restore(item, $event) {
-            this.$emit("restore", item);
-            $event.stopPropagation();
-        },
-        destroy(item, $event) {
-            this.$emit("destroy", item);
-            $event.stopPropagation();
-        },
-        edit(item) {
+        select(item) {
             this.selecting = item.id;
             this.$emit("select", item);
         },
@@ -138,7 +115,7 @@ export default {
         },
     },
     components: {
-
+        TodoLi
     }
 
 }

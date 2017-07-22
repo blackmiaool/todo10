@@ -3,19 +3,19 @@
         <div class="login-panel">
             <div class="top-half-panel">
                 <div class="input-block" v-if="mode==='register'">
-                    <input name="name" class="form-control" type="text" placeholder="Username" v-model="name">
+                    <input name="name" class="form-control" type="text" :placeholder="$t('Username')" v-model="name">
                     <div class="err" v-if="webError.name">{{webError.name}}</div>
                 </div>
                 <div class="input-block">
-                    <input name="email" class="form-control" type="email" placeholder="Email" v-model="email">
+                    <input name="email" class="form-control" type="email" :placeholder="$t('Email')" v-model="email">
                     <div class="err" v-if="webError.email">{{webError.email}}</div>
                 </div>
                 <div class="input-block">
-                    <input name="password" class="form-control" type="password" placeholder="Password" v-model="password">
+                    <input name="password" class="form-control" type="password" :placeholder="$t('Password')" v-model="password">
                     <div class="err" v-if="webError.password">{{webError.password}}</div>
                 </div>
                 <div class="input-block">
-                    <input name="password2" v-if="mode==='register'" class="form-control" type="password" placeholder="Password again (optional)" v-model="password2">
+                    <input name="password2" v-if="mode==='register'" class="form-control" type="password" :placeholder="$t('Password again (optional)')" v-model="password2">
                     <div class="err" v-if="webError.password2">{{webError.password2}}</div>
                 </div>
             </div>
@@ -28,11 +28,11 @@
                 </div>
     
                 <label class="remember">
-                    <input v-model="remember" type="checkbox"> Remember me
+                    <input v-model="remember" type="checkbox"> {{$t('Remember me')}}
                 </label>
                 <button @click="send" class="btn btn-primary submit">Go</button>
-                <button v-if="mode==='login'" class="go-register clickable" @click="setMode('register')">or Register</button>
-                <button v-if="mode==='register'" class="go-register clickable" @click="setMode('login')">or Login</button>
+                <button v-if="mode==='login'" class="go-register clickable" @click="setMode('register')">{{$t('or Register')}}</button>
+                <button v-if="mode==='register'" class="go-register clickable" @click="setMode('login')">{{$t('or Login')}}</button>
             </div>
     
         </div>

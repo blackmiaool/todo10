@@ -55,46 +55,11 @@ export default {
     },
     data() {
         return {
-            b: true,
-            c: 2,
-            d: 3,
             mode: "Create",
             editing: undefined,
             initialized: false,
             list: [
-                {
-                    title: "测试1",
-                    description: "测试1的描述",
-                    requestor: 'a',
-                    owner: "blackmiaool",
-                    deadline: 1499257423548,
-                    priority: "normal",
-                    selectedTags: ["编辑器", "活动", "app-rn"],
-                    id: 1234,
-                    status: 'pending',
-                },
-                {
-                    title: "测试2",
-                    description: "测试2的描述",
-                    requestor: 'blackmiaool',
-                    owner: "blackmiaool",
-                    deadline: 1499257423548,
-                    priority: "warn",
-                    selectedTags: ["活动", "app-rn"],
-                    id: 1231,
-                    status: 'pending',
-                },
-                {
-                    title: "测试3",
-                    description: "测试3的描述",
-                    requestor: 'blackmiaool2',
-                    owner: "blackmiaool",
-                    deadline: 1499257563708,
-                    priority: "danger",
-                    selectedTags: ["app-rn", "小程序"],
-                    id: 456,
-                    status: 'done',
-                }
+
             ],
 
             today: (new Date()).format("yyyy-MM-dd")
@@ -151,7 +116,7 @@ export default {
                     return;
                 }
                 this.list = list;
-                this.$refs.list.edit(list.find(li => li.id === id));
+                this.$refs.list.select(list.find(li => li.id === id));
             });
         },
         onSave(item) {
@@ -194,7 +159,6 @@ export default {
             this.$refs.todoPanel.view(item);
             this.editing = item;
 
-            console.log('onSelect item', item);
         },
         onNew() {
             this.$refs.todoPanel.setMode('Create');
