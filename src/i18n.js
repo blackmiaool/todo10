@@ -46,6 +46,7 @@ const messages = {
         goLogin: "去登陆以进行操作",
         'Watch': '关注',
         'Unwatch': '取消关注',
+        'Watchers': '关注者'
     }
 }
 module.exports = messages;

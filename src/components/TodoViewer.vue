@@ -59,10 +59,21 @@
             <p>{{ownerName}}</p>
         </div>
     
+        <div class="input-block" v-if="watchers">
+            <label for="choose-owner">
+                <i class="fa fa-group"></i>
+                {{$t('Watchers')}}
+            </label>
+            <div>
+                <span class="watcher" :key="watcher" v-for="watcher in handledWatchers">{{watcher}}</span>
+            </div>
+    
+        </div>
+    
         <div class="input-block" v-if="attachments&&attachments.length">
             <label for="choose-owner">
                 <i class="fa fa-file"></i>
-                Attachments
+                {{$t('Attachments (200MB limit)')}}
             </label>
             <FileList v-model="attachments" mode="view"></FileList>
         </div>
@@ -126,16 +137,18 @@ export default {
             }
 
         },
-        editMode: function () {
-            return this.mode === 'Create' || this.mode === 'Edit';
-        },
         descriptionHandled: function () {
             return this.description.replace(/\n/g, "<br/>")
+        },
+        handledWatchers() {
+            const ret = [];
+            for (const uid in this.watchers) {
+                ret.push(store.state.userMap[uid]);
+            }
+            return ret;
         }
     },
     props: ['userList'],
-    watch: {
-    },
     methods: {
         uid2name(uid) {
             if (store.state.userMap[uid]) {
@@ -147,16 +160,6 @@ export default {
         set(info) {
             Object.assign(this, properties);
             Object.assign(this, info);
-        },
-        edit() {
-            if (this.requestor !== store.state.user.name && this.owner !== store.state.user.name) {
-                alert("Only requestor or owner can mutate it");
-                return;
-            }
-            this.$emit("edit");
-        },
-        fork() {
-
         },
     },
     components: {

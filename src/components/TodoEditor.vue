@@ -17,14 +17,14 @@
     
         </div>
         <!--<div class="input-block">
-                                                                            <label>
-                                                                                <i class="fa fa-cubes"></i>
-                                                                                Project
-                                                                                <button class="btn btn-primary btn-xs">
-                                                                                    <i class="fa fa-plus"></i>
-                                                                                </button>
-                                                                            </label>
-                                                                        </div>-->
+                                                                                    <label>
+                                                                                        <i class="fa fa-cubes"></i>
+                                                                                        Project
+                                                                                        <button class="btn btn-primary btn-xs">
+                                                                                            <i class="fa fa-plus"></i>
+                                                                                        </button>
+                                                                                    </label>
+                                                                                </div>-->
         <div class="input-block">
             <label>
                 <i class="fa fa-tags"></i>
@@ -150,7 +150,6 @@ export default {
                 1: '(A) do it as soon as possible!',
                 0: '(S) do it right now!!!',
             },
-            watchers: {},
             targetOwner: ""
         }
     },

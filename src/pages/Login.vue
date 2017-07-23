@@ -30,6 +30,7 @@
                 <label class="remember">
                     <input v-model="remember" type="checkbox"> {{$t('Remember me')}}
                 </label>
+                <span class="login-tip">米家用户点这 -></span>
                 <button @click="send" class="btn btn-primary submit">Go</button>
                 <button v-if="mode==='login'" class="go-register clickable" @click="setMode('register')">{{$t('or Register')}}</button>
                 <button v-if="mode==='register'" class="go-register clickable" @click="setMode('login')">{{$t('or Login')}}</button>
