@@ -105,6 +105,7 @@ export default {
             this.$root.userName = data.name;
             window.router.push({
                 name: this.$route.params.target || 'Todo',
+                query: this.$route.params.params,
                 params: {}
             });
 

@@ -6,9 +6,6 @@
         </h2>
         <TodoViewer :userList="userList" ref="viewer" v-if="mode==='View'"></TodoViewer>
         <TodoEditor :userList="userList" ref="editor" v-if="mode==='Edit'||mode==='Create'" @change="onChange" :mode="mode"></TodoEditor>
-        <!--<div class="create-btn">
-                                                                                                                                                                                                                                        <i class="fa fa-plus-square-o"></i>
-                                                                                                                                                                                                                                    </div>-->
         <div>
             <button v-if="mode==='Create'" class="btn btn-success submit" @click="create">
                 <i class="fa fa-arrow-circle-o-up"></i>
@@ -22,7 +19,7 @@
                 <i class="fa fa-code-fork"></i>
                 {{$t('Copy and Create (fork)')}}
             </button>
-            <button v-if="mode==='View'&&page==='todo'" class="btn btn-default submit" @click="newOne">
+            <button v-if="mode==='View'&&page==='todo'" class="btn btn-default submit" @click="emit('newOne')">
                 <i class="fa fa-plus-square-o"></i>
                 {{$t('New')}}
             </button>
@@ -34,9 +31,17 @@
                 <i class="fa fa-save"></i>
                 {{$t('Save')}}
             </button>
-            <button v-if="mode==='View'&&page==='view'&&!logged" class="btn btn-success submit" @click="goLogin">
+            <button v-if="mode==='View'&&page==='view'&&!logged" class="btn btn-success submit" @click="emit('login')">
                 <i class="fa fa-save"></i>
                 {{$t('goLogin')}}
+            </button>
+            <button v-if="canWatch" class="btn btn-success submit" @click="emit('watch')">
+                <i class="fa fa-bookmark-o"></i>
+                {{$t('Watch')}}
+            </button>
+            <button v-if="canUnwatch&&page==='view'" class="btn btn-danger submit" @click="emit('unwatch')">
+                <i class="fa fa-bookmark"></i>
+                {{$t('Unwatch')}}
             </button>
         </div>
     </div>
@@ -98,7 +103,13 @@ export default {
         }
     },
     computed: {
-        logged: () => store.state.logged
+        logged: () => store.state.logged,
+        canUnwatch() {
+            return this.logged && this.info.watchers && this.info.watchers[store.state.user.uid];
+        },
+        canWatch() {
+            return this.logged && this.info.watchers && !this.info.watchers[store.state.user.uid];
+        }
     },
     props: ["page"],
     watch: {
@@ -115,7 +126,6 @@ export default {
             setTimeout(() => {
                 this.set(info);
             });
-
         },
         setMode(mode) {
             if (mode === 'Edit') {
@@ -166,17 +176,9 @@ export default {
         create() {
             this.$emit('create', this.$refs.editor.get());
         },
-        newOne() {
-            this.$emit('newOne');
-        },
-        goLogin() {
-            window.router.push({
-                name: 'Login',
-                params: {
-                    target: "View"
-                }
-            });
-        },
+        emit(...rags) {
+            this.$emit(...rags);
+        }
     },
     components: {
         datepicker,

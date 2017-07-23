@@ -81,7 +81,7 @@ export default {
         },
         listWatching() {
             return this.list.filter((item) => {
-                return item.requestor === store.state.user.uid;
+                return item.owner !== store.state.user.uid;
             }).sort((a, b) => a.priority - b.priority);
         },
         listDone() {

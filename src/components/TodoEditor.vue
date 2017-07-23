@@ -17,14 +17,14 @@
     
         </div>
         <!--<div class="input-block">
-                                                                        <label>
-                                                                            <i class="fa fa-cubes"></i>
-                                                                            Project
-                                                                            <button class="btn btn-primary btn-xs">
-                                                                                <i class="fa fa-plus"></i>
-                                                                            </button>
-                                                                        </label>
-                                                                    </div>-->
+                                                                            <label>
+                                                                                <i class="fa fa-cubes"></i>
+                                                                                Project
+                                                                                <button class="btn btn-primary btn-xs">
+                                                                                    <i class="fa fa-plus"></i>
+                                                                                </button>
+                                                                            </label>
+                                                                        </div>-->
         <div class="input-block">
             <label>
                 <i class="fa fa-tags"></i>
@@ -108,6 +108,7 @@ const properties = {
     selectedTags: [],
     commonTags: [],
     attachments: [],
+    watchers: {},
 }
 Vue.filter('url2fileName', function (value) {
     const arr = value.split('/');

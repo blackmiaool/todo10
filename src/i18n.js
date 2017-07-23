@@ -44,6 +44,8 @@ const messages = {
             0: '(甲) 立即做',
         },
         goLogin: "去登陆以进行操作",
+        'Watch': '关注',
+        'Unwatch': '取消关注',
     }
 }
 module.exports = messages;

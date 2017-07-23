@@ -26,9 +26,7 @@ db.getList(false).then((list) => {
     });
 });
 
-function getTodo({
-    id
-}) {
+function getTodo(id) {
     return mapAll[id];
 }
 
@@ -58,13 +56,30 @@ async function edit(id, info) {
 async function create(info) {
     const id = await db.create(JSON.stringify(info));
     info.id = id;
+    syncInfo(id, info);
+    return id;
+}
+
+function syncInfo(id, info) {
     mapAll[id] = info;
     mapCurrent[id] = info;
-    return id;
+}
+async function watch(id, uid) {
+    const info = getTodo(id);
+    info.watchers[uid] = true;
+    await edit(id, info);
+}
+async function unwatch(id, uid) {
+    const info = getTodo(id);
+    delete info.watchers[uid];
+    await edit(id, info);
+    return info;
 }
 module.exports = {
     getList,
     create,
     edit,
-    getTodo
+    getTodo,
+    watch,
+    unwatch
 }

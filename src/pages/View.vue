@@ -1,6 +1,6 @@
 <template>
     <div class="top-page-wrap view-page">
-        <TodoPanel page="view" ref="todoPanel" :editing="editing" @fork="onFork"></TodoPanel>
+        <TodoPanel page="view" ref="todoPanel" :editing="editing" @fork="onFork" @login="goLogin" @watch="watch" @unwatch='unwatch'></TodoPanel>
     </div>
 </template>
 
@@ -37,11 +37,38 @@ export default {
             editing: undefined,
         }
     },
+    watch: {
+        '$route': 'init',
+    },
     methods: {
+        watch() {
+            socket.emit('watch', { id: this.$route.query.id }, () => {
+                window.router.push({
+                    name: 'Todo',
+                    params: {
+                        id: this.$route.query.id,
+                    }
+                });
+            });
+        },
+        unwatch() {
+            socket.emit('unwatch', { id: this.$route.query.id }, ({ data: { info } }) => {
+                this.$refs.todoPanel.view(info);
+            });
+        },
+        goLogin() {
+            window.router.push({
+                name: 'Login',
+                params: {
+                    target: "View",
+                    params: JSON.parse(JSON.stringify(this.$route.query))
+                }
+            });
+        },
         init() {
-            this.initialized = true;
-            // vm.$refs.todoPanel.set(vm.list[0]);
-
+            if (this.$route.name !== 'View') {
+                return;
+            }
             const id = this.$route.query.id;
             if (!id) {
                 alert("need id param");
@@ -52,8 +79,8 @@ export default {
                     //ignore
                 });
             }
-            socket.emit("getTodo", { id }, ({ data: { item } }) => {
-                this.$refs.todoPanel.view(item);
+            socket.emit("getTodo", { id }, ({ data: { info } }) => {
+                this.$refs.todoPanel.view(info);
             });
         },
         onFork(item) {

@@ -34,9 +34,6 @@ export default {
             return next("/login");
         }
         next(vm => {
-            setTimeout(() => {
-                vm.init.call(vm);
-            }, 100);
         });
     },
     computed: {
@@ -66,23 +63,30 @@ export default {
         }
     },
     watch: {
-
+        '$route': 'init'
     },
-
     methods: {
         init() {
-            if (this.initialized) {
-                return;
-            }
-            if (!this.$refs.todoPanel) {
-                return;
-            }
+            console.log('init', this.$route.params.id)
             this.initialized = true;
             // vm.$refs.todoPanel.set(vm.list[0]);
             this.$refs.todoPanel.setMode("Create");
             socket.emit("getList", {}, (result) => {
                 this.list = result;
+                if (this.$route.params.id) {
+                    this.view(this.$route.params.id);
+                }
             });
+        },
+        view(id) {
+            console.log('view', id, this.list)
+            const target = this.list.find(li => li.id * 1 === id * 1);
+            console.log(target)
+            if (target) {
+                this.$refs.todoPanel.view(target);
+                this.editing = target;
+                // this.view(this.$route.params.id);
+            }
         },
         onRestore(item) {
             item = JSON.parse(JSON.stringify(item));
@@ -99,12 +103,15 @@ export default {
             });
         },
         onDestroy(item) {
-            if (!confirm("Delete it?"))
+            if (!confirm("Unwatch it?"))
                 return;
-            item = JSON.parse(JSON.stringify(item));
-            delete item.watchers[store.state.user.uid];
-            socket.emit("edit", item, ({ data: { list } }) => {
-                this.list = list;
+            socket.emit('unwatch', { id: item.id }, () => {
+                this.list.some((v, i) => {
+                    if (v.id === item.id) {
+                        this.list.splice(i, 1);
+                        return true;
+                    }
+                });
             });
         },
         onCreate(item) {
@@ -124,13 +131,7 @@ export default {
             const id = item.id;
             socket.emit("edit", item, ({ data: { list } }) => {
                 this.list = list;
-
-                const target = this.list.find(li => li.id === id);
-                console.log('target', id, target)
-                if (target) {
-                    this.$refs.todoPanel.view(target);
-                    this.editing = target;
-                }
+                this.view(id);
             });
 
 

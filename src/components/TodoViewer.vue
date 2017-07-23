@@ -89,6 +89,7 @@ const properties = {
     selectedTags: [],
     commonTags: [],
     attachments: [],
+    watchers: {},
 }
 export default {
     name: 'TodoViewer',

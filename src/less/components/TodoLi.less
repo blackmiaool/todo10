@@ -140,6 +140,9 @@ label {
     .priority-area(@color) {
         color: white;
         background-color: @color;
+        &:after {
+            border-color: @color;
+        }
     }
     .point {
         background-color: white !important;
@@ -170,8 +173,17 @@ label {
 }
 
 &:hover {
-    .point {
-        animation: 1s infinite alternate point;
+    .drag-handle {
+        .point {
+            // animation: 1s infinite alternate point;
+            &:after {
+                @gap: 7px;
+                left: -@gap;
+                right: -@gap;
+                top: -@gap;
+                bottom: -@gap;
+            }
+        }
     }
 }
 
@@ -194,14 +206,29 @@ label {
     transition: 0.2s background-color;
     .point {
         // transition: 0.2s background-color;
-        .common-circle(10px);
+        .common-circle(11px);
         .crop(0);
         margin: auto;
+        &:after {
+            content: "";
+            @gap: 0px;
+            left: -@gap;
+            right: -@gap;
+            top: -@gap;
+            bottom: -@gap;
+            position: absolute;
+            border-radius: 100px;
+            border: 1px solid;
+            transition: all 0.1s;
+        }
     }
     .priority-area(@color) {
         color: @color;
         .point {
             background-color: @color;
+            &:after {
+                border-color: @color;
+            }
         }
     }
     &[data-priority="0"] {
@@ -246,7 +273,7 @@ label {
 }
 
 .finish {
-    right: 10px;
+    right: 35px;
     &:after {
         content: '➼';
     }

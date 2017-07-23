@@ -6,10 +6,10 @@
                 <!--<span>{{priority2letter[info.priority]}}</span>-->
             </div>
             <label>{{info.title}}</label>
-            <button v-if="info.status==='pending'" class=" tool finish clickable" title="finish" @click="emit('finish',$event)"></button>
+            <button v-if="canFinish" class=" tool finish clickable" title="finish" @click="emit('finish',$event)"></button>
     
             <button v-if="info.status==='done'" class=" tool restore clickable" title="restore" @click="emit('restore',$event)"></button>
-            <button v-if="info.status==='done'" class=" tool destroy clickable" title="destroy" @click="emit('destroy',$event)"></button>
+            <button class=" tool destroy clickable" title="unwatch" @click="emit('destroy',$event)"></button>
         </header>
         <main>
             <span class="relation">
@@ -34,6 +34,9 @@ export default {
 
     },
     computed: {
+        canFinish: function () {
+            return this.info.status === 'pending' && (this.info.requestor === store.state.user.uid || this.info.owner === store.state.user.uid)
+        },
         requestorName: function (uid) { return store.state.userMap[this.info.requestor] },
         ownerName: function (uid) {
             return store.state.userMap[this.info.owner]

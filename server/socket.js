@@ -56,6 +56,10 @@ class User {
 }
 const mkdirp = require("mkdirp");
 
+function doNothing() {
+    //nothing
+}
+
 function init(io) {
     io.on('connection', function (socket) {
         socket.context = {};
@@ -85,6 +89,34 @@ function init(io) {
                 }
             });
         });
+
+        function $on(event, cb, needLogin) {
+            socket.on(event, function (data, socketCb = doNothing) {
+                if (needLogin) {
+                    if (!socket.context.uid) {
+                        socketCb(errorMap[13]);
+                        return;
+                    }
+                }
+                const ret = cb(data, socketCb);
+                if (ret.then) {
+                    ret.then(result => {
+                        socketCb(successData(result));
+                    });
+                } else {
+                    //TODO
+                }
+            });
+        }
+        $on('unwatch', async(data, cb) => {
+            const info = await todo.unwatch(data.id, socket.context.uid);
+            return {
+                info
+            }
+        }, true);
+        $on('watch', async(data, cb) => {
+            await todo.watch(data.id, socket.context.uid);
+        }, true);
         socket.on('edit', async(data, cb) => {
             if (!socket.context.uid) {
                 cb(errorMap[13]);
@@ -112,11 +144,9 @@ function init(io) {
             // if (!socket.context.uid) {
             //     return cb(errorMap[13]);
             // }
-            const item = todo.getTodo({
-                id: data.id
-            });
+            const info = todo.getTodo(data.id);
             cb(successData({
-                item
+                info
             }));
         });
         socket.on('create', async(data, cb) => {
