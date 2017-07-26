@@ -67,7 +67,6 @@ export default {
     },
     methods: {
         init() {
-            console.log('init', this.$route.params.id)
             this.initialized = true;
             // vm.$refs.todoPanel.set(vm.list[0]);
             this.$refs.todoPanel.setMode("Create");
@@ -79,9 +78,7 @@ export default {
             });
         },
         view(id) {
-            console.log('view', id, this.list)
             const target = this.list.find(li => li.id * 1 === id * 1);
-            console.log(target)
             if (target) {
                 this.$refs.todoPanel.view(target);
                 this.editing = target;
@@ -127,7 +124,6 @@ export default {
             });
         },
         onSave(item) {
-            console.log('onSave', item);
             const id = item.id;
             socket.emit("edit", item, ({ data: { list } }) => {
                 this.list = list;
@@ -151,7 +147,6 @@ export default {
             delete item.id;
             this.$refs.todoPanel.setMode("Create");
             this.$refs.list.clear();
-            console.log(item)
             setTimeout(() => {
                 this.$refs.todoPanel.set(item);
             });

@@ -1,5 +1,5 @@
 <template>
-    <div class="generate-panel root-panel todo-panel-component">
+    <div ref="wrap" class="generate-panel root-panel todo-panel-component" @drop="drop" @dragenter="dragEnter" @dragleave="dragLeave" @dragexit="dragExit" @dragover="dragOver" @mouseover="dragClear">
         <h2 class="current-mode">
             <span>{{$t(mode)}}</span>
             <span v-if="unsaved && mode==='Edit'" class="unsaved">(unsaved)</span>
@@ -94,12 +94,6 @@ export default {
             },
             userList: [],
             unsaved: false,
-            priorityMap: {
-                verbose: 'delay it as u want(~)',
-                normal: 'do it when u have time(.)',
-                warn: 'do it as soon as possible(!)',
-                danger: 'do it right now(!!!)',
-            },
         }
     },
     computed: {
@@ -134,14 +128,10 @@ export default {
             this.mode = mode;
         },
         onChange() {
-            console.log('onChange')
             this.unsaved = true;
         },
         set(info = this.info) {
             info = JSON.parse(JSON.stringify(info));
-            if (!info.priority) {
-                info.priority = "normal";
-            }
             this.info = info;
             this.$refs.viewer && this.$refs.viewer.set(info);
             this.$refs.editor && this.$refs.editor.set(info);
@@ -164,6 +154,7 @@ export default {
             this.mode = 'Edit';
             setTimeout(() => {
                 this.set();
+                this.unsaved = false;
             });
         },
         fork() {
@@ -178,7 +169,53 @@ export default {
         },
         emit(...rags) {
             this.$emit(...rags);
-        }
+        },
+        drop(e) {
+            const dropEvent = e;
+            this.$refs.wrap.classList.remove("dragging");
+            e.stopPropagation();
+            e.preventDefault();
+
+            const that = this;
+            const items = Array.prototype.slice.call(e.dataTransfer.items);
+
+            const files = e.dataTransfer.files;
+            items.forEach((item, index) => {
+                if (item.kind === 'file') {
+                    const reader = new FileReader();
+                    const instance = this;
+                    reader.onloadend = function (e) {
+                        if (!that.$refs.editor) {
+                            alert("You can just upload file in edit mode");
+                            return;
+                        }
+                        that.$refs.editor.appendFile(files[index].name, this.result);
+                    };
+                    reader.readAsDataURL(item.getAsFile());
+                }
+            });
+        },
+        dragClear(e) {
+            this.$refs.wrap.classList.remove("dragging");
+        },
+        dragEnter(e) {
+            this.$refs.wrap.classList.add("dragging");
+            e.stopPropagation();
+            e.preventDefault();
+        },
+        dragExit(e) {
+            e.stopPropagation();
+            e.preventDefault();
+        },
+        dragLeave(e) {
+            e.stopPropagation();
+            e.preventDefault();
+        },
+        dragOver(e) {
+            e.stopPropagation();
+            e.preventDefault();
+            //               e.stopPropagation(); // e.preventDefault();
+        },
     },
     components: {
         datepicker,

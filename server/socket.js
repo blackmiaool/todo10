@@ -14,7 +14,7 @@ const randtoken = require('rand-token');
 // const fs = require('fs');
 const config = require("../config.js");
 const uaParser = require('ua-parser-js');
-
+const request = require('request');
 const userMap = {}
 class User {
     constructor(info) {
@@ -58,6 +58,43 @@ const mkdirp = require("mkdirp");
 
 function doNothing() {
     //nothing
+}
+
+function doUploadImage(stream, url) {
+    let formData = {
+        upload: {
+            value: stream,
+            options: {
+                filename: `test.${url.match(/\w+$/)}`,
+                contentType: `image/${url.match(/\w+$/)}`,
+                name: "upload",
+            }
+        }
+    };
+    //    console.log(formData);
+    return new Promise((resolve, reject) => {
+        request.post({
+            url: 'http://support.io.mi.srv/shop/uploadpic',
+            formData,
+            headers: {
+                "Accept-Language": "en,zh-CN;q=0.8,zh;q=0.6",
+                "Cache-Control": "no-cache",
+                "Connection": "keep-alive",
+                //"Content-Type":multipart/form-data; boundary=----WebKitFormBoundaryLUio9LersMxXLcDU
+                // Cookie: ck,
+                Host: "support.io.mi.srv",
+                Origin: "http://support.io.mi.srv",
+                Pragma: "no-cache",
+                Referer: "http://support.io.mi.srv/miot_editor/dist/index.html",
+                "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/53.0.2785.101 Safari/537.36",
+            }
+        }, function optionalCallback(err, httpResponse, body) {
+            if (err) {
+                return console.error('upload failed:', err);
+            }
+            resolve(JSON.parse(body).result);
+        });
+    });
 }
 
 function init(io) {
@@ -108,15 +145,23 @@ function init(io) {
                 }
             });
         }
-        $on('unwatch', async(data, cb) => {
+        $on('unwatch', async(data) => {
             const info = await todo.unwatch(data.id, socket.context.uid);
             return {
                 info
             }
         }, true);
-        $on('watch', async(data, cb) => {
+        $on('watch', async(data) => {
             await todo.watch(data.id, socket.context.uid);
         }, true);
+        $on('uploadUrl', async(data) => {
+            let url = await doUploadImage(request.get(data), data);
+            if (data.match(/\.gif$/)) {
+                url += "&t=raw";
+            }
+            return url;
+        }, false);
+
         socket.on('edit', async(data, cb) => {
             if (!socket.context.uid) {
                 cb(errorMap[13]);
@@ -221,6 +266,9 @@ function init(io) {
         }
         socket.on('register', register);
         async function doLogin(data, cb) {
+            if (!data) {
+                return;
+            }
             let name;
             let avatar;
             let email = data.email;

@@ -17,14 +17,14 @@
     
         </div>
         <!--<div class="input-block">
-                                                                                    <label>
-                                                                                        <i class="fa fa-cubes"></i>
-                                                                                        Project
-                                                                                        <button class="btn btn-primary btn-xs">
-                                                                                            <i class="fa fa-plus"></i>
-                                                                                        </button>
-                                                                                    </label>
-                                                                                </div>-->
+                                                                                                <label>
+                                                                                                    <i class="fa fa-cubes"></i>
+                                                                                                    Project
+                                                                                                    <button class="btn btn-primary btn-xs">
+                                                                                                        <i class="fa fa-plus"></i>
+                                                                                                    </button>
+                                                                                                </label>
+                                                                                            </div>-->
         <div class="input-block">
             <label>
                 <i class="fa fa-tags"></i>
@@ -80,7 +80,7 @@
                 <i class="fa fa-file"></i>
                 {{$t('Attachments (200MB limit)')}}
             </label>
-            <input @change="fileUpload" type="file" accept="*">
+            <input @change="onFileUpload" type="file" accept="*">
             <FileList v-model="attachments" mode="edit"></FileList>
         </div>
     
@@ -200,7 +200,6 @@ export default {
             return deadline;
         },
         get() {
-            console.log('this.owner', this.owner)
             if (this.mode === 'Create') {
                 console.log(this.owner, this.requestor);
                 const ret = {
@@ -265,7 +264,19 @@ export default {
                 this.preventEdit = false;
             });
         },
-        fileUpload(e) {
+        appendFile(name, data) {
+            this.doUpload(this.id, name, data).then((url) => {
+                this.attachments.push(url);
+            });
+        },
+        doUpload(id, name, data) {
+            return new Promise((resolve) => {
+                socket.emit("upload", { id, data, name }, (url) => {
+                    resolve(url);
+                });
+            });
+        },
+        onFileUpload(e) {
             const getBase64 = (file) => {
                 var reader = new FileReader();
                 if (!file) {
@@ -273,7 +284,7 @@ export default {
                 }
                 reader.readAsDataURL(file);
                 reader.onload = () => {
-                    socket.emit("upload", { id: this.id, data: reader.result, name: file.name }, (url) => {
+                    this.doUpload(this.id, file.name, reader.result).then((url) => {
                         this.attachments.push(url);
                     });
                 };

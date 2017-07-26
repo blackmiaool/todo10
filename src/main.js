@@ -43,8 +43,8 @@ Date.prototype.format = function (format) {
 Vue.use(VueI18n);
 Vue.use(VueRouter);
 const i18n = new VueI18n({
-    // locale: navigator.language, // set locale
-    locale: 'zh-CN', // set locale
+    locale: navigator.language, // set locale
+    // locale: 'zh-CN', // set locale
     silentTranslationWarn: true,
     messages, // set locale messages
 })

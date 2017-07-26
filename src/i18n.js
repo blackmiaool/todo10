@@ -46,7 +46,8 @@ const messages = {
         goLogin: "去登陆以进行操作",
         'Watch': '关注',
         'Unwatch': '取消关注',
-        'Watchers': '关注者'
+        'Watchers': '关注者',
+        'Upload and copy url': '上传并复制地址',
     }
 }
 module.exports = messages;
