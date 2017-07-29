@@ -5,6 +5,7 @@ import Vue from 'vue'
 import Login from './pages/Login'
 import Todo from './pages/Todo'
 import View from './pages/View'
+import List from './pages/List'
 import Settings from './pages/Settings'
 import socket from './io';
 
@@ -73,18 +74,26 @@ const routes = [{
         path: '/view',
         component: View,
         name: "View"
+    },
+    {
+        path: '/list',
+        component: List,
+        name: "List"
     }
 ];
 socket.on("connect", () => {
     store.commit('setConnectionState', true);
+    store.dispatch('login');
 });
 socket.on("disconnect", () => {
     store.commit('setConnectionState', false);
+    store.commit('setLoginState', false);
 });
 window.router = new VueRouter({
     routes // short for routes: routes
 });
-
+store.dispatch('getProjects').then((projects) => {});
+store.dispatch('getUserMap').then((map) => {});
 Vue.filter('messageDate', function (value) {
     return (new Date(value).format('hh:mm'));
 });

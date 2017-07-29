@@ -161,6 +161,12 @@ function init(io) {
             }
             return url;
         }, false);
+        $on('addProject', async(data) => {
+            await db.addProject({
+                name: data.name
+            });
+        }, true);
+        $on('getProjects', db.getProjects, false);
 
         socket.on('edit', async(data, cb) => {
             if (!socket.context.uid) {

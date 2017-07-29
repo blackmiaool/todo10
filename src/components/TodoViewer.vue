@@ -17,6 +17,16 @@
             <pre>{{description}}</pre>
         </div>
     
+        <div v-if="projects&&projects.length" class="input-block">
+            <label>
+                <i class="fa fa-cube"></i>
+                {{$t('Projects')}}
+            </label>
+            <div data-mode="View" class="selected-tags">
+                <span :key="project" v-for="project in projects" class="selected-tag clickable" @click="goProject(project)">{{project2name(project)}}</span>
+            </div>
+        </div>
+    
         <div v-if="selectedTags&&selectedTags.length" class="input-block">
             <label>
                 <i class="fa fa-tags"></i>
@@ -101,6 +111,7 @@ const properties = {
     commonTags: [],
     attachments: [],
     watchers: {},
+    projects: [],
 }
 export default {
     name: 'TodoViewer',
@@ -124,10 +135,10 @@ export default {
     },
     computed: {
         requestorName() {
-            return this.uid2name(this.requestor);
+            return store.getters.uid2name(this.requestor);
         },
         ownerName() {
-            return this.uid2name(this.owner);
+            return store.getters.uid2name(this.owner);
         },
         formattedDeadline() {
             if (this.deadline) {
@@ -143,24 +154,26 @@ export default {
         handledWatchers() {
             const ret = [];
             for (const uid in this.watchers) {
-                ret.push(store.state.userMap[uid]);
+                ret.push(store.getters.uid2name(uid));
             }
             return ret;
         }
     },
     props: ['userList'],
     methods: {
-        uid2name(uid) {
-            if (store.state.userMap[uid]) {
-                return store.state.userMap[uid];
-            } else {
-                return 'not found';
-            }
-        },
+        project2name: (id) => store.getters.project2name(id),
         set(info) {
             Object.assign(this, properties);
             Object.assign(this, info);
         },
+        goProject(project) {
+            window.router.push({
+                name: 'List',
+                query: {
+                    project
+                }
+            });
+        }
     },
     components: {
         FileList

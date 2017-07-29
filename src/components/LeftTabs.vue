@@ -2,7 +2,7 @@
     <div class="left-tabs-wrap">
     
         <div class="avatar">
-            <img v-if="avatar" :src="avatar" alt="" :class="{active:connected}">
+            <img v-if="avatar" :src="avatar" alt="" :class="{active:logged}">
         </div>
         <div class="tabs">
     
@@ -10,8 +10,8 @@
                 <i class="fa fa-user-circle"></i>
             </router-link>
             <!--<router-link to="/settings" data-tab-name="settings" class="clickable">
-                                        <i class="fa fa-cog"></i>
-                                    </router-link>-->
+                                            <i class="fa fa-cog"></i>
+                                        </router-link>-->
             <!--                <div data-tab-name="search" class="clickable"></div>-->
             <!--                <div data-tab-name="other" class="clickable"></div>-->
             <router-link to="/login" data-tab-name="login" class="clickable">
@@ -38,7 +38,7 @@ export default {
         }
     },
     computed: {
-        connected: () => store.state.connected,
+        logged: () => store.state.logged,
         avatar: () => store.state.user.avatar
     },
     methods: {

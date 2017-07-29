@@ -16,15 +16,21 @@
             <textarea type="text" id="new-todo-content" class="form-control" :placeholder="$t('DescriptionPlaceholder')" v-model="description"></textarea>
     
         </div>
-        <!--<div class="input-block">
-                                                                                                <label>
-                                                                                                    <i class="fa fa-cubes"></i>
-                                                                                                    Project
-                                                                                                    <button class="btn btn-primary btn-xs">
-                                                                                                        <i class="fa fa-plus"></i>
-                                                                                                    </button>
-                                                                                                </label>
-                                                                                            </div>-->
+        <div class="input-block">
+            <label>
+                <i class="fa fa-cubes"></i>
+                {{$t('Projects')}}
+                <button class="btn btn-primary btn-xs" @click="addProject">
+                    <i class="fa fa-plus"></i>
+                </button>
+            </label>
+            <div data-mode="Edit" class="selected-tags" v-if="projects&&projects.length">
+                <span :key="project" v-for="project in projects" class="selected-tag clickable" @click="removeProject(project)">{{project2name(project)}}</span>
+            </div>
+            <div data-mode="Edit" class="common-tags">
+                <span :key="tag.id" v-for="tag in allProjects" class="common-tag clickable" @click="selectProject(tag)">{{tag.name}}</span>
+            </div>
+        </div>
         <div class="input-block">
             <label>
                 <i class="fa fa-tags"></i>
@@ -107,6 +113,7 @@ const properties = {
     priority: "",
     selectedTags: [],
     commonTags: [],
+    projects: [],
     attachments: [],
     watchers: {},
 }
@@ -154,9 +161,22 @@ export default {
         }
     },
     computed: {
+
         userName: () => store.state.user.name,
         realRequestor: function () {
             return this.mode === 'Edit' ? this.uid2name(this.requestor) : this.userName;
+        },
+        allProjects() {
+            const map = {};
+            Object.assign(map, store.state.projects);
+            this.projects.forEach((project) => {
+                delete map[project];
+            });
+            const list = [];
+            for (const id in map) {
+                list.push(map[id]);
+            }
+            return list;
         }
     },
     props: ["change", 'mode', 'userList'],
@@ -167,6 +187,7 @@ export default {
         }
     },
     methods: {
+        project2name: (id) => store.getters.project2name(id),
         uid2name(uid) {
             const user = this.userList.find((user) => user.value == uid);
             if (user) {
@@ -200,19 +221,21 @@ export default {
             return deadline;
         },
         get() {
+            const ret = {
+                title: this.title,
+                description: this.description,
+                deadline: this.getDeadline(),
+                priority: this.priority,
+                selectedTags: this.selectedTags,
+                owner: this.owner,
+                status: this.status,
+                attachments: this.attachments,
+                projects: this.projects
+            }
             if (this.mode === 'Create') {
-                console.log(this.owner, this.requestor);
-                const ret = {
-                    title: this.title,
-                    description: this.description,
-                    deadline: this.getDeadline(),
-                    priority: this.priority,
-                    selectedTags: this.selectedTags,
-                    owner: this.owner,
-                    status: this.status,
+                Object.assign(ret, {
                     requestor: store.state.user.uid,
-                    attachments: this.attachments,
-                };
+                });
                 ret.watchers = {};
                 if (ret.owner) {
                     ret.watchers[ret.owner] = true;
@@ -220,22 +243,15 @@ export default {
                 if (ret.requestor) {
                     ret.watchers[ret.requestor] = true;
                 }
-                return ret;
+
             } else if (this.mode === 'Edit') {
-                return ({
+                Object.assign(ret, {
                     id: this.id,
-                    title: this.title,
-                    description: this.description,
-                    deadline: this.getDeadline(),
-                    priority: this.priority,
-                    selectedTags: this.selectedTags,
                     requestor: this.requestor,
-                    owner: this.owner,
-                    status: this.status,
                     watchers: this.watchers,
-                    attachments: this.attachments,
                 });
             }
+            return ret;
         },
         set(info) {
             if (!info.deadline) {
@@ -296,6 +312,24 @@ export default {
             const file = e.target.files[0];
             getBase64(file);
 
+        },
+        selectProject(project) {
+            console.log(project);
+            this.projects.push(project.id);
+        },
+        removeProject() {
+        },
+        addProject() {
+            const name = prompt('Give your project a name');
+            if (!name) {
+                return;
+            }
+            if (!name.trim()) {
+                return;
+            }
+            socket.emit('addProject', { name }, () => {
+
+            });
         },
     },
     components: {

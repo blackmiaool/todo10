@@ -20,7 +20,7 @@ const messages = {
         Owner: '接收者',
         'Attachments (200MB limit)': '附件 (上限200MB)',
         'Create': "创建",
-        'View': "创建",
+        'View': "查看",
         'Edit': "编辑",
         'Copy and Create (fork)': '复制并新建',
         'New': '新建',
@@ -48,6 +48,7 @@ const messages = {
         'Unwatch': '取消关注',
         'Watchers': '关注者',
         'Upload and copy url': '上传并复制地址',
+        'Projects': '项目'
     }
 }
 module.exports = messages;

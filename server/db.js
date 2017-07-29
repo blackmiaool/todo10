@@ -9,6 +9,12 @@ import {
 
 //create table
 db.serialize(function () {
+    db.run(`CREATE TABLE project (
+        id INTEGER PRIMARY KEY,
+        Name TEXT, 
+        Data TEXT
+        );
+    `, function (e) {});
     db.run(`CREATE TABLE user (
         id INTEGER PRIMARY KEY,
         Name VARCHAT(32),
@@ -191,6 +197,58 @@ function register($name, $email, $password, $avatar, $source) {
     });
 }
 
+function addProject({
+    name: $name
+}) {
+    return new Promise(function (resolve, reject) {
+        db.get(`SELECT id FROM project WHERE Name=$name;`, {
+            $name,
+        }, function (e, result) {
+            if (e) {
+                console.log(e);
+                reject(e);
+            } else {
+                if (!result) {
+                    db.serialize(function () {
+                        db.run(`INSERT INTO project (Name,Data) VALUES ($name,$data);`, {
+                            $name,
+                            $data: JSON.stringify({}),
+                        }, function (e) {
+                            if (e) {
+                                console.log(e);
+                                reject(e);
+                            } else {
+                                resolve(false);
+                            }
+                        });
+                    });
+                } else {
+                    console.log(result, 'duplicated');
+                    reject("duplicated");
+                }
+            }
+        });
+    });
+}
+
+function getProjects() {
+    return new Promise(function (resolve, reject) {
+        db.all(`SELECT Data as data,Name as name,id FROM project;`, {}, function (e, result) {
+            if (e) {
+                console.log(e);
+                reject(e);
+            } else {
+                if (!result) {
+                    reject(true);
+                }
+                result.forEach((v) => {
+                    v.data = JSON.parse(v.data);
+                });
+                resolve(result);
+            }
+        });
+    });
+}
 export {
     register,
     login,
@@ -199,4 +257,6 @@ export {
     edit,
     getAvatar,
     getUserList,
+    addProject,
+    getProjects
 }

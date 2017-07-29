@@ -28,6 +28,7 @@ import socket from "../io";
 
 import settings from '../settings';
 import store from 'store';
+
 export default {
     name: 'TodoLi',
     created() {
@@ -37,9 +38,11 @@ export default {
         canFinish: function () {
             return this.info.status === 'pending' && (this.info.requestor === store.state.user.uid || this.info.owner === store.state.user.uid)
         },
-        requestorName: function (uid) { return store.state.userMap[this.info.requestor] },
-        ownerName: function (uid) {
-            return store.state.userMap[this.info.owner]
+        requestorName: function () {
+            return store.getters.uid2name(this.info.requestor);
+        },
+        ownerName: function () {
+            return store.getters.uid2name(this.info.owner);
         }
     },
     mounted() {

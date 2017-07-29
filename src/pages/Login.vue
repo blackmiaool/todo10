@@ -84,11 +84,11 @@ export default {
     },
     mounted() {
         this.refreshAvatar();
-        store.dispatch("login").then((result) => {
-            this.onLogin(result);
-        }).catch(() => {
-            //ignore it;
-        });
+        // store.dispatch("login").then((result) => {
+        //     this.onLogin(result);
+        // }).catch(() => {
+        //     //ignore it;
+        // });
     },
     methods: {
         refreshAvatar() {
@@ -102,14 +102,11 @@ export default {
         },
 
         onSuccess(data) {
-            this.$root.avatar = data.avatar;
-            this.$root.userName = data.name;
             window.router.push({
                 name: this.$route.params.target || 'Todo',
                 query: this.$route.params.params,
                 params: {}
             });
-
         },
         onThird(mode) {
             return (data) => {

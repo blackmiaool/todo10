@@ -76,27 +76,29 @@ export default {
         setTimeout(() => {
             this.set();
         });
-        socket.emit("getUserList", {}, ({ code, data: { list } }) => {
-            const userMap = {};
-            list.forEach(user => {
-                userMap[user.uid] = user.name;
-            });
-            this.userList = list.map((user) => ({ label: `${user.name}`, value: user.uid }));
-            store.commit("setUserMap", userMap);
-        });
     },
-
     data() {
         return {
             mode: "Create",
             info: {
 
             },
-            userList: [],
             unsaved: false,
         }
     },
     computed: {
+        userList() {
+            const list = [];
+            for (const uid in store.state.userMap) {
+                const label = store.state.userMap[uid].name;
+                const value = uid;
+                list.push({
+                    label,
+                    value,
+                })
+            }
+            return list;
+        },
         logged: () => store.state.logged,
         canUnwatch() {
             return this.logged && this.info.watchers && this.info.watchers[store.state.user.uid];
