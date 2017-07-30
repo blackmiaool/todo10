@@ -6,10 +6,10 @@
                 <!--<span>{{priority2letter[info.priority]}}</span>-->
             </div>
             <label>{{info.title}}</label>
-            <button v-if="canFinish" class=" tool finish clickable" title="finish" @click="emit('finish',$event)"></button>
+            <button v-if="mutable&&canFinish" class=" tool finish clickable" title="finish" @click="emit('finish',$event)"></button>
     
-            <button v-if="info.status==='done'" class=" tool restore clickable" title="restore" @click="emit('restore',$event)"></button>
-            <button class=" tool destroy clickable" title="unwatch" @click="emit('destroy',$event)"></button>
+            <button v-if="mutable&&info.status==='done'" class=" tool restore clickable" title="restore" @click="emit('restore',$event)"></button>
+            <button v-if="mutable" class=" tool destroy clickable" title="unwatch" @click="emit('destroy',$event)"></button>
         </header>
         <main>
             <span class="relation">
@@ -48,7 +48,7 @@ export default {
     mounted() {
 
     },
-    props: ['info', 'selected'],
+    props: { info: Object, selected: Boolean, mutable: { type: Boolean, default: true } },
     data() {
         return {
             priority2letter: {

@@ -13,7 +13,6 @@ import settings from 'settings';
 import datepicker from 'vue-date';
 import TodoPanel from 'components/TodoPanel';
 import TodoList from 'components/TodoList';
-import TodoInfo from 'components/TodoInfo';
 import store from 'store';
 
 function e() {
@@ -96,8 +95,7 @@ export default {
     },
     components: {
         TodoPanel,
-        TodoList,
-        TodoInfo
+        TodoList
     }
 
 }

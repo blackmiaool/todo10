@@ -1,5 +1,5 @@
 <template>
-    <div class="current-panel root-panel todo-list-component">
+    <div class="list-panel todo-list-component">
         <div>
     
             <section class="todoapp">

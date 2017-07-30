@@ -1,5 +1,6 @@
 & {
     padding: 8px 15px;
+    box-sizing: border-box;
     background-color: #f1f2f5;
     position: relative;
     &.dragging {
@@ -38,6 +39,7 @@ p {
 
 .input-block {
     margin-bottom: 10px;
+    position: relative;
 }
 
 pre {
@@ -111,4 +113,10 @@ textarea {
         padding: 0 10px;
         margin-bottom: 5px;
     }
+}
+
+.owner-arrow {
+    position: absolute;
+    left: -60px;
+    bottom: 6px;
 }

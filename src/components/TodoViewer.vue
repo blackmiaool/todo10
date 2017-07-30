@@ -53,20 +53,20 @@
             <p>{{formattedDeadline}}</p>
         </div>
     
-        <div class="input-block">
+        <div class="input-block" style="display:inline-block;width:48%;">
             <label for="choose-assigner">
                 <i class="fa fa-user-o"></i>
                 {{$t('Requestor')}}
             </label>
             <p>{{requestorName}}</p>
         </div>
-    
-        <div class="input-block">
+        <div class="input-block" style="display:inline-block;width:48%;">
             <label for="choose-owner">
                 <i class="fa fa-user-circle-o"></i>
                 {{$t('Owner')}}
             </label>
             <p>{{ownerName}}</p>
+            <i class="fa fa-long-arrow-right owner-arrow"></i>
         </div>
     
         <div class="input-block" v-if="watchers">

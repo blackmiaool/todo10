@@ -102,6 +102,9 @@ import socket from "../io";
 import Vue from "vue";
 import FileList from 'components/FileList';
 const loadImage = require("blueimp-load-image");
+function clone(obj) {
+    return JSON.parse(JSON.stringify(obj));
+}
 const properties = {
     id: "",
     title: "",
@@ -149,7 +152,7 @@ export default {
 
     data() {
         return {
-            ...properties,
+            ...clone(properties),
             preventEdit: false,
             priorityMap: {
                 3: '(C) delay it as u want~',
@@ -257,7 +260,7 @@ export default {
             if (!info.deadline) {
                 info.deadline = '';
             }
-            Object.assign(this, properties);
+            Object.assign(this, clone(properties));
             Object.assign(this, info);
             this.preventEdit = true;
 
@@ -317,7 +320,9 @@ export default {
             console.log(project);
             this.projects.push(project.id);
         },
-        removeProject() {
+        removeProject(project) {
+            const index = this.projects.indexOf(project);
+            this.projects.splice(index, 1);
         },
         addProject() {
             const name = prompt('Give your project a name');

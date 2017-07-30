@@ -1,5 +1,5 @@
 <template>
-    <div ref="wrap" class="generate-panel root-panel todo-panel-component" @drop="drop" @dragenter="dragEnter" @dragleave="dragLeave" @dragexit="dragExit" @dragover="dragOver" @mouseover="dragClear">
+    <div ref="wrap" class="detail-panel todo-panel-component" @drop="drop" @dragenter="dragEnter" @dragleave="dragLeave" @dragexit="dragExit" @dragover="dragOver" @mouseover="dragClear">
         <h2 class="current-mode">
             <span>{{$t(mode)}}</span>
             <span v-if="unsaved && mode==='Edit'" class="unsaved">(unsaved)</span>
@@ -149,7 +149,7 @@ export default {
             this.selectedTags.splice(index, 1);
         },
         edit() {
-            if (this.info.requestor !== store.state.user.uid && this.info.owner !== store.state.user.uid) {
+            if (this.info.requestor != store.state.user.uid && this.info.owner != store.state.user.uid) {
                 alert("Only requestor or owner can mutate it");
                 return;
             }

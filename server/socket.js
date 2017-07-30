@@ -216,7 +216,7 @@ function init(io) {
             if (!socket.context.uid) {
                 return cb(errorMap[13]);
             }
-            const list = todo.getList(socket.context.uid);
+            const list = todo.getList(socket.context.uid, data);
             cb(list);
         });
         async function register({

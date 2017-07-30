@@ -2,7 +2,6 @@
     <div class="top-page-wrap todo-page">
         <TodoPanel page="todo" v-if="userName" ref="todoPanel" @create="onCreate" :editing="editing" @save="onSave" @fork="onFork" @newOne="onNew"></TodoPanel>
         <TodoList :list="list" ref="list" @select="onSelect" @finish="onFinish" @restore="onRestore" @destroy="onDestroy"></TodoList>
-        <TodoInfo></TodoInfo>
     </div>
 </template>
 
@@ -15,7 +14,6 @@ import settings from 'settings';
 import datepicker from 'vue-date';
 import TodoPanel from 'components/TodoPanel';
 import TodoList from 'components/TodoList';
-import TodoInfo from 'components/TodoInfo';
 import store from 'store';
 
 function e() {
@@ -48,7 +46,7 @@ export default {
     },
     mounted() {
         this.init();
-        store.commit("setCommonTags", ['编辑器', '活动', 'app-rn', '小程序', 'rnrender', '酷玩', '品味', 'todolist']);
+        store.commit("setCommonTags", ['活动', 'app-rn', 'rnrender', '酷玩', '品味']);
     },
     data() {
         return {
@@ -166,8 +164,7 @@ export default {
     },
     components: {
         TodoPanel,
-        TodoList,
-        TodoInfo
+        TodoList
     }
 
 }

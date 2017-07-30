@@ -30,12 +30,23 @@ function getTodo(id) {
     return mapAll[id];
 }
 
-function getList(uid) {
+function getList(uid, filter) {
+    console.log('filter', filter);
     const ret = [];
-    for (const id in mapCurrent) {
-        const item = mapCurrent[id];
-        if (item.watchers[uid]) {
-            ret.push(item);
+    if (filter && filter.project) {
+        filter.project = filter.project * 1;
+        for (const id in mapAll) {
+            const item = mapAll[id];
+            if (item.projects && item.projects.indexOf(filter.project) !== -1) {
+                ret.push(item);
+            }
+        }
+    } else {
+        for (const id in mapCurrent) {
+            const item = mapCurrent[id];
+            if (item.watchers[uid]) {
+                ret.push(item);
+            }
         }
     }
     return ret;
