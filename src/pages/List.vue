@@ -12,11 +12,16 @@
                         <label>
                             <i class="fa fa-cubes"></i>
                             Project: {{projectName}}
+                            <button class="btn btn-primary btn-xs" @click="addTag(project)" :title="$t('add tag')">
+                                <i class="fa fa-plus"></i>
+                            </button>
                         </label>
+    
                     </div>
-                    <!--<div class="tags">
-                            <router-link :to="'/list?project='+project.id+'&tag='+tag.id" class="clickable" v-for="tag in tags" :key="tag.id">{{project.name}}</router-link>
-                        </div>-->
+                    <div class="tags">
+                        <span v-for="tag in projectInfo(project).tags" :key="tag.id" class="top-tag">{{tag.name}}</span>
+                        <!--<router-link :to="'/list?project='+project.id+'&tag='+tag.id" class="clickable" v-for="tag in tags" :key="tag.id">{{project.name}}</router-link>-->
+                    </div>
                 </header>
                 <div class="todo-wrap">
                     <header class="list-header">
@@ -68,7 +73,7 @@ export default {
     computed: {
         userName: () => store.state.user && store.state.user.name,
         projectName() {
-            return store.getters.project2name(this.project);
+            return store.getters.projectInfo(this.project).name;
         },
         projects() {
             return store.state.projects;
@@ -92,6 +97,20 @@ export default {
         '$route': 'init'
     },
     methods: {
+        addTag(projectId) {
+            console.log('projectId', projectId);
+            const name = prompt("New Tag Name");
+            if (!name) {
+                return;
+            }
+            socket.emit("addTag", { project: projectId, tag: name }, (result) => {
+                console.log('result', result)
+                store.dispatch('getProjects').then((projects) => { });
+            });
+        },
+        projectInfo(project) {
+            return store.getters.projectInfo(project);
+        },
         init() {
             this.project = this.$route.query.project;
             this.tag = this.$route.query.tag;

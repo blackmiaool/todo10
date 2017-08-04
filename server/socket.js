@@ -166,6 +166,7 @@ function init(io) {
                 name: data.name
             });
         }, true);
+        $on('addTag', db.addTag, true);
         $on('getProjects', db.getProjects, false);
 
         socket.on('edit', async(data, cb) => {

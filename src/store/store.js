@@ -89,7 +89,14 @@ const actions = {
                 code,
                 data
             }) => {
+                const tagMap = {};
                 const map = list2map(data, 'id');
+                data.forEach((project) => {
+                    project.tags.forEach((tag) => {
+                        tagMap[tag.id] = tag;
+                    });
+                });
+                commit("setTags", tagMap);
                 commit("setProjects", map);
                 resolve(map);
             });
@@ -132,6 +139,9 @@ const store = new Vuex.Store({
         setUser(state, userInfo) {
             state.user = userInfo;
         },
+        setTags(state, tags) {
+            state.tags = tags;
+        },
         setCommonTags(state, tags) {
             state.commonTags = tags;
         },
@@ -156,16 +166,28 @@ const store = new Vuex.Store({
                 return user.name;
             }
         },
-        project2name(state) {
+        projectInfo(state) {
             return (id) => {
                 if (!id) {
-                    return '';
+                    return {};
                 }
                 const project = state.projects[id];
                 if (!project) {
                     return 'not found';
                 }
-                return project.name;
+                return project;
+            };
+        },
+        tagInfo(state) {
+            return (id) => {
+                if (!id) {
+                    return {};
+                }
+                const tag = state.tags[id];
+                if (!tag) {
+                    return 'not found';
+                }
+                return tag;
             };
         }
     }

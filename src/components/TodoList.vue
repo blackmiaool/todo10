@@ -67,7 +67,13 @@ import settings from '../settings';
 import datepicker from 'vue-date';
 import store from 'store';
 import TodoLi from 'components/TodoLi'
-
+function sortList(a, b) {
+    if (a.priority === b.priority) {
+        return a.name > b.name ? 1 : -1;
+    } else {
+        return a.priority - b.priority;
+    }
+}
 export default {
     name: 'TodoList',
     created() {
@@ -77,17 +83,17 @@ export default {
         listPending() {
             return this.list.filter((item) => {
                 return item.owner == store.state.user.uid && item.status === 'pending';
-            }).sort((a, b) => a.priority - b.priority);
+            }).sort(sortList);
         },
         listWatching() {
             return this.list.filter((item) => {
                 return item.owner != store.state.user.uid;
-            }).sort((a, b) => a.priority - b.priority);
+            }).sort(sortList);
         },
         listDone() {
             return this.list.filter((item) => {
                 return item.owner == store.state.user.uid && item.status === 'done';
-            }).sort((a, b) => a.priority - b.priority);
+            }).sort(sortList);
         }
     },
     mounted() {

@@ -9,6 +9,13 @@ import {
 
 //create table
 db.serialize(function () {
+    db.run(`CREATE TABLE tag (
+        id INTEGER PRIMARY KEY,
+        Name TEXT,
+        Project INTEGER,     
+        FOREIGN KEY (Project) REFERENCES project(id) 
+        );
+    `, function (e) {});
     db.run(`CREATE TABLE project (
         id INTEGER PRIMARY KEY,
         Name TEXT, 
@@ -231,8 +238,29 @@ function addProject({
     });
 }
 
+function addTag({
+    project,
+    tag
+}) {
+    return new Promise((resolve, reject) => {
+        db.run(`INSERT INTO tag (Name,Project) VALUES ($name,$project);`, {
+            $name: tag,
+            $project: project,
+        }, function (e) {
+            if (e) {
+                console.log(e);
+                resolve(e);
+            } else {
+                resolve(false);
+            }
+        });
+    });
+}
+
 function getProjects() {
-    return new Promise(function (resolve, reject) {
+    let projects;
+    let tags;
+    const p1 = new Promise((resolve, reject) => {
         db.all(`SELECT Data as data,Name as name,id FROM project;`, {}, function (e, result) {
             if (e) {
                 console.log(e);
@@ -241,13 +269,40 @@ function getProjects() {
                 if (!result) {
                     reject(true);
                 }
-                result.forEach((v) => {
-                    v.data = JSON.parse(v.data);
-                });
+
+                projects = result;
                 resolve(result);
             }
         });
     });
+    const p2 = new Promise((resolve, reject) => {
+        db.all(`SELECT Project as project,Name as name,id FROM tag;`, {}, function (e, result) {
+            if (e) {
+                console.log(e);
+                reject(e);
+            } else {
+                if (!result) {
+                    reject(true);
+                }
+                tags = result;
+                resolve(result);
+            }
+        });
+    });
+    return p1.then(() => p2).then(() => new Promise((resolve, reject) => {
+        const tagMap = {};
+        tags.forEach((tag) => {
+            if (!tagMap[tag.project]) {
+                tagMap[tag.project] = [];
+            }
+            tagMap[tag.project].push(tag);
+        });
+        projects.forEach((project) => {
+            project.data = JSON.parse(project.data);
+            project.tags = tagMap[project.id] || [];
+        });
+        resolve(projects);
+    }));
 }
 export {
     register,
@@ -258,5 +313,6 @@ export {
     getAvatar,
     getUserList,
     addProject,
-    getProjects
+    getProjects,
+    addTag
 }

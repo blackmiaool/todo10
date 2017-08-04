@@ -16,7 +16,7 @@
                 {{requestorName}} -> {{ownerName}}
             </span>
             <span class="tags">
-                <span v-for="tag in info.selectedTags" :key="tag" class="tag">{{tag}}</span>
+                <span v-for="project in info.projects" :key="project" class="tag">{{projectInfo(project).name}}</span>
             </span>
         </main>
     </li>
@@ -36,7 +36,7 @@ export default {
     },
     computed: {
         canFinish: function () {
-            return this.info.status === 'pending' && (this.info.requestor === store.state.user.uid || this.info.owner === store.state.user.uid)
+            return this.info.status === 'pending' && (this.info.requestor == store.state.user.uid || this.info.owner == store.state.user.uid)
         },
         requestorName: function () {
             return store.getters.uid2name(this.info.requestor);
@@ -70,6 +70,7 @@ export default {
         select(item) {
             this.$emit("select", item);
         },
+        projectInfo: store.getters.projectInfo,
     },
     components: {
 

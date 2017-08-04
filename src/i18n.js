@@ -48,7 +48,8 @@ const messages = {
         'Unwatch': '取消关注',
         'Watchers': '关注者',
         'Upload and copy url': '上传并复制地址',
-        'Projects': '项目'
+        'Projects': '项目',
+        'add tag': '新增标签',
     }
 }
 module.exports = messages;

@@ -1,12 +1,14 @@
 <template>
     <div class="todo-viewer">
+        <span class="id-detail">id:{{id}}</span>
         <div class="input-block">
+    
             <label for="new-todo-title">
                 <i class="fa fa-pencil"></i>
                 {{$t('Title')}}
             </label>
             <p>{{title}}</p>
-            <span class="id-detail">id:{{id}}</span>
+    
         </div>
     
         <div v-if="description" class="input-block">
@@ -23,17 +25,17 @@
                 {{$t('Projects')}}
             </label>
             <div data-mode="View" class="selected-tags">
-                <span :key="project" v-for="project in projects" class="selected-tag clickable" @click="goProject(project)">{{project2name(project)}}</span>
+                <span :key="project" v-for="project in projects" class="selected-tag clickable" @click="goProject(project)">{{projectInfo(project).name}}</span>
             </div>
         </div>
     
-        <div v-if="selectedTags&&selectedTags.length" class="input-block">
+        <div v-if="tags&&tags.length" class="input-block">
             <label>
                 <i class="fa fa-tags"></i>
                 {{$t('Tags')}}
             </label>
             <div data-mode="View" class="selected-tags">
-                <span :key="tag" v-for="tag in selectedTags" class="selected-tag clickable">{{tag}}</span>
+                <span :key="tag" v-for="tag in tags" class="selected-tag clickable">{{tagInfo(tag).name}}</span>
             </div>
         </div>
     
@@ -107,7 +109,7 @@ const properties = {
     deadlineText: "",
     owner: "",
     priority: "",
-    selectedTags: [],
+    tags: [],
     commonTags: [],
     attachments: [],
     watchers: {},
@@ -161,7 +163,8 @@ export default {
     },
     props: ['userList'],
     methods: {
-        project2name: (id) => store.getters.project2name(id),
+        tagInfo: (id) => store.getters.tagInfo(id),
+        projectInfo: (id) => store.getters.projectInfo(id),
         set(info) {
             Object.assign(this, properties);
             Object.assign(this, info);

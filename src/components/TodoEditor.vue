@@ -1,12 +1,13 @@
 <template>
     <div class="todo-editor">
+        <span class="id-detail">id:{{id}}</span>
         <div class="input-block">
             <label for="new-todo-title">
                 <i class="fa fa-pencil"></i>
                 {{$t("Title")}}
             </label>
             <input type="text" id="new-todo-title" class="form-control" :placeholder="$t('TitlePlaceholder')" v-model="title">
-            <span class="id-detail">id:{{id}}</span>
+    
         </div>
         <div class="input-block">
             <label for="new-todo-content">
@@ -20,12 +21,12 @@
             <label>
                 <i class="fa fa-cubes"></i>
                 {{$t('Projects')}}
-                <button class="btn btn-primary btn-xs" @click="addProject">
+                <button class="btn btn-primary btn-xs" @click="addProject" title="add project">
                     <i class="fa fa-plus"></i>
                 </button>
             </label>
             <div data-mode="Edit" class="selected-tags" v-if="projects&&projects.length">
-                <span :key="project" v-for="project in projects" class="selected-tag clickable" @click="removeProject(project)">{{project2name(project)}}</span>
+                <span :key="project" v-for="project in projects" class="selected-tag clickable" @click="removeProject(project)">{{projectInfo(project).name}}</span>
             </div>
             <div data-mode="Edit" class="common-tags">
                 <span :key="tag.id" v-for="tag in allProjects" class="common-tag clickable" @click="selectProject(tag)">{{tag.name}}</span>
@@ -36,11 +37,12 @@
                 <i class="fa fa-tags"></i>
                 {{$t('Tags')}}
             </label>
-            <div data-mode="Edit" class="selected-tags" v-if="selectedTags&&selectedTags.length">
-                <span :key="tag" v-for="tag in selectedTags" class="selected-tag clickable" @click="removeTag(tag)">{{tag}}</span>
+            <div v-if="!availableTags.length">Select a project first</div>
+            <div data-mode="Edit" class="selected-tags" v-if="tags&&tags.length">
+                <span :key="tag" v-for="tag in tags" class="selected-tag clickable" @click="removeTag(tag)">{{tagInfo(tag).name}}</span>
             </div>
             <div data-mode="Edit" class="common-tags">
-                <span :key="tag" v-for="tag in commonTags" class="common-tag clickable" @click="selectTag(tag)">{{tag}}</span>
+                <span :key="tag.id" v-for="tag in availableTags" class="common-tag clickable" @click="selectTag(tag.id)">{{tag.name}}</span>
             </div>
     
         </div>
@@ -89,7 +91,6 @@
             <input @change="onFileUpload" type="file" accept="*">
             <FileList v-model="attachments" mode="edit"></FileList>
         </div>
-    
     </div>
 </template>
 
@@ -119,6 +120,7 @@ const properties = {
     projects: [],
     attachments: [],
     watchers: {},
+    tags: [],
 }
 Vue.filter('url2fileName', function (value) {
     const arr = value.split('/');
@@ -180,6 +182,17 @@ export default {
                 list.push(map[id]);
             }
             return list;
+        },
+        availableTags() {
+            let tags = [];
+            this.projects.forEach((project) => {
+                tags = tags.concat(store.state.projects[project].tags);
+            });
+            tags = tags.filter((tag) => {
+                return this.tags.indexOf(tag.id) === -1
+            });
+            return tags;
+
         }
     },
     props: ["change", 'mode', 'userList'],
@@ -190,7 +203,8 @@ export default {
         }
     },
     methods: {
-        project2name: (id) => store.getters.project2name(id),
+        tagInfo: (id) => store.getters.tagInfo(id),
+        projectInfo: (id) => store.getters.projectInfo(id),
         uid2name(uid) {
             const user = this.userList.find((user) => user.value == uid);
             if (user) {
@@ -206,15 +220,14 @@ export default {
                 this.owner = undefined;
             }
         },
-        selectTag(tag) {
-            const index = this.commonTags.indexOf(tag);
-            this.selectedTags.push(tag);
-            this.commonTags.splice(index, 1);
+        selectTag(tagId) {
+            // const index = this.commonTags.indexOf(tag);
+            this.tags.push(tagId);
+            // this.commonTags.splice(index, 1);
         },
         removeTag(tag) {
-            const index = this.selectedTags.indexOf(tag);
-            this.commonTags.push(tag);
-            this.selectedTags.splice(index, 1);
+            const index = this.tags.indexOf(tag);
+            this.tags.splice(index, 1);
         },
         getDeadline() {
             let deadline = 0;
@@ -233,7 +246,8 @@ export default {
                 owner: this.owner,
                 status: this.status,
                 attachments: this.attachments,
-                projects: this.projects
+                projects: this.projects,
+                tags: this.tags
             }
             if (this.mode === 'Create') {
                 Object.assign(ret, {
@@ -317,12 +331,18 @@ export default {
 
         },
         selectProject(project) {
-            console.log(project);
             this.projects.push(project.id);
+
         },
         removeProject(project) {
             const index = this.projects.indexOf(project);
             this.projects.splice(index, 1);
+            this.projectInfo(project).tags.forEach((tag) => {
+                const index = this.tags.indexOf(tag.id);
+                if (index > -1) {
+                    this.tags.splice(index, 1);
+                }
+            });
         },
         addProject() {
             const name = prompt('Give your project a name');
