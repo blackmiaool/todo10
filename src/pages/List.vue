@@ -5,6 +5,10 @@
         <div class="list-panel">
             <div class="projects-wrap">
                 <router-link :to="'/list?project='+project.id" class="clickable btn btn-primary" v-for="project in projects" :key="project.id">{{project.name}}</router-link>
+                <button class="btn btn-primary btn-xs" @click="addProject" title="add project">
+                    Add Project
+                    <i class="fa fa-plus"></i>
+                </button>
             </div>
             <div class="list-panel-content" v-if="project">
                 <header class="filter-wrap">
@@ -13,6 +17,7 @@
                             <i class="fa fa-cubes"></i>
                             Project: {{projectName}}
                             <button class="btn btn-primary btn-xs" @click="addTag(project)" :title="$t('add tag')">
+                                {{$t('Add Tag')}}
                                 <i class="fa fa-plus"></i>
                             </button>
                         </label>
@@ -157,6 +162,18 @@ export default {
             this.$refs.todoPanel.view(item);
             this.selecting = item.id;
 
+        },
+        addProject() {
+            const name = prompt('Give your project a name');
+            if (!name) {
+                return;
+            }
+            if (!name.trim()) {
+                return;
+            }
+            socket.emit('addProject', { name }, () => {
+
+            });
         },
 
     },

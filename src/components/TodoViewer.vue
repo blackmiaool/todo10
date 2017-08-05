@@ -1,7 +1,7 @@
 <template>
     <div class="todo-viewer">
         <span class="id-detail">id:{{id}}</span>
-        <div class="input-block">
+        <div v-if="title" class="input-block">
     
             <label for="new-todo-title">
                 <i class="fa fa-pencil"></i>
@@ -71,7 +71,7 @@
             <i class="fa fa-long-arrow-right owner-arrow"></i>
         </div>
     
-        <div class="input-block" v-if="watchers">
+        <div class="input-block" v-if="watchers&&Object.keys(watchers).length">
             <label for="choose-owner">
                 <i class="fa fa-group"></i>
                 {{$t('Watchers')}}
@@ -133,6 +133,7 @@ export default {
                 1: '(A) do it as soon as possible!',
                 0: '(S) do it right now!!!',
             },
+            selectingId: undefined,
         }
     },
     computed: {
@@ -150,7 +151,7 @@ export default {
             }
 
         },
-        descriptionHandled: function () {
+        descriptionHandled() {
             return this.description.replace(/\n/g, "<br/>")
         },
         handledWatchers() {
@@ -159,15 +160,27 @@ export default {
                 ret.push(store.getters.uid2name(uid));
             }
             return ret;
+        },
+        theInfo() {
+            console.log('get the info')
+            return store.state.list.find((li) => li.id == this.selectingId);
         }
     },
     props: ['userList'],
+    watch: {
+        theInfo() {
+            this.set(this.selectingId);
+        }
+    },
     methods: {
         tagInfo: (id) => store.getters.tagInfo(id),
         projectInfo: (id) => store.getters.projectInfo(id),
-        set(info) {
+        set(id) {
+            this.selectingId = id;
+            const info = store.state.list.find((li) => li.id == id);
             Object.assign(this, properties);
             Object.assign(this, info);
+
         },
         goProject(project) {
             window.router.push({

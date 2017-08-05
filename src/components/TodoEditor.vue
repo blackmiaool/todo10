@@ -21,9 +21,7 @@
             <label>
                 <i class="fa fa-cubes"></i>
                 {{$t('Projects')}}
-                <button class="btn btn-primary btn-xs" @click="addProject" title="add project">
-                    <i class="fa fa-plus"></i>
-                </button>
+    
             </label>
             <div data-mode="Edit" class="selected-tags" v-if="projects&&projects.length">
                 <span :key="project" v-for="project in projects" class="selected-tag clickable" @click="removeProject(project)">{{projectInfo(project).name}}</span>
@@ -80,8 +78,9 @@
                 <i class="fa fa-user-circle-o"></i>
                 {{$t('Owner')}}
             </label>
-            <v-select :value.sync="targetOwner" :options="userList" placeholder="search..." :onChange="onSelectOwner">
+            <v-select v-if="mode==='Create'" :value.sync="targetOwner" :options="userList" placeholder="search..." :onChange="onSelectOwner">
             </v-select>
+            <div v-if="mode==='Edit'">{{uid2name(owner)}}</div>
         </div>
         <div class="input-block">
             <label for="choose-owner">
@@ -342,18 +341,6 @@ export default {
                 if (index > -1) {
                     this.tags.splice(index, 1);
                 }
-            });
-        },
-        addProject() {
-            const name = prompt('Give your project a name');
-            if (!name) {
-                return;
-            }
-            if (!name.trim()) {
-                return;
-            }
-            socket.emit('addProject', { name }, () => {
-
             });
         },
     },

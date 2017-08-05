@@ -2,20 +2,20 @@
     <div class="comp-filelist">
         <div :key="attachment" v-for="(attachment,key) in value">
             <section>
-                <button v-if="mode==='edit'" class="btn btn-danger btn-xs" @click="remove(key)">
-                    <i class="fa fa-remove"></i>
-                </button>
+    
                 <a :href="attachment" target="_blank">{{attachment | url2fileName}}</a>
                 <div class="button-group">
-                    <button class="btn btn-success btn-xs" @click="upload(attachment)">
-                        <i class="fa fa-upload" :title="$t('Upload and copy url')"></i>
+                    <button class="btn btn-success btn-xs" @click="upload(attachment)" :title="$t('Upload and copy url')">
+                        <i class="fa fa-upload"></i>
                     </button>
-                    <a :href="attachment" class="btn btn-default btn-xs" download>
-                        <i class="fa fa-download" :title="$t('Upload and copy url')"></i>
+                    <a :href="attachment" class="btn btn-default btn-xs" download :title="$t('Download')">
+                        <i class="fa fa-download"></i>
                     </a>
-    
+                    <button v-if="mode==='edit'" class="btn btn-danger btn-xs" @click="remove(key)" :title="$t('Delete')">
+                        <i class="fa fa-remove"></i>
+                    </button>
                 </div>
-                <div v-if="attachment.match(/jpeg|jpg|png|gif|svg$/)" class="file-preview-img">
+                <div v-if="showPreview(attachment)" class="file-preview-img">
                     <a :href="attachment" target="_blank">
                         <img :src="attachment" alt="">
                     </a>
@@ -50,6 +50,9 @@ export default {
 
     },
     methods: {
+        showPreview(attachment) {
+            return attachment && attachment.match(/jpeg|jpg|png|gif|svg$/);
+        },
         upload(url) {
             if (url.match(/^\/\//)) {
                 url = 'http:' + url;

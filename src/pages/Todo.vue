@@ -1,7 +1,12 @@
 <template>
     <div class="top-page-wrap todo-page">
-        <TodoPanel page="todo" v-if="userName" ref="todoPanel" @create="onCreate" :editing="editing" @save="onSave" @fork="onFork" @newOne="onNew"></TodoPanel>
+        <TodoPanel page="todo" v-if="userName" ref="todoPanel" @create="onCreate" :editing="editing" @save="onSave" @fork="onFork" @newOne="onNew" @transfer="onTransfer"></TodoPanel>
         <TodoList :list="list" ref="list" @select="onSelect" @finish="onFinish" @restore="onRestore" @destroy="onDestroy"></TodoList>
+        <Modal v-if="showingModal">
+            <UserSelector v-if="modalMap.userSelector" @select="onSelectUser">
+    
+            </UserSelector>
+        </Modal>
     </div>
 </template>
 
@@ -14,6 +19,8 @@ import settings from 'settings';
 import datepicker from 'vue-date';
 import TodoPanel from 'components/TodoPanel';
 import TodoList from 'components/TodoList';
+import Modal from 'components/Modal';
+import UserSelector from 'components/UserSelector';
 import store from 'store';
 
 function e() {
@@ -53,10 +60,10 @@ export default {
             mode: "Create",
             editing: undefined,
             initialized: false,
-            list: [
-
-            ],
-
+            isSelectingUser: false,
+            list: [],
+            showingModal: false,
+            modalMap: {},
             today: (new Date()).format("yyyy-MM-dd")
         }
     },
@@ -69,6 +76,7 @@ export default {
             // vm.$refs.todoPanel.set(vm.list[0]);
             this.$refs.todoPanel.setMode("Create");
             socket.emit("getList", {}, (result) => {
+                store.commit('setTodoList', result);
                 this.list = result;
                 if (this.$route.params.id) {
                     this.view(this.$route.params.id);
@@ -161,10 +169,51 @@ export default {
                 this.$refs.todoPanel.set({});
             })
         },
+        hideModal() {
+            this.showingModal = false;
+            this.modalMap = {};
+        },
+        showModal(name) {
+            this.showingModal = true;
+            this.modalMap[name] = true;
+        },
+        selectUser() {
+            this.showModal('userSelector');
+            return new Promise((resolve, reject) => {
+                this.$on("select-user", (uid) => {
+                    resolve(uid);
+                });
+                this.$on("close-user-selector", (uid) => {
+                    resolve(uid);
+                });
+            });
+        },
+        onTransfer(id) {
+            this.selectUser().then((uid) => {
+                console.log('transfer', id, 'to', uid);
+
+                socket.emit("transfer", {
+                    id,
+                    uid,
+                }, ({ data: { list } }) => {
+                    console.warn('list', list);
+                    store.commit('setTodoList', list);
+                    this.list = list;
+                });
+            }).catch(() => {
+
+            });
+        },
+        onSelectUser(uid) {
+            this.$emit("select-user", uid);
+            this.hideModal();
+        }
     },
     components: {
         TodoPanel,
-        TodoList
+        TodoList,
+        UserSelector,
+        Modal
     }
 
 }

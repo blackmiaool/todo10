@@ -16,7 +16,7 @@
                 {{requestorName}} -> {{ownerName}}
             </span>
             <span class="tags">
-                <span v-for="project in info.projects" :key="project" class="tag">{{projectInfo(project).name}}</span>
+                <span v-for="project in info.projects" :key="project" class="project">{{projectInfo(project).name}}</span>
             </span>
         </main>
     </li>

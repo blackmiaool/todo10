@@ -86,11 +86,18 @@ async function unwatch(id, uid) {
     await edit(id, info);
     return info;
 }
+async function transfer(id, uid) {
+    const info = getTodo(id);
+    info.owner = uid;
+    info.watchers[uid] = true;
+    await edit(id, info);
+}
 module.exports = {
     getList,
     create,
     edit,
     getTodo,
     watch,
-    unwatch
+    unwatch,
+    transfer
 }

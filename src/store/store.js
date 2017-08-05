@@ -128,6 +128,7 @@ const store = new Vuex.Store({
         connected: false,
         logged: false,
         projects: {},
+        list: [],
     },
     mutations: {
         setLoginState(state, logged) {
@@ -151,6 +152,9 @@ const store = new Vuex.Store({
         setProjects(state, map) {
             state.projects = map;
         },
+        setTodoList(state, list) {
+            state.list = list;
+        }
     },
     actions,
     getters: {
@@ -189,7 +193,7 @@ const store = new Vuex.Store({
                 }
                 return tag;
             };
-        }
+        },
     }
 });
 window.ddd = () => {

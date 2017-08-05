@@ -31,6 +31,10 @@
                 <i class="fa fa-save"></i>
                 {{$t('Save')}}
             </button>
+            <button v-if="mode==='View'&&page==='todo'" class="btn btn-danger submit" @click="transfer">
+                <i class="fa fa-paper-plane"></i>
+                {{$t('Transfer')}}
+            </button>
             <button v-if="mode==='View'&&page==='view'&&!logged" class="btn btn-success submit" @click="emit('login')">
                 <i class="fa fa-save"></i>
                 {{$t('goLogin')}}
@@ -135,7 +139,7 @@ export default {
         set(info = this.info) {
             info = JSON.parse(JSON.stringify(info));
             this.info = info;
-            this.$refs.viewer && this.$refs.viewer.set(info);
+            this.$refs.viewer && this.$refs.viewer.set(info.id);
             this.$refs.editor && this.$refs.editor.set(info);
         },
         selectTag(tag) {
@@ -171,6 +175,9 @@ export default {
         },
         emit(...rags) {
             this.$emit(...rags);
+        },
+        transfer() {
+            this.$emit('transfer', this.info.id);
         },
         drop(e) {
             const dropEvent = e;

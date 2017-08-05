@@ -50,6 +50,11 @@ const messages = {
         'Upload and copy url': '上传并复制地址',
         'Projects': '项目',
         'add tag': '新增标签',
+        'Add Tag': '新增标签',
+        'Delete': '删除',
+        'Transfer': '移交',
+        'Download': '下载',
+        'Select a user': '选择一个用户',
     }
 }
 module.exports = messages;

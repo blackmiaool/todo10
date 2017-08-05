@@ -168,6 +168,15 @@ function init(io) {
         }, true);
         $on('addTag', db.addTag, true);
         $on('getProjects', db.getProjects, false);
+        $on('transfer', async function ({
+            id,
+            uid
+        }) {
+            await todo.transfer(id, uid);
+            return {
+                list: todo.getList(socket.context.uid)
+            };
+        }, false);
 
         socket.on('edit', async(data, cb) => {
             if (!socket.context.uid) {
@@ -176,7 +185,7 @@ function init(io) {
             }
             const id = data.id;
             await todo.edit(id, data);
-            const list = await todo.getList(socket.context.uid);
+            const list = todo.getList(socket.context.uid);
             cb(successData({
                 id,
                 list
@@ -207,7 +216,7 @@ function init(io) {
             }
             data.status = 'pending';
             const id = await todo.create(data);
-            const list = await todo.getList(socket.context.uid);
+            const list = todo.getList(socket.context.uid);
             cb(successData({
                 id,
                 list
