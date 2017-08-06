@@ -40,6 +40,8 @@
                 <h3>
                     <i class="fa fa-trash"></i>
                     {{$t('Finished')}}
+                    <button class="btn btn-primary btn-xs" @click="$emit('generateReport',[listPending,listDone])">
+                        <i class="fa fa-file-text"></i> {{$t('Generate Report')}}</button>
                 </h3>
                 <div class="todo-wrap">
                     <header class="list-header"></header>

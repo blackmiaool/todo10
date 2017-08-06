@@ -1,11 +1,14 @@
 <template>
     <div class="top-page-wrap todo-page">
         <TodoPanel page="todo" v-if="userName" ref="todoPanel" @create="onCreate" :editing="editing" @save="onSave" @fork="onFork" @newOne="onNew" @transfer="onTransfer"></TodoPanel>
-        <TodoList :list="list" ref="list" @select="onSelect" @finish="onFinish" @restore="onRestore" @destroy="onDestroy"></TodoList>
+        <TodoList :list="list" ref="list" @select="onSelect" @finish="onFinish" @restore="onRestore" @destroy="onDestroy" @generateReport="onGenerateReport"></TodoList>
         <Modal v-if="showingModal" @cancel="onModalCancel">
             <UserSelector v-if="modalMap.userSelector" @select="onSelectUser">
     
             </UserSelector>
+            <ReportViewer v-if="modalMap.reportViewer" :list="reportList">
+    
+            </ReportViewer>
         </Modal>
     </div>
 </template>
@@ -18,6 +21,7 @@ import TodoPanel from 'components/TodoPanel';
 import TodoList from 'components/TodoList';
 import Modal from 'components/Modal';
 import UserSelector from 'components/UserSelector';
+import ReportViewer from 'components/ReportViewer';
 import socket from "../io";
 
 export default {
@@ -57,7 +61,8 @@ export default {
             isSelectingUser: false,
             showingModal: false,
             modalMap: {},
-            today: (new Date()).format("yyyy-MM-dd")
+            today: (new Date()).format("yyyy-MM-dd"),
+            reportList: []
         }
     },
     watch: {
@@ -186,13 +191,18 @@ export default {
         onSelectUser(uid) {
             this.$emit("select-user", uid);
             this.hideModal();
+        },
+        onGenerateReport(list) {
+            this.showModal('reportViewer');
+            this.reportList = list;
         }
     },
     components: {
         TodoPanel,
         TodoList,
         UserSelector,
-        Modal
+        Modal,
+        ReportViewer
     }
 
 }

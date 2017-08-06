@@ -176,7 +176,11 @@ export default {
             this.$emit('save', this.$refs.editor.get());
         },
         create() {
-            this.$emit('create', this.$refs.editor.get());
+            const info = this.$refs.editor.get();
+            if (!info.title) {
+                return alert("title is needed")
+            }
+            this.$emit('create', info);
         },
         emit(...rags) {
             this.$emit(...rags);
