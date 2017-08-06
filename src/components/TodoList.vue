@@ -59,14 +59,10 @@
 </template>
 
 <script>
-import $ from "jquery";
-import socket from "../io";
 
-import eventHub from '../eventHub';
-import settings from '../settings';
-import datepicker from 'vue-date';
 import store from 'store';
-import TodoLi from 'components/TodoLi'
+import TodoLi from 'components/TodoLi';
+
 function sortList(a, b) {
     if (a.priority === b.priority) {
         return a.name > b.name ? 1 : -1;
@@ -76,24 +72,17 @@ function sortList(a, b) {
 }
 export default {
     name: 'TodoList',
-    created() {
-
-    },
     computed: {
         listPending() {
-            return this.list.filter((item) => {
-                return item.owner == store.state.user.uid && item.status === 'pending';
-            }).sort(sortList);
+            return this.list.filter(item =>
+                item.owner == store.state.user.uid
+                && item.status === 'pending').sort(sortList);
         },
         listWatching() {
-            return this.list.filter((item) => {
-                return item.owner != store.state.user.uid;
-            }).sort(sortList);
+            return this.list.filter(item => item.owner != store.state.user.uid).sort(sortList);
         },
         listDone() {
-            return this.list.filter((item) => {
-                return item.owner == store.state.user.uid && item.status === 'done';
-            }).sort(sortList);
+            return this.list.filter(item => item.owner == store.state.user.uid && item.status === 'done').sort(sortList);
         }
     },
     mounted() {
@@ -103,10 +92,7 @@ export default {
     data() {
         return {
             selecting: "",
-        }
-    },
-    watch: {
-
+        };
     },
     methods: {
         liAction({ action, info }) {
@@ -116,7 +102,7 @@ export default {
             this.selecting = item.id;
             this.$emit("select", item);
         },
-        clear(item) {
+        clear() {
             this.selecting = undefined;
         },
     },
@@ -124,6 +110,6 @@ export default {
         TodoLi
     }
 
-}
+};
 
 </script>

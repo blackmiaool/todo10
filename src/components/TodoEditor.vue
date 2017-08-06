@@ -1,6 +1,6 @@
 <template>
     <div class="todo-editor">
-        <span class="id-detail">id:{{id}}</span>
+        <span class="id-detail" v-if="id">id:{{id}}</span>
         <div class="input-block">
             <label for="new-todo-title">
                 <i class="fa fa-pencil"></i>

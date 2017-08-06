@@ -1,17 +1,17 @@
 import {
-    loadLocal
-} from "./io";
+    loadLocal,
+} from './io';
 
-let config = loadLocal("config");
+let config = loadLocal('config');
 
 if (!config) {
     config = {
-        showNotification: false
-    }
+        showNotification: false,
+    };
 }
 if (config.showNotification) {
-    window.Notification.requestPermission(function (permission) {});
+    window.Notification.requestPermission((permission) => {});
 }
 export default {
-    config
-}
+    config,
+};

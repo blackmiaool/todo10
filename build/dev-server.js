@@ -10,22 +10,23 @@ var webpackConfig = require('./webpack.dev.conf')
 
 // default port where dev server listens for incoming traffic
 var port = process.env.PORT || config.dev.port
-    // Define HTTP proxies to your custom API backend
-    // https://github.com/chimurai/http-proxy-middleware
+// Define HTTP proxies to your custom API backend
+// https://github.com/chimurai/http-proxy-middleware
 var proxyTable = config.dev.proxyTable
 
 var app = express()
+// app.use(express.compress());
 var compiler = webpack(webpackConfig)
 
 var devMiddleware = require('webpack-dev-middleware')(compiler, {
     publicPath: webpackConfig.output.publicPath,
-    quiet: true
+    quiet: true,
 })
 
 var hotMiddleware = require('webpack-hot-middleware')(compiler, {
-        log: () => {}
-    })
-    // force page reload when html-webpack-plugin template changes
+    log: () => {}
+})
+// force page reload when html-webpack-plugin template changes
 compiler.plugin('compilation', function (compilation) {
     compilation.plugin('html-webpack-plugin-after-emit', function (data, cb) {
         hotMiddleware.publish({
@@ -48,7 +49,8 @@ Object.keys(proxyTable).forEach(function (context) {
 
 // handle fallback for HTML5 history API
 app.use(require('connect-history-api-fallback')())
-
+var compression = require('compression');
+app.use(compression({}));
 // serve webpack bundle output
 app.use(devMiddleware)
 

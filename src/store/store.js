@@ -1,10 +1,11 @@
-import Vuex from "vuex";
+import Vuex from 'vuex';
 import Vue from 'vue';
-import port from "port";
+import port from 'port';
 import socket, {
     loadLocal,
-    saveLocal
-} from "../io";
+    saveLocal,
+} from '../io';
+
 Vue.use(Vuex);
 let loginPromise;
 
@@ -20,10 +21,10 @@ function login({
         if (mode) {
             params = {
                 mode,
-                data
+                data,
             };
         } else if (!email) {
-            const local = loadLocal("todoAccount") || {};
+            const local = loadLocal('todoAccount') || {};
             email = local.email;
             password = local.password;
             if (!email) {
@@ -32,16 +33,16 @@ function login({
             } else {
                 params = {
                     email,
-                    password
+                    password,
                 };
             }
         } else {
             params = {
                 email,
-                password
+                password,
             };
         }
-        socket.emit("login", params, (result) => {
+        socket.emit('login', params, (result) => {
             store.commit('setUser', result.data);
             if (result.code) {
                 reject(result);
@@ -50,7 +51,7 @@ function login({
                 if (remember) {
                     saveLocal('todoAccount', {
                         email: result.data.email,
-                        password: result.data.password
+                        password: result.data.password,
                     });
                 }
                 store.commit('setLoginState', true);
@@ -77,17 +78,16 @@ const actions = {
                 loginPromise = login(params);
             }
             return loginPromise;
-        } else {
-            return login(params);
         }
+        return login(params);
     },
     getProjects({
-        commit
+        commit,
     }) {
         return new Promise((resolve) => {
-            socket.emit("getProjects", {}, ({
+            socket.emit('getProjects', {}, ({
                 code,
-                data
+                data,
             }) => {
                 const tagMap = {};
                 const map = list2map(data, 'id');
@@ -96,28 +96,28 @@ const actions = {
                         tagMap[tag.id] = tag;
                     });
                 });
-                commit("setTags", tagMap);
-                commit("setProjects", map);
+                commit('setTags', tagMap);
+                commit('setProjects', map);
                 resolve(map);
             });
         });
     },
     getUserMap({
-        commit
+        commit,
     }) {
         return new Promise((resolve) => {
-            socket.emit("getUserList", {}, ({
+            socket.emit('getUserList', {}, ({
                 code,
                 data: {
-                    list
-                }
+                    list,
+                },
             }) => {
                 const userMap = list2map(list, 'uid');
-                store.commit("setUserMap", userMap);
+                store.commit('setUserMap', userMap);
                 resolve(userMap);
             });
         });
-    }
+    },
 };
 const store = new Vuex.Store({
     state: {
@@ -154,7 +154,7 @@ const store = new Vuex.Store({
         },
         setTodoList(state, list) {
             state.list = list;
-        }
+        },
     },
     actions,
     getters: {
@@ -168,7 +168,7 @@ const store = new Vuex.Store({
                     return 'not found';
                 }
                 return user.name;
-            }
+            };
         },
         projectInfo(state) {
             return (id) => {
@@ -194,7 +194,7 @@ const store = new Vuex.Store({
                 return tag;
             };
         },
-    }
+    },
 });
 window.ddd = () => {
     console.log(store.state);

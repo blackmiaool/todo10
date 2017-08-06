@@ -13,18 +13,19 @@ try {
     }
     // no worries, in browser enviro Vue should already be global
 }
-const $ = require("jquery");
+const $ = require('jquery');
+
 const vueStickyScroll = Vue.directive('sticky-scroll', {
-    bind: function (el, binding) {
-        //use browser MutationObserver object
+    bind(el, binding) {
+        // use browser MutationObserver object
         const observer = new MutationObserver(scrollToBottom);
-        //looking for new children that will change the height
+        // looking for new children that will change the height
         const config = {
-            childList: true
+            childList: true,
         };
         observer.observe(el, config);
 
-        //need reference to this, otherwise 'this'=MutationObserver
+        // need reference to this, otherwise 'this'=MutationObserver
 
         function animateScroll(duration) {
             const start = el.scrollTop;
@@ -33,7 +34,7 @@ const vueStickyScroll = Vue.directive('sticky-scroll', {
             const increment = 20;
 
             function easeInOut(currentTime, start, change, duration) {
-                //by Robert Penner
+                // by Robert Penner
                 currentTime /= duration / 2;
                 if (currentTime < 1) {
                     return change / 2 * currentTime * currentTime + start;
@@ -44,13 +45,13 @@ const vueStickyScroll = Vue.directive('sticky-scroll', {
 
             function animate(elapsedTime) {
                 elapsedTime += increment;
-                var position = easeInOut(elapsedTime, start, change, duration);
+                const position = easeInOut(elapsedTime, start, change, duration);
                 el.scrollTop = position;
 
                 if (elapsedTime < duration) {
-                    setTimeout(function () {
+                    setTimeout(() => {
                         animate(elapsedTime);
-                    }, increment)
+                    }, increment);
                 }
             }
             animate(0);
@@ -68,14 +69,14 @@ const vueStickyScroll = Vue.directive('sticky-scroll', {
         function scrollToBottom(e) {
             if (firstRender) {
                 firstRender = false;
-                setTimeout(function () {
+                setTimeout(() => {
                     el.scrollTop = el.scrollHeight;
                 }, 300);
             }
-            e.forEach(function (record) {
-                record.addedNodes.forEach(function (newChild) {
-                    $(newChild).find("img").on("load", function () {
-                        setTimeout(function () {
+            e.forEach((record) => {
+                record.addedNodes.forEach((newChild) => {
+                    $(newChild).find('img').on('load', () => {
+                        setTimeout(() => {
                             tryJump();
                         }, 100);
                         //                        el.scrollTop = el.scrollHeight;
@@ -84,16 +85,16 @@ const vueStickyScroll = Vue.directive('sticky-scroll', {
             });
             //            console.log(heightSum, el.scrollTop + heightSum, el.scrollHeight)
             if (binding.arg === 'animate') {
-                //default is 300
+                // default is 300
                 const duration = Number(binding.expression) || 300;
                 animateScroll(duration);
             } else {
-                //default is jump to bottom
+                // default is jump to bottom
                 tryJump();
                 //                el.scrollTop = el.scrollHeight;
             }
         }
-    }
+    },
 });
 
 // check whether we are in node.js enviro

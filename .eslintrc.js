@@ -1,35 +1,49 @@
+// http://eslint.org/docs/user-guide/configuring
+
 module.exports = {
     root: true,
-    parser: 'babel-eslint',
+    "parser": "vue-eslint-parser",
     parserOptions: {
+        parser: 'babel-eslint',
         sourceType: 'module'
     },
-    // https://github.com/feross/standard/blob/master/RULES.md#javascript-standard-style
-    extends: 'standard',
-    globals: {
-        MutationObserver: false
+    env: {
+        browser: true,
     },
+    // extends: 'airbnb-base',
     // required to lint *.vue files
     plugins: [
-        'html'
+        'html', 'vue'
     ],
+
+    // check if imports actually resolve
+    'settings': {
+        'import/resolver': {
+            'webpack': {
+                'config': 'build/webpack.base.conf.js'
+            }
+        }
+    },
     // add your custom rules here
     'rules': {
-        // allow paren-less arrow functions
-        'arrow-parens': 0,
-        indent: 0,
-        "space-before-function-paren": 0,
-        semi: 0,
-        quotes: 0,
-        'comma-dangle': 0,
-        // allow async-await
-        'generator-star-spacing': 0,
-        'no-extend-native': 0,
-        'spaced-comment': 0,
+        // don't require .vue extension when importing
+        // 'import/extensions': ['error', 'always', {
+        //     'js': 'never',
+        //     'vue': 'never'
+        // }],
+        // allow optionalDependencies
+        // 'import/no-extraneous-dependencies': ['error', {
+        //     'optionalDependencies': ['test/unit/index.js']
+        // }],
         // allow debugger during development
         'no-debugger': process.env.NODE_ENV === 'production' ? 2 : 0,
-        "eol-last": 0,
-        "prefer-template": 1,
-        "no-unused-vars": 1
+        "indent": ["error", 4],
+        "no-console": 0,
+        "eqeqeq": 0,
+        "comma-dangle": 0,
+        "quotes": 0,
+        "no-param-reassign": 0,
+        "no-alert": 0,
+        "func-names": 0
     }
 }

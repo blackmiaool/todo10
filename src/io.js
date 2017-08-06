@@ -1,20 +1,21 @@
-const config = require("../config.js");
-const io = require('socket.io-client')
+const config = require('../config.js');
+const io = require('socket.io-client');
+
 const socket = io(`:${config.serverPort}`);
 socket.context = {
-    logged: false
+    logged: false,
 };
 
 export default socket;
 
 function saveLocal(key, value) {
     const type = typeof value;
-    if (typeof value === "object" && value) {
+    if (typeof value === 'object' && value) {
         value = JSON.stringify(value);
     }
     let item2save = {
         type,
-        value
+        value,
     };
     item2save = JSON.stringify(item2save);
     window.localStorage.setItem(`god-${key}`, item2save);
@@ -28,10 +29,10 @@ function loadLocal(key) {
     item = JSON.parse(item);
     let {
         value,
-        type
+        type,
     } = item;
 
-    if (type === "object") {
+    if (type === 'object') {
         value = JSON.parse(value);
     }
 
@@ -39,5 +40,5 @@ function loadLocal(key) {
 }
 export {
     saveLocal,
-    loadLocal
+    loadLocal,
 };

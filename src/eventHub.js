@@ -1,2 +1,3 @@
 import Vue from 'vue';
-module.exports = new Vue()
+
+module.exports = new Vue();

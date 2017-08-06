@@ -17,7 +17,7 @@
             </button>
             <button v-if="mode==='View'&&page==='todo'" class="btn btn-success submit" @click="fork">
                 <i class="fa fa-code-fork"></i>
-                {{$t('Copy and Create (fork)')}}
+                {{$t('Fork')}}
             </button>
             <button v-if="mode==='View'&&page==='todo'" class="btn btn-default submit" @click="emit('newOne')">
                 <i class="fa fa-plus-square-o"></i>
@@ -39,7 +39,7 @@
                 <i class="fa fa-save"></i>
                 {{$t('goLogin')}}
             </button>
-            <button v-if="canWatch" class="btn btn-success submit" @click="emit('watch')">
+            <button v-if="canWatch&&page!=='list'" class="btn btn-success submit" @click="emit('watch')">
                 <i class="fa fa-bookmark-o"></i>
                 {{$t('Watch')}}
             </button>
@@ -139,7 +139,12 @@ export default {
         set(info = this.info) {
             info = JSON.parse(JSON.stringify(info));
             this.info = info;
-            this.$refs.viewer && this.$refs.viewer.set(info.id);
+            if (store.state.list.find((li) => li.id == info.id)) {
+                this.$refs.viewer && this.$refs.viewer.set(info.id);
+            } else {
+                this.$refs.viewer && this.$refs.viewer.set(info);
+            }
+
             this.$refs.editor && this.$refs.editor.set(info);
         },
         selectTag(tag) {

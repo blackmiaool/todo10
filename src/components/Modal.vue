@@ -1,6 +1,6 @@
 <template>
     <div class="comp-modal">
-        <div class="shadow"></div>
+        <div @click="$emit('cancel')" class="shadow"></div>
         <slot></slot>
     </div>
 </template>
@@ -14,31 +14,6 @@ import store from 'store';
 
 export default {
     name: 'Modal',
-    created() {
-
-    },
-    computed: {
-
-    },
-    mounted() {
-
-    },
-    props: {},
-    data() {
-        return {
-
-        }
-    },
-    watch: {
-
-    },
-    methods: {
-
-    },
-    components: {
-
-    }
-
 }
 
 </script>

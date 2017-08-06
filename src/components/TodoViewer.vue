@@ -134,6 +134,7 @@ export default {
                 0: '(S) do it right now!!!',
             },
             selectingId: undefined,
+            reactive: undefined
         }
     },
     computed: {
@@ -162,22 +163,33 @@ export default {
             return ret;
         },
         theInfo() {
-            console.log('get the info')
             return store.state.list.find((li) => li.id == this.selectingId);
         }
     },
     props: ['userList'],
     watch: {
         theInfo() {
-            this.set(this.selectingId);
+            if (this.reactive) {
+                this.set(this.selectingId);
+            }
         }
     },
     methods: {
         tagInfo: (id) => store.getters.tagInfo(id),
         projectInfo: (id) => store.getters.projectInfo(id),
         set(id) {
-            this.selectingId = id;
-            const info = store.state.list.find((li) => li.id == id);
+            let info;
+            if (typeof id === 'object') {
+                this.reactive = false;
+                this.selectingId = id.id;
+                info = id;
+
+            } else {
+                this.reactive = true;
+                this.selectingId = id;
+                info = store.state.list.find((li) => li.id == id);
+            }
+
             Object.assign(this, properties);
             Object.assign(this, info);
 

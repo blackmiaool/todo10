@@ -2,7 +2,7 @@
     <div class="top-page-wrap todo-page">
         <TodoPanel page="todo" v-if="userName" ref="todoPanel" @create="onCreate" :editing="editing" @save="onSave" @fork="onFork" @newOne="onNew" @transfer="onTransfer"></TodoPanel>
         <TodoList :list="list" ref="list" @select="onSelect" @finish="onFinish" @restore="onRestore" @destroy="onDestroy"></TodoList>
-        <Modal v-if="showingModal">
+        <Modal v-if="showingModal" @cancel="onModalCancel">
             <UserSelector v-if="modalMap.userSelector" @select="onSelectUser">
     
             </UserSelector>
@@ -11,22 +11,15 @@
 </template>
 
 <script>
-import $ from "jquery";
-import socket from "../io";
+import store from 'store';
 
-import eventHub from 'eventHub';
-import settings from 'settings';
-import datepicker from 'vue-date';
+
 import TodoPanel from 'components/TodoPanel';
 import TodoList from 'components/TodoList';
 import Modal from 'components/Modal';
 import UserSelector from 'components/UserSelector';
-import store from 'store';
+import socket from "../io";
 
-function e() {
-    console.log(e)
-    return this.d;
-}
 export default {
     name: 'Todo',
     created() {
@@ -50,6 +43,7 @@ export default {
     },
     computed: {
         userName: () => store.state.user && store.state.user.name,
+        list: () => store.state.list
     },
     mounted() {
         this.init();
@@ -61,7 +55,6 @@ export default {
             editing: undefined,
             initialized: false,
             isSelectingUser: false,
-            list: [],
             showingModal: false,
             modalMap: {},
             today: (new Date()).format("yyyy-MM-dd")
@@ -77,7 +70,6 @@ export default {
             this.$refs.todoPanel.setMode("Create");
             socket.emit("getList", {}, (result) => {
                 store.commit('setTodoList', result);
-                this.list = result;
                 if (this.$route.params.id) {
                     this.view(this.$route.params.id);
                 }
@@ -95,26 +87,23 @@ export default {
             item = JSON.parse(JSON.stringify(item));
             item.status = 'pending';
             socket.emit("edit", item, ({ data: { list } }) => {
-                this.list = list;
+                store.commit('setTodoList', list);
             });
         },
         onFinish(item) {
             item = JSON.parse(JSON.stringify(item));
             item.status = 'done';
             socket.emit("edit", item, ({ data: { list } }) => {
-                this.list = list;
+                store.commit('setTodoList', list);
             });
         },
         onDestroy(item) {
-            if (!confirm("Unwatch it?"))
+            if (!confirm("Unwatch it?")) {
                 return;
-            socket.emit('unwatch', { id: item.id }, () => {
-                this.list.some((v, i) => {
-                    if (v.id === item.id) {
-                        this.list.splice(i, 1);
-                        return true;
-                    }
-                });
+            }
+
+            socket.emit('unwatch', { id: item.id }, ({ data: { list } }) => {
+                store.commit('setTodoList', list);
             });
         },
         onCreate(item) {
@@ -125,28 +114,16 @@ export default {
                     alert(msg);
                     return;
                 }
-                this.list = list;
+                store.commit('setTodoList', list);
                 this.$refs.list.select(list.find(li => li.id === id));
             });
         },
         onSave(item) {
             const id = item.id;
             socket.emit("edit", item, ({ data: { list } }) => {
-                this.list = list;
+                store.commit('setTodoList', list);
                 this.view(id);
             });
-
-
-            // this.editing = item;
-            // this.list.some((v, i) => {
-            //     if (v.id === item.id) {
-            //         Object.assign(v, item);
-            //         this.$refs.todoPanel.view(v);
-            //         return true;
-            //     }
-
-            // });
-
         },
         onFork(item) {
             item = JSON.parse(JSON.stringify(item));
@@ -169,6 +146,10 @@ export default {
                 this.$refs.todoPanel.set({});
             })
         },
+        onModalCancel() {
+            this.hideModal();
+            this.$emit('modalCancel');
+        },
         hideModal() {
             this.showingModal = false;
             this.modalMap = {};
@@ -183,8 +164,8 @@ export default {
                 this.$on("select-user", (uid) => {
                     resolve(uid);
                 });
-                this.$on("close-user-selector", (uid) => {
-                    resolve(uid);
+                this.$once("modalCancel", (uid) => {
+                    reject(uid);
                 });
             });
         },
@@ -196,9 +177,7 @@ export default {
                     id,
                     uid,
                 }, ({ data: { list } }) => {
-                    console.warn('list', list);
                     store.commit('setTodoList', list);
-                    this.list = list;
                 });
             }).catch(() => {
 

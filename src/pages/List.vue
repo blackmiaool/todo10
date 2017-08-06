@@ -57,9 +57,7 @@ import store from 'store';
 export default {
     name: 'List',
     created() {
-        setTimeout(() => {
 
-        }, 100);
     },
     beforeRouteEnter(to, from, next) {
         if (!store.state.logged) {
@@ -155,6 +153,7 @@ export default {
             });
         },
         onSelect(item) {
+
             if (item.id == this.selecting) {
                 this.selecting = undefined;
                 return;

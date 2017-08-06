@@ -146,9 +146,9 @@ function init(io) {
             });
         }
         $on('unwatch', async(data) => {
-            const info = await todo.unwatch(data.id, socket.context.uid);
+            await todo.unwatch(data.id, socket.context.uid);
             return {
-                info
+                list: todo.getList(socket.context.uid)
             }
         }, true);
         $on('watch', async(data) => {
