@@ -55,7 +55,8 @@ const messages = {
         Transfer: '移交',
         Download: '下载',
         'Select a user': '选择一个用户',
-        'Generate Report': '生成报告'
+        'Generate Report': '生成报告',
+        'Refresh': '刷新'
     },
 };
 module.exports = messages;

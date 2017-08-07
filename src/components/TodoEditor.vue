@@ -70,7 +70,7 @@
                 <i class="fa fa-user-o"></i>
                 {{$t('Requestor')}}
             </label>
-            <input readonly type="text" id="choose-requestor" class="form-control" v-model="realRequestor">
+            <div>{{realRequestor}}</div>
     
         </div>
         <div class="input-block">
@@ -78,9 +78,10 @@
                 <i class="fa fa-user-circle-o"></i>
                 {{$t('Owner')}}
             </label>
-            <v-select v-if="mode==='Create'" :value.sync="targetOwner" :options="userList" placeholder="search..." :onChange="onSelectOwner">
-            </v-select>
+            <!--<v-select v-if="mode==='Create'" :value.sync="targetOwner" :options="userList" placeholder="search..." :onChange="onSelectOwner">
+                </v-select>-->
             <div v-if="mode==='Edit'">{{uid2name(owner)}}</div>
+            <input v-if="mode==='Create'" :value="owner?uid2name(owner):''" type="text" class="form-control" :placeholder="$t('Click to select')" readonly @click="selectOwner">
         </div>
         <div class="input-block">
             <label for="choose-owner">
@@ -161,7 +162,8 @@ export default {
                 1: '(A) do it as soon as possible!',
                 0: '(S) do it right now!!!',
             },
-            targetOwner: ""
+            targetOwner: "",
+            selectUserCb: undefined,
         }
     },
     computed: {
@@ -332,6 +334,13 @@ export default {
         selectProject(project) {
             this.projects.push(project.id);
 
+        },
+        selectOwner() {
+            this.selectUserCb = (id) => {
+                console.log('id', id);
+                this.onSelectOwner({ value: id });
+            }
+            this.$emit("showUserSelector");
         },
         removeProject(project) {
             const index = this.projects.indexOf(project);

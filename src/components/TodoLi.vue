@@ -15,8 +15,13 @@
             <span class="relation">
                 {{requestorName}} -> {{ownerName}}
             </span>
-            <span class="tags">
-                <span v-for="project in info.projects" :key="project" class="project">{{projectInfo(project).name}}</span>
+            <span class="projects-tags">
+                <span class="projects">
+                    <span v-for="project in info.projects" :key="project" class="project">{{projectInfo(project).name}}</span>
+                </span>
+                <span class="tags">
+                    <span v-for="tag in info.tags" :key="tag" class="tag">{{tagInfo(tag).name}}</span>
+                </span>
             </span>
         </main>
     </li>
@@ -43,7 +48,8 @@ export default {
         },
         ownerName: function () {
             return store.getters.uid2name(this.info.owner);
-        }
+        },
+
     },
     mounted() {
 
@@ -63,6 +69,7 @@ export default {
 
     },
     methods: {
+        tagInfo: (id) => store.getters.tagInfo(id),
         emit(action, $event) {
             this.$emit("action", { action, info: this.info });
             $event.stopPropagation();

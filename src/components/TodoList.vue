@@ -1,62 +1,65 @@
 <template>
     <div class="list-panel todo-list-component">
-        <div>
-    
-            <section class="todoapp">
-                <h3>
-                    <i class="fa fa-tasks"></i>
-                    {{$t('Pending')}}
-                </h3>
-                <div class="todo-wrap">
-                    <header class="list-header">
-    
-                    </header>
-                    <section class="list-main">
-                        <ul class="todo-list">
-                            <TodoLi v-for="li in listPending" :info="li" :selected="li.id===selecting" :key="li.id" @action="liAction" @select="select">
-                            </TodoLi>
-                        </ul>
-                    </section>
-                </div>
-            </section>
-    
-            <section class="todoapp">
-                <h3>
-                    <i class="fa fa-feed"></i>
-                    {{$t('Watching')}}
-                </h3>
-                <div class="todo-wrap">
-                    <header class="list-header"></header>
-                    <section class="list-main">
-                        <ul class="todo-list">
-                            <TodoLi v-for="li in listWatching" :info="li" :selected="li.id===selecting" :key="li.id" @action="liAction" @select="select">
-                            </TodoLi>
-                        </ul>
-                    </section>
-                </div>
-            </section>
-    
-            <section class="todoapp">
-                <h3>
-                    <i class="fa fa-trash"></i>
-                    {{$t('Finished')}}
-                    <button class="btn btn-primary btn-xs" @click="$emit('generateReport',[listPending,listDone])">
-                        <i class="fa fa-file-text"></i> {{$t('Generate Report')}}</button>
-                </h3>
-                <div class="todo-wrap">
-                    <header class="list-header"></header>
-                    <section class="list-main">
-                        <ul class="todo-list">
-                            <TodoLi v-for="li in listDone" :info="li" :selected="li.id===selecting" :key="li.id" @action="liAction" @select="select">
-                            </TodoLi>
-                        </ul>
-                    </section>
-                </div>
-    
-            </section>
-    
+        <div class="top-bar">
+            <button class="btn btn-primary" @click="$emit('new')">
+                <i class="fa fa-plus-square-o"></i> {{$t('New')}}
+            </button>
+            <button class="btn btn-default" @click="$emit('refresh')">
+                <i class="fa fa-refresh"></i> {{$t('Refresh')}}
+            </button>
         </div>
+        <section class="todoapp">
+            <h3>
+                <i class="fa fa-tasks"></i>
+                {{$t('Pending')}}
+            </h3>
+            <div class="todo-wrap">
+                <header class="list-header">
     
+                </header>
+                <section class="list-main">
+                    <ul class="todo-list">
+                        <TodoLi v-for="li in listPending" :info="li" :selected="li.id===selecting" :key="li.id" @action="liAction" @select="select">
+                        </TodoLi>
+                    </ul>
+                </section>
+            </div>
+        </section>
+    
+        <section class="todoapp">
+            <h3>
+                <i class="fa fa-feed"></i>
+                {{$t('Watching')}}
+            </h3>
+            <div class="todo-wrap">
+                <header class="list-header"></header>
+                <section class="list-main">
+                    <ul class="todo-list">
+                        <TodoLi v-for="li in listWatching" :info="li" :selected="li.id===selecting" :key="li.id" @action="liAction" @select="select">
+                        </TodoLi>
+                    </ul>
+                </section>
+            </div>
+        </section>
+    
+        <section class="todoapp">
+            <h3>
+                <i class="fa fa-trash"></i>
+                {{$t('Finished')}}
+                <button class="btn btn-primary btn-xs" @click="$emit('generateReport',[listPending,listDone])">
+                    <i class="fa fa-file-text"></i> {{$t('Generate Report')}}</button>
+            </h3>
+            <div class="todo-wrap">
+                <header class="list-header"></header>
+                <section class="list-main">
+                    <ul class="todo-list">
+                        <TodoLi v-for="li in listDone" :info="li" :selected="li.id===selecting" :key="li.id" @action="liAction" @select="select">
+                        </TodoLi>
+                    </ul>
+                </section>
+            </div>
+    
+        </section>
     </div>
 </template>
 

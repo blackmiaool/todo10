@@ -5,7 +5,7 @@
             <span v-if="unsaved && mode==='Edit'" class="unsaved">(unsaved)</span>
         </h2>
         <TodoViewer :userList="userList" ref="viewer" v-if="mode==='View'"></TodoViewer>
-        <TodoEditor :userList="userList" ref="editor" v-if="mode==='Edit'||mode==='Create'" @change="onChange" :mode="mode"></TodoEditor>
+        <TodoEditor :userList="userList" ref="editor" v-if="mode==='Edit'||mode==='Create'" @change="onChange" :mode="mode" @showUserSelector="emit('selectUser')"></TodoEditor>
         <div>
             <button v-if="mode==='Create'" class="btn btn-success submit" @click="create">
                 <i class="fa fa-arrow-circle-o-up"></i>
@@ -18,10 +18,6 @@
             <button v-if="mode==='View'&&page==='todo'" class="btn btn-success submit" @click="fork">
                 <i class="fa fa-code-fork"></i>
                 {{$t('Fork')}}
-            </button>
-            <button v-if="mode==='View'&&page==='todo'" class="btn btn-default submit" @click="emit('newOne')">
-                <i class="fa fa-plus-square-o"></i>
-                {{$t('New')}}
             </button>
             <button v-if="mode==='View'&&page==='todo'" class="btn btn-warning submit" @click="share">
                 <i class="fa fa-share-alt"></i>
@@ -118,6 +114,9 @@ export default {
         },
     },
     methods: {
+        selectUser(uid) {
+            this.$refs.editor.selectUserCb && this.$refs.editor.selectUserCb(uid);
+        },
         share() {
             prompt("Copy link to share", `${location.origin}/#/view?id=${this.info.id}`);
         },
@@ -182,8 +181,8 @@ export default {
             }
             this.$emit('create', info);
         },
-        emit(...rags) {
-            this.$emit(...rags);
+        emit(...args) {
+            this.$emit(...args);
         },
         transfer() {
             this.$emit('transfer', this.info.id);

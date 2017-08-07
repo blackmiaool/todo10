@@ -1,7 +1,7 @@
 <template>
     <div class="top-page-wrap todo-page">
-        <TodoPanel page="todo" v-if="userName" ref="todoPanel" @create="onCreate" :editing="editing" @save="onSave" @fork="onFork" @newOne="onNew" @transfer="onTransfer"></TodoPanel>
-        <TodoList :list="list" ref="list" @select="onSelect" @finish="onFinish" @restore="onRestore" @destroy="onDestroy" @generateReport="onGenerateReport"></TodoList>
+        <TodoPanel page="todo" v-if="userName" ref="todoPanel" @create="onCreate" :editing="editing" @save="onSave" @fork="onFork" @newOne="onNew" @transfer="onTransfer" @selectUser="onTodoPanelSelectUser"></TodoPanel>
+        <TodoList :list="list" ref="list" @select="onSelect" @finish="onFinish" @restore="onRestore" @destroy="onDestroy" @generateReport="onGenerateReport" @refresh="onRefresh" @new="onNew"></TodoList>
         <Modal v-if="showingModal" @cancel="onModalCancel">
             <UserSelector v-if="modalMap.userSelector" @select="onSelectUser">
     
@@ -73,10 +73,11 @@ export default {
             this.initialized = true;
             // vm.$refs.todoPanel.set(vm.list[0]);
             this.$refs.todoPanel.setMode("Create");
-            socket.emit("getList", {}, (result) => {
-                store.commit('setTodoList', result);
+            socket.emit("getList", {}, (list) => {
+                store.commit('setTodoList', list);
                 if (this.$route.params.id) {
                     this.view(this.$route.params.id);
+                    this.$refs.list.select(list.find(li => li.id == this.$route.params.id));
                 }
             });
         },
@@ -188,6 +189,14 @@ export default {
 
             });
         },
+        onTodoPanelSelectUser() {
+            console.log('showUserSelector')
+            this.selectUser().then((uid) => {
+                this.$refs.todoPanel.selectUser(uid);
+            }).catch(() => {
+
+            });
+        },
         onSelectUser(uid) {
             this.$emit("select-user", uid);
             this.hideModal();
@@ -195,6 +204,11 @@ export default {
         onGenerateReport(list) {
             this.showModal('reportViewer');
             this.reportList = list;
+        },
+        onRefresh() {
+            socket.emit("getList", {}, (result) => {
+                store.commit('setTodoList', result);
+            });
         }
     },
     components: {

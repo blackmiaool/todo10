@@ -53,6 +53,7 @@ export default {
             line-height: 16px;
             background-color: #5cb85c;
             color: white;
+            margin-right:2px;
             `,
             tagStyle: `
             font-size:12px;
