@@ -73,7 +73,7 @@ function doUploadImage(stream, url) {
         }
     };
     //    console.log(formData);
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
         request.post({
             url: 'http://support.io.mi.srv/shop/uploadpic',
             formData,
@@ -147,6 +147,9 @@ wechat.bot.on('message', msg => {
     case wechat.bot.CONF.MSGTYPE_TEXT:
         if (msg.Content === '[Smile]') {
             const user = topUserMap.getFromName(name);
+            if (!user) {
+                return;
+            }
             todo.filter((item) => item.confirmPending && item.owner == user.uid).forEach((item, i) => {
                 setTimeout(() => {
                     wechat.sendMessage(topUserMap.getName(item.requestor), `【${name}】接受了你创建的任务【${item.title}】`);
@@ -239,7 +242,8 @@ function init(io) {
         }) {
             await todo.transfer(id, uid);
             const item = todo.getTodo(id);
-            wechat.sendMessage(topUserMap.getName(uid), `${topUserMap.getName(socket.context.uid)} 把任务： “${item.title}” 移交给了你。详情参见 http://${config.domain}:${config.clientPort}\/#\/view?id=${id}`);
+            wechat.sendMessage(topUserMap.getName(uid), `【${topUserMap.getName(socket.context.uid)}】把任务：【${item.title}】移交给了你。
+详情参见 http://${config.domain}:${config.clientPort}\/#\/view?id=${id}`);
             return {
                 list: todo.getList(socket.context.uid)
             };
@@ -248,7 +252,8 @@ function init(io) {
             console.log('id', id, userMap[id]);
             const item = todo.getTodo(id);
             item.status = 'done';
-            wechat.sendMessage(topUserMap.getName(item.requestor), `你的 “${item.title}” 任务被 ${topUserMap.getName(socket.context.uid)} 完成了哦～  详情参见 http://${config.domain}:${config.clientPort}\/#\/view?id=${id}`);
+            wechat.sendMessage(topUserMap.getName(item.requestor), `【${item.title}】任务被【${topUserMap.getName(socket.context.uid)}】完成了哦～  
+详情参见 http://${config.domain}:${config.clientPort}\/#\/view?id=${id}`);
             await todo.edit(id, item);
             const list = todo.getList(socket.context.uid);
             return {
@@ -280,7 +285,7 @@ function init(io) {
 
             wechat.sendMessage($owner.name, message);
             const list = todo.getList(socket.context.uid);
-            await new Promise((resolve, reject) => {
+            await new Promise((resolve) => {
                 const dir = `./public/files/${topUserMap.getName(socket.context.uid)}`;
                 fs.rename(dir, `./public/files/${id}`, () => {
                     resolve();
