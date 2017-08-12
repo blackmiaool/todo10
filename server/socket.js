@@ -174,6 +174,9 @@ function init(io) {
             data = data.replace(/^data:\w*\/?[\w\-+]*;base64,/, "");
             const buff = Buffer.from(data, 'base64');
             const dir1 = `./public`;
+            if (!id) {
+                id = topUserMap.getName(socket.context.uid);
+            }
             const dir2 = `/files/${id}`;
             const dir = dir1 + dir2;
             mkdirp(dir, function (err) {
@@ -260,7 +263,14 @@ function init(io) {
             if ($owner.hasWechat && $requestor.hasWechat) {
                 item.confirmPending = true;
             }
+
             const id = await todo.create(item);
+            if (item.attachments) {
+                item.attachments = item.attachments.map((path) => {
+                    return path.replace(/files\/[^\/]+\//, `files\/${id}\/`);
+                });
+            }
+            await todo.edit(id, item);
             let message = `【${$requestor.name}】 给你分配了任务【${item.title}】
 详情参见 http://${config.domain}:${config.clientPort}\/#\/view?id=${id}`;
             console.log('$requestor', $requestor)
@@ -270,6 +280,12 @@ function init(io) {
 
             wechat.sendMessage($owner.name, message);
             const list = todo.getList(socket.context.uid);
+            await new Promise((resolve, reject) => {
+                const dir = `./public/files/${topUserMap.getName(socket.context.uid)}`;
+                fs.rename(dir, `./public/files/${id}`, () => {
+                    resolve();
+                });
+            });
             return {
                 id,
                 list

@@ -5,12 +5,16 @@ const mapAll = {};
 
 // db.getList(true).then((list) => {
 //     list.forEach((li) => {
-//         li.priority = ({
-//             'verbose': 3,
-//             'normal': 2,
-//             'warn': 1,
-//             'danger': 0,
-//         })[li.priority];
+//         if (!li.attachments) {
+//             return;
+//         }
+//         li.attachments = li.attachments.map((att) => {
+//             if (att.match(/files\/\//)) {
+//                 console.log(li.id, att);
+//             }
+//             return att.replace(/files\/\//, `files\/${li.id}\/`);
+//         });
+//         console.log(li.attachments);
 //         edit(li.id, li);
 //     });
 // });
