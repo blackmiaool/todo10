@@ -244,6 +244,11 @@ function init(io) {
             const item = todo.getTodo(id);
             wechat.sendMessage(topUserMap.getName(uid), `【${topUserMap.getName(socket.context.uid)}】把任务：【${item.title}】移交给了你。
 详情参见 http://${config.domain}:${config.clientPort}\/#\/view?id=${id}`);
+            if (item.requestor != socket.context.uid) {
+                wechat.sendMessage(topUserMap.getName(item.requestor), `【${topUserMap.getName(socket.context.uid)}】把任务：【${item.title}】移交给了【${topUserMap.getName(uid)}】。
+详情参见 http://${config.domain}:${config.clientPort}\/#\/view?id=${id}`);
+            }
+
             return {
                 list: todo.getList(socket.context.uid)
             };
