@@ -3,7 +3,7 @@
     "version": "0.1.0",
     "private": true,
     "scripts": {
-        "start": "./node_modules/.bin/nodemon bin/run",
+        "start": "./node_modules/.bin/nodemon bin/run --config ./nodemon.json",
         "koa": "./node_modules/.bin/runkoa bin/www",
         "pm2": "pm2 start bin/run ",
         "test": "echo \"Error: no test specified\" && exit 1",
@@ -14,6 +14,7 @@
         "co": "^4.6.0",
         "debug": "^2.2.0",
         "jade": "~1.11.0",
+        "kcors": "^2.2.1",
         "koa": "^2.0.0",
         "koa-bodyparser": "^2.0.1",
         "koa-convert": "^1.2.0",
@@ -25,12 +26,14 @@
         "koa-views": "^5.0.1",
         "md5": "^2.2.1",
         "mkdirp": "^0.5.1",
+        "qrcode-terminal": "^0.11.0",
         "rand-token": "^0.3.0",
         "request": "^2.81.0",
         "runkoa": "^1.3.1",
         "socket.io": "^1.7.2",
         "sqlite3": "^3.1.8",
-        "ua-parser-js": "^0.7.12"
+        "ua-parser-js": "^0.7.12",
+        "wechat4u": "^0.7.6"
     },
     "devDependencies": {
         "eslint": "^4.4.0",

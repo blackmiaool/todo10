@@ -1,0 +1,4 @@
+{
+    "ignore": ["public/*", "sync-data.json"],
+    "ext": "js"
+}

@@ -44,43 +44,43 @@ Date.prototype.format = function (format) {
 Vue.use(VueI18n);
 Vue.use(VueRouter);
 const i18n = new VueI18n({
-    locale: navigator.language, // set locale
+    locale: localStorage.getItem('testChinese') ? 'zh-CN' : navigator.language, // set locale
     // locale: 'zh-CN', // set locale
     silentTranslationWarn: true,
     messages, // set locale messages
 });
-
+/*eslint-disable */
 const routes = [{
-    path: '/',
-    component: Todo,
-
-},
-{
-    path: '/login',
-    component: Login,
-    name: 'Login',
-},
-{
-    path: '/settings',
-    component: Settings,
-    name: 'Settings',
-},
-{
-    path: '/todo',
-    component: Todo,
-    name: 'Todo',
-},
-{
-    path: '/view',
-    component: View,
-    name: 'View',
-},
-{
-    path: '/list',
-    component: List,
-    name: 'List',
-},
+        path: '/',
+        component: Todo,
+    },
+    {
+        path: '/login',
+        component: Login,
+        name: 'Login',
+    },
+    {
+        path: '/settings',
+        component: Settings,
+        name: 'Settings',
+    },
+    {
+        path: '/todo',
+        component: Todo,
+        name: 'Todo',
+    },
+    {
+        path: '/view',
+        component: View,
+        name: 'View',
+    },
+    {
+        path: '/list',
+        component: List,
+        name: 'List',
+    },
 ];
+/*eslint-disable */
 socket.on('connect', () => {
     store.commit('setConnectionState', true);
     store.dispatch('login');

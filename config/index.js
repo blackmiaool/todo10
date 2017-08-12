@@ -1,6 +1,6 @@
 // see http://vuejs-templates.github.io/webpack for documentation.
 var path = require('path')
-
+const userConfig = require('../config.js');
 module.exports = {
     build: {
         env: require('./prod.env'),
@@ -18,7 +18,7 @@ module.exports = {
     },
     dev: {
         env: require('./dev.env'),
-        port: 9014,
+        port: userConfig.clientPort,
         assetsSubDirectory: 'static',
         assetsPublicPath: '/',
         proxyTable: {},

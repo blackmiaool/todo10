@@ -35,7 +35,7 @@
                 <i class="fa fa-tags"></i>
                 {{$t('Tags')}}
             </label>
-            <div v-if="!availableTags.length">Select a project first</div>
+            <div v-if="!availableTags.length">{{$t('Select a project first')}}</div>
             <div data-mode="Edit" class="selected-tags" v-if="tags&&tags.length">
                 <span :key="tag" v-for="tag in tags" class="selected-tag clickable" @click="removeTag(tag)">{{tagInfo(tag).name}}</span>
             </div>
@@ -79,7 +79,7 @@
                 {{$t('Owner')}}
             </label>
             <!--<v-select v-if="mode==='Create'" :value.sync="targetOwner" :options="userList" placeholder="search..." :onChange="onSelectOwner">
-                </v-select>-->
+                        </v-select>-->
             <div v-if="mode==='Edit'">{{uid2name(owner)}}</div>
             <input v-if="mode==='Create'" :value="owner?uid2name(owner):''" type="text" class="form-control" :placeholder="$t('Click to select')" readonly @click="selectOwner">
         </div>
@@ -337,7 +337,6 @@ export default {
         },
         selectOwner() {
             this.selectUserCb = (id) => {
-                console.log('id', id);
                 this.onSelectOwner({ value: id });
             }
             this.$emit("showUserSelector");

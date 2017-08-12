@@ -16,6 +16,7 @@ const router = new Router();
 const socket = require("./socket");
 const config = require("../config.js");
 const fs = require('fs');
+const cors = require('kcors');
 
 import {
     registerCheck
@@ -24,6 +25,7 @@ import {
 app.use(convert(bodyparser));
 app.use(convert(json()));
 app.use(convert(logger()));
+app.use(cors());
 app.use(convert(require('koa-static')(__dirname + '/public')));
 
 var avatar = require('./avatar-generator')({

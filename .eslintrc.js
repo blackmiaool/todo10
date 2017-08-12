@@ -44,6 +44,7 @@ module.exports = {
         "quotes": 0,
         "no-param-reassign": 0,
         "no-alert": 0,
-        "func-names": 0
+        "func-names": 0,
+        "no-unused-vars": ["error"]
     }
 }

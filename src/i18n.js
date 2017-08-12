@@ -48,15 +48,21 @@ const messages = {
         Unwatch: '取消关注',
         Watchers: '关注者',
         'Upload and copy url': '上传并复制地址',
-        Projects: '项目',
+        Projects: '工程',
+        Project: '工程',
         'add tag': '新增标签',
+        'Add Project': '新增工程',
         'Add Tag': '新增标签',
         Delete: '删除',
         Transfer: '移交',
         Download: '下载',
         'Select a user': '选择一个用户',
         'Generate Report': '生成报告',
-        'Refresh': '刷新'
+        'Refresh': '刷新',
+        'Share Image': '分享图片',
+        'Right click to copy': '右键点击图片复制分享',
+        'Select a project first': '首先选择一个工程',
+        'Click to select': '点击以选择'
     },
 };
 module.exports = messages;

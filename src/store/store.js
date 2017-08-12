@@ -86,7 +86,6 @@ const actions = {
     }) {
         return new Promise((resolve) => {
             socket.emit('getProjects', {}, ({
-                code,
                 data,
             }) => {
                 const tagMap = {};
@@ -107,13 +106,12 @@ const actions = {
     }) {
         return new Promise((resolve) => {
             socket.emit('getUserList', {}, ({
-                code,
                 data: {
                     list,
                 },
             }) => {
                 const userMap = list2map(list, 'uid');
-                store.commit('setUserMap', userMap);
+                commit('setUserMap', userMap);
                 resolve(userMap);
             });
         });

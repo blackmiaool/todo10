@@ -10,7 +10,7 @@ if (!config) {
     };
 }
 if (config.showNotification) {
-    window.Notification.requestPermission((permission) => {});
+    window.Notification.requestPermission(() => {});
 }
 export default {
     config,

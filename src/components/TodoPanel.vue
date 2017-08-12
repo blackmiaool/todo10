@@ -19,6 +19,10 @@
                 <i class="fa fa-code-fork"></i>
                 {{$t('Fork')}}
             </button>
+            <button v-if="mode==='View'&&page==='todo'" class="btn btn-default submit" @click="shareAsImage">
+                <i class="fa fa-image"></i>
+                {{$t('Share as Image')}}
+            </button>
             <button v-if="mode==='View'&&page==='todo'" class="btn btn-warning submit" @click="share">
                 <i class="fa fa-share-alt"></i>
                 {{$t('Share')}}
@@ -119,6 +123,9 @@ export default {
         },
         share() {
             prompt("Copy link to share", `${location.origin}/#/view?id=${this.info.id}`);
+        },
+        shareAsImage() {
+            this.$emit('shareAsImage', 'todo-viewer');
         },
         view(info) {
             this.mode = 'View';

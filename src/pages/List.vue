@@ -6,7 +6,7 @@
             <div class="projects-wrap">
                 <router-link :to="'/list?project='+project.id" class="clickable btn btn-primary" v-for="project in projects" :key="project.id">{{project.name}}</router-link>
                 <button class="btn btn-primary btn-xs" @click="addProject" title="add project">
-                    Add Project
+                    {{$t('Add Project')}}
                     <i class="fa fa-plus"></i>
                 </button>
             </div>
@@ -15,7 +15,7 @@
                     <div>
                         <label>
                             <i class="fa fa-cubes"></i>
-                            Project: {{projectName}}
+                            {{$t('Project')}}: {{projectName}}
                             <button class="btn btn-primary btn-xs" @click="addTag(project)" :title="$t('add tag')">
                                 {{$t('Add Tag')}}
                                 <i class="fa fa-plus"></i>

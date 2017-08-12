@@ -1,14 +1,14 @@
 <template>
     <div class="top-page-wrap todo-page">
-        <TodoPanel page="todo" v-if="userName" ref="todoPanel" @create="onCreate" :editing="editing" @save="onSave" @fork="onFork" @newOne="onNew" @transfer="onTransfer" @selectUser="onTodoPanelSelectUser"></TodoPanel>
+        <TodoPanel page="todo" v-if="userName" ref="todoPanel" @create="onCreate" :editing="editing" @save="onSave" @fork="onFork" @newOne="onNew" @transfer="onTransfer" @shareAsImage="onShareAsImage" @selectUser="onTodoPanelSelectUser"></TodoPanel>
         <TodoList :list="list" ref="list" @select="onSelect" @finish="onFinish" @restore="onRestore" @destroy="onDestroy" @generateReport="onGenerateReport" @refresh="onRefresh" @new="onNew"></TodoList>
         <Modal v-if="showingModal" @cancel="onModalCancel">
             <UserSelector v-if="modalMap.userSelector" @select="onSelectUser">
     
             </UserSelector>
             <ReportViewer v-if="modalMap.reportViewer" :list="reportList">
-    
             </ReportViewer>
+            <ImageShare v-if="modalMap.imageShare" :src="sharingImage"></ImageShare>
         </Modal>
     </div>
 </template>
@@ -16,14 +16,16 @@
 <script>
 import store from 'store';
 
-
+import $ from 'jquery';
+window.$ = $;
 import TodoPanel from 'components/TodoPanel';
 import TodoList from 'components/TodoList';
 import Modal from 'components/Modal';
 import UserSelector from 'components/UserSelector';
 import ReportViewer from 'components/ReportViewer';
+import ImageShare from 'components/ImageShare';
 import socket from "../io";
-
+import domtoimage from 'dom-to-image';
 export default {
     name: 'Todo',
     created() {
@@ -62,7 +64,8 @@ export default {
             showingModal: false,
             modalMap: {},
             today: (new Date()).format("yyyy-MM-dd"),
-            reportList: []
+            reportList: [],
+            sharingImage: '',
         }
     },
     watch: {
@@ -99,7 +102,7 @@ export default {
         onFinish(item) {
             item = JSON.parse(JSON.stringify(item));
             item.status = 'done';
-            socket.emit("edit", item, ({ data: { list } }) => {
+            socket.emit("finish", item.id, ({ data: { list } }) => {
                 store.commit('setTodoList', list);
             });
         },
@@ -206,9 +209,41 @@ export default {
             this.reportList = list;
         },
         onRefresh() {
+            store.commit('setTodoList', []);
             socket.emit("getList", {}, (result) => {
                 store.commit('setTodoList', result);
             });
+        },
+        shareImage(src) {
+            this.showModal('imageShare');
+            this.sharingImage = src;
+        },
+        onShareAsImage(id) {
+            console.log('onShareAsImage', id)
+            const $target = $(`#${id}`);
+            $target.addClass('screenshotting');
+            $(".todo-page .detail-panel").css('width', '600px');
+
+            function clean() {
+                $target.removeClass('screenshotting');
+                $(".todo-page .detail-panel").css('width', '');
+            }
+            setTimeout(() => {
+                domtoimage.toPng($target[0])
+                    .then((dataUrl) => {
+                        var img = new Image();
+                        img.src = dataUrl;
+                        this.shareImage(dataUrl)
+                        // document.body.appendChild(img);
+                        clean();
+                    })
+                    .catch(function (error) {
+                        clean();
+                        alert('failed');
+                        console.error('oops, something went wrong!', error);
+                    });
+            }, 200);
+
         }
     },
     components: {
@@ -216,7 +251,8 @@ export default {
         TodoList,
         UserSelector,
         Modal,
-        ReportViewer
+        ReportViewer,
+        ImageShare
     }
 
 }

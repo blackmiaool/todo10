@@ -16,6 +16,7 @@ const config = require("../config.js");
 const uaParser = require('ua-parser-js');
 const request = require('request');
 const userMap = {}
+const wechat = require('./wechat');
 class User {
     constructor(info) {
         Object.assign(this, {
@@ -96,6 +97,15 @@ function doUploadImage(stream, url) {
         });
     });
 }
+let topUserMap = {}
+
+function handleTopUserList(list) {
+    list.forEach((user) => {
+        topUserMap[user.uid] = user;
+    });
+}
+db.getUserList().then(handleTopUserList);
+
 
 function init(io) {
     io.on('connection', function (socket) {
@@ -173,10 +183,39 @@ function init(io) {
             uid
         }) {
             await todo.transfer(id, uid);
+            const item = todo.getTodo(id);
+            wechat.sendMessage(topUserMap[uid].name, `${topUserMap[socket.context.uid].name} 把任务： “${item.title}” 移交给了你。详情参见 http://${config.domain}:${config.clientPort}\/#\/view?id=${id}`);
             return {
                 list: todo.getList(socket.context.uid)
             };
         }, false);
+        $on('finish', async function (
+            id
+        ) {
+            console.log('id', id, userMap[id]);
+            const item = todo.getTodo(id);
+            item.status = 'done';
+            wechat.sendMessage(topUserMap[item.requestor].name, `你的 “${item.title}” 任务被 ${topUserMap[socket.context.uid].name} 完成了哦～  详情参见 http://${config.domain}:${config.clientPort}\/#\/view?id=${id}`);
+            await todo.edit(id, item);
+            const list = todo.getList(socket.context.uid);
+            return {
+                id,
+                list
+            };
+        }, true);
+        $on('create', async function (
+            item
+        ) {
+            item.status = 'pending';
+            const id = await todo.create(item);
+            wechat.sendMessage(topUserMap[item.owner].name, `${topUserMap[item.requestor].name} 给你分配了任务： “${item.title}”  详情参见 http://${config.domain}:${config.clientPort}\/#\/view?id=${id}`);
+
+            const list = todo.getList(socket.context.uid);
+            return {
+                id,
+                list
+            };
+        }, true);
 
         socket.on('edit', async(data, cb) => {
             if (!socket.context.uid) {
@@ -197,6 +236,7 @@ function init(io) {
             //     return cb(errorMap[13]);
             // }
             const list = await db.getUserList();
+            handleTopUserList(list);
             cb(successData({
                 list
             }));
@@ -210,18 +250,7 @@ function init(io) {
                 info
             }));
         });
-        socket.on('create', async(data, cb) => {
-            if (!socket.context.uid) {
-                return cb(errorMap[13]);
-            }
-            data.status = 'pending';
-            const id = await todo.create(data);
-            const list = todo.getList(socket.context.uid);
-            cb(successData({
-                id,
-                list
-            }));
-        });
+
         socket.on('getList', async(data, cb) => {
             if (!socket.context.uid) {
                 return cb(errorMap[13]);
