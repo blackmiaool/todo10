@@ -3,7 +3,10 @@
         <header>{{$t("Select a user")}}</header>
         <main>
             <ul>
-                <li @click="$emit('select',user.uid)" class="clickable" v-for="user in userMap" :key="user.uid">{{user.name}}</li>
+                <li @click="$emit('select',user.uid)" class="clickable" v-for="user in userMap" :key="user.uid">
+                    <i class="fa fa-wechat" :class="{active:user.hasWechat}"></i>
+                    <span class="user-name">{{user.name}}</span>
+                </li>
             </ul>
         </main>
     </div>

@@ -79,12 +79,18 @@ getContent.then(getLogin).then(() => {
     mounted();
 });
 
+let isMounted = false;
+let mountedCbList = [];
 
 function mounted() {
     for (const name in bot.contacts) {
         const nickName = bot.contacts[name].RemarkName || bot.contacts[name].NickName;
         userNameMap[nickName] = bot.contacts[name];
     }
+    isMounted = true;
+    mountedCbList.forEach((func) => {
+        func();
+    });
     // console.log(userNameMap);
     console.log('mounted');
 }
@@ -348,13 +354,13 @@ bot.on('message', msg => {
 /**
  * 如何直接转发消息
  */
-bot.on('message', msg => {
-    // 不是所有消息都可以直接转发
-    // bot.forwardMsg(msg, 'filehelper')
-    //     .catch(err => {
-    //         bot.emit('error', err)
-    //     })
-})
+// bot.on('message', msg => {
+// 不是所有消息都可以直接转发
+// bot.forwardMsg(msg, 'filehelper')
+//     .catch(err => {
+//         bot.emit('error', err)
+//     })
+// })
 /**
  * 如何获取联系人头像
  */
@@ -365,6 +371,16 @@ bot.on('message', msg => {
 //         bot.emit('error', err)
 //     })
 // })
+function afterMounted(func) {
+    if (isMounted) {
+        setImmediate(func);
+    } else {
+        mountedCbList.push(func);
+    }
+}
 module.exports = {
-    sendMessage
+    sendMessage,
+    userNameMap,
+    bot,
+    afterMounted
 }

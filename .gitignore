@@ -5,3 +5,4 @@ npm-debug.log
 server/db
 public/
 config.js
+server/sync-data.json 

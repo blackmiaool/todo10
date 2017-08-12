@@ -92,6 +92,26 @@ async function transfer(id, uid) {
     info.watchers[uid] = true;
     await edit(id, info);
 }
+
+function filter(func, range = 'current') {
+    if (range === 'current') {
+        range = mapCurrent;
+    } else if (range = 'all') {
+        range = mapAll;
+    } else {
+        console.warn('unknown range', range);
+        range = {}
+    }
+    const ret = [];
+    for (const i in range) {
+        const item = range[i];
+        if (func(item)) {
+            ret.push(item);
+        }
+    }
+    return ret;
+}
+
 module.exports = {
     getList,
     create,
@@ -99,5 +119,8 @@ module.exports = {
     getTodo,
     watch,
     unwatch,
-    transfer
+    transfer,
+    mapCurrent,
+    mapAll,
+    filter,
 }
