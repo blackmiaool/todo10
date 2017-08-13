@@ -184,7 +184,10 @@ export default {
         create() {
             const info = this.$refs.editor.get();
             if (!info.title) {
-                return alert("title is needed")
+                return alert(this.$t("Title is needed"));
+            }
+            if (!info.owner) {
+                return alert(this.$t('Owner is needed'));
             }
             this.$emit('create', info);
         },

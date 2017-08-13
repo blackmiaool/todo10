@@ -24,8 +24,10 @@
     
                     </div>
                     <div class="tags">
-                        <span v-for="tag in projectInfo(project).tags" :key="tag.id" class="top-tag">{{tag.name}}</span>
-                        <!--<router-link :to="'/list?project='+project.id+'&tag='+tag.id" class="clickable" v-for="tag in tags" :key="tag.id">{{project.name}}</router-link>-->
+    
+                        <router-link :to="getLink(tag.id)" class="clickable" v-for="tag in projectInfo(project).tags" :key="tag.id">
+                            <span class="top-tag" :class="{'active':!selectingTag||selectingTag==tag.id}">{{tag.name}}</span>
+                        </router-link>
                     </div>
                 </header>
                 <div class="todo-wrap">
@@ -80,6 +82,9 @@ export default {
         },
         projects() {
             return store.state.projects;
+        },
+        selectingTag() {
+            return this.$route.query.tag;
         }
     },
     mounted() {
@@ -100,6 +105,14 @@ export default {
         '$route': 'init'
     },
     methods: {
+        getLink(id) {
+            if (this.selectingTag != id) {
+                return '/list?project=' + this.project + '&tag=' + id;
+            } else {
+                return '/list?project=' + this.project;
+            }
+
+        },
         addTag(projectId) {
             console.log('projectId', projectId);
             const name = prompt("New Tag Name");
@@ -129,7 +142,7 @@ export default {
                 return;
             }
             socket.emit("getList", query, (result) => {
-                this.list = result.reverse();
+                this.list = result.data.reverse();
                 if (this.$route.query.id) {
                     this.view(this.$route.query.id);
                 }

@@ -35,15 +35,30 @@ function getTodo(id) {
 }
 
 function getList(uid, filter) {
-    console.log('filter', filter);
     const ret = [];
-    if (filter && filter.project) {
-        filter.project = filter.project * 1;
+    if (filter && Object.keys(filter).length) {
+        let project;
+        let tag;
+        if (filter.project) {
+            project = filter.project * 1;
+        }
+        if (filter.tag) {
+            tag = filter.tag * 1;
+        }
         for (const id in mapAll) {
             const item = mapAll[id];
-            if (item.projects && item.projects.indexOf(filter.project) !== -1) {
-                ret.push(item);
+            if (project) {
+                if (!item.projects || item.projects.indexOf(project) === -1) {
+                    continue;
+                }
             }
+            if (tag) {
+                if (!item.tags || item.tags.indexOf(tag) === -1) {
+                    continue;
+                }
+            }
+            ret.push(item);
+
         }
     } else {
         for (const id in mapCurrent) {

@@ -17,6 +17,11 @@ const uaParser = require('ua-parser-js');
 const request = require('request');
 const userMap = {}
 const wechat = require('./wechat');
+const clientOrigin = `http://${config.domain}:${config.clientPort}`;
+
+function getViewUrl(id) {
+    return `${clientOrigin}\/#\/view?id=${id}`;
+}
 class User {
     constructor(info) {
         Object.assign(this, {
@@ -243,10 +248,12 @@ function init(io) {
             await todo.transfer(id, uid);
             const item = todo.getTodo(id);
             wechat.sendMessage(topUserMap.getName(uid), `【${topUserMap.getName(socket.context.uid)}】把任务：【${item.title}】移交给了你。
-详情参见 http://${config.domain}:${config.clientPort}\/#\/view?id=${id}`);
+详情参见 ${getViewUrl(id)}`);
             if (item.requestor != socket.context.uid) {
-                wechat.sendMessage(topUserMap.getName(item.requestor), `【${topUserMap.getName(socket.context.uid)}】把任务：【${item.title}】移交给了【${topUserMap.getName(uid)}】。
-详情参见 http://${config.domain}:${config.clientPort}\/#\/view?id=${id}`);
+                setTimeout(() => {
+                    wechat.sendMessage(topUserMap.getName(item.requestor), `【${topUserMap.getName(socket.context.uid)}】把任务：【${item.title}】移交给了【${topUserMap.getName(uid)}】。
+详情参见 ${getViewUrl(id)}`);
+                }, 3000);
             }
 
             return {
@@ -254,11 +261,20 @@ function init(io) {
             };
         }, false);
         $on('finish', async function (id) {
-            console.log('id', id, userMap[id]);
             const item = todo.getTodo(id);
+            console.log(item);
             item.status = 'done';
-            wechat.sendMessage(topUserMap.getName(item.requestor), `【${item.title}】任务被【${topUserMap.getName(socket.context.uid)}】完成了哦～  
-详情参见 http://${config.domain}:${config.clientPort}\/#\/view?id=${id}`);
+            const message = `【${item.title}】任务被【${topUserMap.getName(socket.context.uid)}】完成了哦～  
+详情参见 ${getViewUrl(id)}`;
+            for (const uid in item.watchers) {
+                if (uid != socket.context.uid) {
+                    if (uid == item.requestor) {
+                        wechat.sendMessage(topUserMap.getName(uid), '你创建的' + message);
+                    } else {
+                        wechat.sendMessage(topUserMap.getName(uid), '你关注的' + message);
+                    }
+                }
+            }
             await todo.edit(id, item);
             const list = todo.getList(socket.context.uid);
             return {
@@ -282,7 +298,7 @@ function init(io) {
             }
             await todo.edit(id, item);
             let message = `【${$requestor.name}】 给你分配了任务【${item.title}】
-详情参见 http://${config.domain}:${config.clientPort}\/#\/view?id=${id}`;
+详情参见 ${getViewUrl(id)}`;
             console.log('$requestor', $requestor)
             if ($requestor.hasWechat) {
                 message += '\n回复[Smile]可以通知TA你接受了任务';
@@ -313,36 +329,33 @@ function init(io) {
         }, true);
 
         let user;
-        socket.on('getUserList', async(data, cb) => {
-            // if (!socket.context.uid) {
-            //     return cb(errorMap[13]);
-            // }
+        $on('getUserList', async function () {
             const list = await db.getUserList();
             handleTopUserList(list);
-
-
-
-            cb(successData({
+            return {
                 list
-            }));
+            };
         });
-        socket.on('getTodo', async(data, cb) => {
-            // if (!socket.context.uid) {
-            //     return cb(errorMap[13]);
-            // }
-            const info = todo.getTodo(data.id);
-            cb(successData({
+        $on('getTodo', async function ({
+            id
+        }) {
+            const info = todo.getTodo(id);
+            return {
                 info
-            }));
+            };
         });
-
-        socket.on('getList', async(data, cb) => {
-            if (!socket.context.uid) {
-                return cb(errorMap[13]);
-            }
+        $on('getList', async function (data) {
             const list = todo.getList(socket.context.uid, data);
-            cb(list);
-        });
+            return list;
+        }, true);
+
+        // socket.on('getList', async(data, cb) => {
+        //     if (!socket.context.uid) {
+        //         return cb(errorMap[13]);
+        //     }
+        //     const list = todo.getList(socket.context.uid, data);
+        //     cb(list);
+        // });
         async function register({
             name,
             email,

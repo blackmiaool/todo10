@@ -77,6 +77,7 @@ export default {
             // vm.$refs.todoPanel.set(vm.list[0]);
             this.$refs.todoPanel.setMode("Create");
             socket.emit("getList", {}, (list) => {
+                list = list.data;
                 store.commit('setTodoList', list);
                 if (this.$route.params.id) {
                     this.view(this.$route.params.id);
@@ -211,7 +212,7 @@ export default {
         onRefresh() {
             store.commit('setTodoList', []);
             socket.emit("getList", {}, (result) => {
-                store.commit('setTodoList', result);
+                store.commit('setTodoList', result.data);
             });
         },
         shareImage(src) {

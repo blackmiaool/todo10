@@ -29,12 +29,18 @@ font-size:0px;
 }
 
 .top-tag {
-    border: 1px solid #5cb85c;
+    @color: #888;
+    border: 1px solid @color;
     border-radius: 100px;
-    color: #5cb85c;
+    color: @color;
     font-size: 14px;
     line-height: 14px;
     padding: 3px 7px;
     margin-right: 5px;
     margin-bottom: 3px;
+    &.active {
+        @color: #5cb85c;
+        border: 1px solid @color;
+        color: @color;
+    }
 }

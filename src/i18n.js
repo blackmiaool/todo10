@@ -62,7 +62,9 @@ const messages = {
         'Share Image': '分享图片',
         'Right click to copy': '右键点击图片复制分享',
         'Select a project first': '首先选择一个工程',
-        'Click to select': '点击以选择'
+        'Click to select': '点击以选择',
+        "Title is needed": '必须填写标题',
+        'Owner is needed': '必须填写接受者',
     },
 };
 module.exports = messages;

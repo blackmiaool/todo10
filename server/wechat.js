@@ -94,8 +94,15 @@ function mounted() {
     // console.log(userNameMap);
     console.log('mounted');
 }
+const messageQueue = [];
+let idle = true;
 
-function sendMessage(name, message) {
+function onIdle() {
+    if (!messageQueue.length) {
+        return;
+    }
+    idle = false;
+    const [name, message] = messageQueue.pop();
     if (!userNameMap[name]) {
         if (!Object.keys(userNameMap).length) {
             console.warn('userNameMap is empty');
@@ -108,6 +115,19 @@ function sendMessage(name, message) {
         .catch(err => {
             bot.emit('error', err)
         })
+    setTimeout(() => {
+        idle = true;
+        onIdle();
+    }, 3000);
+
+}
+
+function sendMessage(name, message) {
+    messageQueue.push([name, message]);
+    if (idle) {
+        onIdle();
+    }
+
 }
 setTimeout(() => {
     // sendMessage('户口先生', 'hi！！！');
