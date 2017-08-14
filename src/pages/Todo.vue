@@ -52,6 +52,7 @@ export default {
         list: () => store.state.list
     },
     mounted() {
+        this.$refs.todoPanel.setMode("Create");
         this.init();
         store.commit("setCommonTags", ['活动', 'app-rn', 'rnrender', '酷玩', '品味']);
     },
@@ -75,7 +76,7 @@ export default {
         init() {
             this.initialized = true;
             // vm.$refs.todoPanel.set(vm.list[0]);
-            this.$refs.todoPanel.setMode("Create");
+
             socket.emit("getList", {}, (list) => {
                 list = list.data;
                 store.commit('setTodoList', list);
@@ -94,9 +95,7 @@ export default {
             }
         },
         onRestore(item) {
-            item = JSON.parse(JSON.stringify(item));
-            item.status = 'pending';
-            socket.emit("edit", item, ({ data: { list } }) => {
+            socket.emit("restore", item.id, ({ data: { list } }) => {
                 store.commit('setTodoList', list);
             });
         },
@@ -181,6 +180,10 @@ export default {
         },
         onTransfer(id) {
             this.selectUser().then((uid) => {
+                const userName = store.getters.uid2name(uid);
+                if (!confirm(`是否确认将任务移交给${userName}`)) {
+                    return;
+                }
                 console.log('transfer', id, 'to', uid);
 
                 socket.emit("transfer", {

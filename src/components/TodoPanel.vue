@@ -5,7 +5,7 @@
             <span v-if="unsaved && mode==='Edit'" class="unsaved">(unsaved)</span>
         </h2>
         <TodoViewer :userList="userList" ref="viewer" v-if="mode==='View'"></TodoViewer>
-        <TodoEditor :userList="userList" ref="editor" v-if="mode==='Edit'||mode==='Create'" @change="onChange" :mode="mode" @showUserSelector="emit('selectUser')"></TodoEditor>
+        <TodoEditor :userList="userList" ref="editor" v-if="mode==='Edit'||mode==='Create'" @change="onChange" :mode="mode" @showUserSelector="$emit('selectUser')"></TodoEditor>
         <div>
             <button v-if="mode==='Create'" class="btn btn-success submit" @click="create">
                 <i class="fa fa-arrow-circle-o-up"></i>
@@ -35,15 +35,15 @@
                 <i class="fa fa-paper-plane"></i>
                 {{$t('Transfer')}}
             </button>
-            <button v-if="mode==='View'&&page==='view'&&!logged" class="btn btn-success submit" @click="emit('login')">
+            <button v-if="mode==='View'&&page==='view'&&!logged" class="btn btn-success submit" @click="$emit('login')">
                 <i class="fa fa-save"></i>
                 {{$t('goLogin')}}
             </button>
-            <button v-if="canWatch&&page!=='list'" class="btn btn-success submit" @click="emit('watch')">
+            <button v-if="canWatch&&page!=='list'" class="btn btn-success submit" @click="$emit('watch')">
                 <i class="fa fa-bookmark-o"></i>
                 {{$t('Watch')}}
             </button>
-            <button v-if="canUnwatch&&page==='view'" class="btn btn-danger submit" @click="emit('unwatch')">
+            <button v-if="canUnwatch&&page==='view'" class="btn btn-danger submit" @click="$emit('unwatch')">
                 <i class="fa fa-bookmark"></i>
                 {{$t('Unwatch')}}
             </button>
@@ -190,9 +190,6 @@ export default {
                 return alert(this.$t('Owner is needed'));
             }
             this.$emit('create', info);
-        },
-        emit(...args) {
-            this.$emit(...args);
         },
         transfer() {
             this.$emit('transfer', this.info.id);

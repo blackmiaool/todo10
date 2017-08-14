@@ -3,8 +3,10 @@ const Wechat = require('wechat4u')
 const qrcode = require('qrcode-terminal')
 const fs = require('fs')
 const request = require('request')
-
-let bot
+const {
+    doUploadImage
+} = require('./uploadImg');
+let bot;
 /**
  * 尝试获取本地登录数据，免扫码
  * 这里演示从本地文件中获取数据
@@ -68,6 +70,7 @@ const getContent = new Promise((resolve) => {
         console.log('联系人数量：', Object.keys(bot.contacts).length)
     });
 });
+
 const getLogin = new Promise((resolve) => {
     bot.on('login', () => {
         resolve();
@@ -91,6 +94,8 @@ function mounted() {
     mountedCbList.forEach((func) => {
         func();
     });
+    // MemberList
+    // console.log(userNameMap['编辑器讨论群'])
     // console.log(userNameMap);
     console.log('mounted');
 }
@@ -244,6 +249,49 @@ setTimeout(() => {
 /**
  * 如何处理会话消息
  */
+// setTimeout(() => {
+//     sendMessage('面试官', 'hi');
+// }, 5000);
+function shuffle(array) {
+    var currentIndex = array.length,
+        temporaryValue, randomIndex;
+
+    // While there remain elements to shuffle...
+    while (0 !== currentIndex) {
+
+        // Pick a remaining element...
+        randomIndex = Math.floor(Math.random() * currentIndex);
+        currentIndex -= 1;
+
+        // And swap it with the current element.
+        temporaryValue = array[currentIndex];
+        array[currentIndex] = array[randomIndex];
+        array[randomIndex] = temporaryValue;
+    }
+
+    return array;
+}
+
+function sendRandomMembers(groupName, num) {
+    num *= 1;
+    if (num === 0) {
+        sendMessage(groupName, '逗我呢？');
+        return;
+    }
+    if (!userNameMap[groupName].MemberList || !userNameMap[groupName].MemberList.length) {
+        sendMessage(groupName, '???');
+        return;
+    }
+    const list = userNameMap[groupName].MemberList;
+    shuffle(list);
+    shuffle(list);
+    shuffle(list);
+    shuffle(list);
+    if (num > list.length) {
+        num = list.length;
+    }
+    return sendMessage(groupName, shuffle(list).slice(0, num).map((people, i) => `${i+1}:${people.NickName}`).join(', '));
+}
 bot.on('message', msg => {
     /**
      * 获取消息时间
@@ -255,8 +303,8 @@ bot.on('message', msg => {
     /**
      * 获取消息发送者的显示名
      */
-
-    console.log(bot.contacts[msg.FromUserName].getDisplayName(), msg.MsgType)
+    const sender = bot.contacts[msg.FromUserName];
+    console.log(sender.getDisplayName(), msg.MsgType, msg)
     /**
      * 判断消息类型
      */
@@ -265,14 +313,35 @@ bot.on('message', msg => {
         /**
          * 文本消息
          */
+        if (bot.contacts[msg.FromUserName].getDisplayName().match(/面试官/)) {
+            const content = msg.Content;
+            const realMsg = content.split('\n')[1];
+            const match = realMsg.match(/^随(\d+)$/)
+            if (realMsg === '随') {
+                sendRandomMembers('面试官', 3);
+            } else if (match) {
+                sendRandomMembers('面试官', match[1]);
+            }
+        }
         console.log(msg.Content)
         break
     case bot.CONF.MSGTYPE_IMAGE:
         /**
          * 图片消息
          */
-        console.log('图片消息，保存到本地')
+        if (sender.MemberList && sender.MemberList.length) {
+            console.log('群图片消息');
+            return;
+        }
+        console.log('图片消息，保存到本地');
+        if (bot.contacts[msg.FromUserName].getDisplayName()) {
+
+        }
+
         bot.getMsgImg(msg.MsgId).then(res => {
+            doUploadImage(res.data, 'a.jpg').then((url) => {
+                sendMessage(sender.getDisplayName(), url);
+            });
             fs.writeFileSync(`./media/${msg.MsgId}.jpg`, res.data)
         }).catch(err => {
             bot.emit('error', err)

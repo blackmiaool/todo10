@@ -6,6 +6,7 @@ import Login from './pages/Login';
 import Todo from './pages/Todo';
 import View from './pages/View';
 import List from './pages/List';
+import UserPage from './pages/User';
 import Settings from './pages/Settings';
 import socket from './io';
 
@@ -78,6 +79,11 @@ const routes = [{
         path: '/list',
         component: List,
         name: 'List',
+    },
+    {
+        path: '/user',
+        component: UserPage,
+        name: 'UserPage',
     },
 ];
 /*eslint-disable */

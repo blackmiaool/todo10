@@ -7,8 +7,12 @@ module.exports = {
         parser: 'babel-eslint',
         sourceType: 'module'
     },
+    globals: {
+        module: true,
+        require: true
+    },
     env: {
-        browser: true,
+        browser: true
     },
     // extends: 'airbnb-base',
     // required to lint *.vue files
@@ -45,6 +49,7 @@ module.exports = {
         "no-param-reassign": 0,
         "no-alert": 0,
         "func-names": 0,
-        "no-unused-vars": ["error"]
+        "no-unused-vars": ["error"],
+        "no-undef": ["error"]
     }
 }

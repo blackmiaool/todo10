@@ -9,13 +9,16 @@
             <router-link to="/todo" data-tab-name="groups" class="clickable">
                 <i class="fa fa-user-circle"></i>
             </router-link>
+            <router-link to="/user" data-tab-name="users" class="clickable">
+                <i class="fa fa-users"></i>
+            </router-link>
             <router-link to="/list" data-tab-name="projects" class="clickable">
                 <i class="fa fa-cubes"></i>
             </router-link>
     
             <!--<router-link to="/settings" data-tab-name="settings" class="clickable">
-                                                        <i class="fa fa-cog"></i>
-                                                    </router-link>-->
+                                                                <i class="fa fa-cog"></i>
+                                                            </router-link>-->
             <!--                <div data-tab-name="search" class="clickable"></div>-->
             <!--                <div data-tab-name="other" class="clickable"></div>-->
             <router-link to="/login" data-tab-name="login" class="clickable">

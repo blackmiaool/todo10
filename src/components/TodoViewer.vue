@@ -89,6 +89,38 @@
             </label>
             <FileList v-model="attachments" mode="view"></FileList>
         </div>
+    
+        <div class="input-block" v-if="history&&history.length">
+            <label for="choose-owner">
+                <i class="fa fa-history"></i>
+                {{$t('History')}}
+            </label>
+            <div>
+                <button class="btn btn-default" @click="showHistory=!showHistory">{{$t(showHistory?'Hide':'Show')}}</button>
+            </div>
+            <div v-if="showHistory">
+                <div v-for="li in history" :key="li.time">
+                    <header>
+                        <span>{{time2str(li.time)}}</span>
+                        <span>{{getUserName(li.uid)}}</span>
+                        {{$t('set')}} {{$t(li.key)}}
+                    </header>
+                    <main :title="'previous: '+(li.source||'nothing')">
+    
+                        <div v-if="li.key==='projects'" data-mode="View" class="selected-tags">
+                            <span :key="project" v-for="project in li.target" class="selected-tag clickable" @click="goProject(project)">{{projectInfo(project).name}}</span>
+                        </div>
+                        <div v-else-if="li.key==='tags'" data-mode="View" class="selected-tags">
+                            <span :key="project" v-for="project in li.target" class="selected-tag clickable">{{tagInfo(project).name}}</span>
+                        </div>
+                        <div v-else>
+                            {{li.target}}
+                        </div>
+                    </main>
+                </div>
+            </div>
+    
+        </div>
     </div>
 </template>
 
@@ -114,6 +146,7 @@ const properties = {
     attachments: [],
     watchers: {},
     projects: [],
+    history: undefined,
 }
 export default {
     name: 'TodoViewer',
@@ -126,7 +159,7 @@ export default {
     data() {
         return {
             ...properties,
-            unsaved: true,
+            showHistory: false,
             priorityMap: {
                 3: '(C) delay it as u want~',
                 2: '(B) do it when u have time.',
@@ -175,6 +208,12 @@ export default {
         }
     },
     methods: {
+        getUserName(uid) {
+            return store.getters.uid2name(uid);
+        },
+        time2str(time) {
+            return (new Date(time)).format('yyyy-MM-dd hh:mm')
+        },
         tagInfo: (id) => store.getters.tagInfo(id),
         projectInfo: (id) => store.getters.projectInfo(id),
         set(id) {
