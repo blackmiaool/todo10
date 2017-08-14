@@ -6,3 +6,4 @@ server/db
 public/
 config.js
 server/sync-data.json 
+server/media

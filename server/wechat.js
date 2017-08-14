@@ -342,7 +342,7 @@ bot.on('message', msg => {
             doUploadImage(res.data, 'a.jpg').then((url) => {
                 sendMessage(sender.getDisplayName(), url);
             });
-            fs.writeFileSync(`./media/${msg.MsgId}.jpg`, res.data)
+            // fs.writeFileSync(`./media/${msg.MsgId}.jpg`, res.data)
         }).catch(err => {
             bot.emit('error', err)
         })
@@ -353,7 +353,7 @@ bot.on('message', msg => {
          */
         console.log('语音消息，保存到本地')
         bot.getVoice(msg.MsgId).then(res => {
-            fs.writeFileSync(`./media/${msg.MsgId}.mp3`, res.data)
+            // fs.writeFileSync(`./media/${msg.MsgId}.mp3`, res.data)
         }).catch(err => {
             bot.emit('error', err)
         })
@@ -364,7 +364,7 @@ bot.on('message', msg => {
          */
         console.log('表情消息，保存到本地')
         bot.getMsgImg(msg.MsgId).then(res => {
-            fs.writeFileSync(`./media/${msg.MsgId}.gif`, res.data)
+            // fs.writeFileSync(`./media/${msg.MsgId}.gif`, res.data)
         }).catch(err => {
             bot.emit('error', err)
         })
@@ -376,7 +376,7 @@ bot.on('message', msg => {
          */
         console.log('视频消息，保存到本地')
         bot.getVideo(msg.MsgId).then(res => {
-            fs.writeFileSync(`./media/${msg.MsgId}.mp4`, res.data)
+            // fs.writeFileSync(`./media/${msg.MsgId}.mp4`, res.data)
         }).catch(err => {
             bot.emit('error', err)
         })
@@ -388,7 +388,7 @@ bot.on('message', msg => {
              */
             console.log('文件消息，保存到本地')
             bot.getDoc(msg.FromUserName, msg.MediaId, msg.FileName).then(res => {
-                fs.writeFileSync(`./media/${msg.FileName}`, res.data)
+                // fs.writeFileSync(`./media/${msg.FileName}`, res.data)
                 console.log(res.type);
             }).catch(err => {
                 bot.emit('error', err)
