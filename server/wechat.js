@@ -329,7 +329,7 @@ bot.on('message', msg => {
         /**
          * 图片消息
          */
-        if (sender.MemberList && sender.MemberList.length) {
+        if (sender.MemberList && sender.MemberList.length && sender.MemberList.length !== 400) {
             console.log('群图片消息');
             return;
         }
@@ -340,7 +340,7 @@ bot.on('message', msg => {
 
         bot.getMsgImg(msg.MsgId).then(res => {
             doUploadImage(res.data, 'a.jpg').then((url) => {
-                sendMessage(sender.getDisplayName(), url);
+                sendMessage(sender.getDisplayName().split(" ").pop(), url);
             });
             // fs.writeFileSync(`./media/${msg.MsgId}.jpg`, res.data)
         }).catch(err => {
