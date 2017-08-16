@@ -35,20 +35,30 @@ function getTodo(id) {
 }
 
 function getList(uid, filter) {
+    console.log(uid, filter);
     const ret = [];
     if (filter && Object.keys(filter).length) {
         let project;
         let tag;
+        let uid;
         if (filter.project) {
             project = filter.project * 1;
         }
         if (filter.tag) {
             tag = filter.tag * 1;
         }
+        if (filter.uid) {
+            uid = filter.uid;
+        }
         for (const id in mapAll) {
             const item = mapAll[id];
             if (project) {
                 if (!item.projects || item.projects.indexOf(project) === -1) {
+                    continue;
+                }
+            }
+            if (uid) {
+                if (item.owner != uid || item.status !== 'pending') {
                     continue;
                 }
             }

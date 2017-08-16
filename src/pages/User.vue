@@ -1,28 +1,13 @@
 <template>
     <div class="list-page-wrap list-page">
-        <TodoPanel page="list" v-show="userName&&list.length&&selecting" ref="todoPanel" :editing="editing" @fork="onFork"></TodoPanel>
+        <TodoPanel page="list" v-show="userName&&list.length&&selecting" ref="todoPanel" :editing="editing"></TodoPanel>
         <!--<TodoList :list="list" ref="list" @select="onSelect"></TodoList>-->
         <div class="list-panel">
             <div class="projects-wrap">
                 <router-link :to="'/user?uid='+user.uid" class="clickable btn btn-primary" v-for="user in userMap" :key="user.uid">{{user.name}}</router-link>
-                <button class="btn btn-primary btn-xs" @click="addProject" title="add project">
-                    {{$t('Add Project')}}
-                    <i class="fa fa-plus"></i>
-                </button>
             </div>
-            <div class="list-panel-content" v-if="project">
+            <div class="list-panel-content" v-if="uid">
                 <header class="filter-wrap">
-                    <div>
-                        <label>
-                            <i class="fa fa-cubes"></i>
-                            {{$t('Project')}}: {{projectName}}
-                            <button class="btn btn-primary btn-xs" @click="addTag(project)" :title="$t('add tag')">
-                                {{$t('Add Tag')}}
-                                <i class="fa fa-plus"></i>
-                            </button>
-                        </label>
-    
-                    </div>
                     <div class="tags">
     
                         <router-link :to="getLink(tag.id)" class="clickable" v-for="tag in projectInfo(project).tags" :key="tag.id">
@@ -101,7 +86,8 @@ export default {
             tag: undefined,
             list: [
             ],
-            today: (new Date()).format("yyyy-MM-dd")
+            today: (new Date()).format("yyyy-MM-dd"),
+            uid: undefined,
         }
     },
     watch: {
@@ -116,33 +102,14 @@ export default {
             }
 
         },
-        addTag(projectId) {
-            console.log('projectId', projectId);
-            const name = prompt("New Tag Name");
-            if (!name) {
-                return;
-            }
-            socket.emit("addTag", { project: projectId, tag: name }, (result) => {
-                console.log('result', result)
-                store.dispatch('getProjects').then((projects) => { });
-            });
-        },
         projectInfo(project) {
             return store.getters.projectInfo(project);
         },
         init() {
-            this.project = this.$route.query.project;
-            this.tag = this.$route.query.tag;
+            this.uid = this.$route.query.uid;
             const query = {};
-            if (this.project) {
-                query.project = this.project;
-            }
-            if (this.tag) {
-                query.tag = this.tag;
-            }
-            if (!Object.keys(query).length) {
-                this.list = [];
-                return;
+            if (this.uid) {
+                query.uid = this.uid;
             }
             socket.emit("getList", query, (result) => {
                 this.list = result.data.reverse();
@@ -159,15 +126,6 @@ export default {
                 // this.view(this.$route.params.id);
             }
         },
-        onFork(item) {
-            item = JSON.parse(JSON.stringify(item));
-            delete item.id;
-            this.$refs.todoPanel.setMode("Create");
-            this.$refs.list.clear();
-            setTimeout(() => {
-                this.$refs.todoPanel.set(item);
-            });
-        },
         onSelect(item) {
 
             if (item.id == this.selecting) {
@@ -178,19 +136,6 @@ export default {
             this.selecting = item.id;
 
         },
-        addProject() {
-            const name = prompt('Give your project a name');
-            if (!name) {
-                return;
-            }
-            if (!name.trim()) {
-                return;
-            }
-            socket.emit('addProject', { name }, () => {
-
-            });
-        },
-
     },
     components: {
         TodoPanel,
