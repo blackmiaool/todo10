@@ -39,7 +39,7 @@
                 <i class="fa fa-save"></i>
                 {{$t('goLogin')}}
             </button>
-            <button v-if="canWatch&&page!=='list'" class="btn btn-success submit" @click="$emit('watch')">
+            <button v-if="canWatch" class="btn btn-success submit" @click="$emit('watch')">
                 <i class="fa fa-bookmark-o"></i>
                 {{$t('Watch')}}
             </button>

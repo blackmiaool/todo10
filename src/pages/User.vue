@@ -1,6 +1,6 @@
 <template>
     <div class="list-page-wrap list-page">
-        <TodoPanel page="list" v-show="userName&&list.length&&selecting" ref="todoPanel" :editing="editing"></TodoPanel>
+        <TodoPanel page="list" v-show="userName&&list.length&&selecting" ref="todoPanel" @watch="onWatch"></TodoPanel>
         <!--<TodoList :list="list" ref="list" @select="onSelect"></TodoList>-->
         <div class="list-panel">
             <div class="projects-wrap">
@@ -94,6 +94,12 @@ export default {
         '$route': 'init'
     },
     methods: {
+        onWatch() {
+            console.log('this.selecting', this.selecting)
+            socket.emit('watch', { id: this.selecting.id || this.selecting }, () => {
+                this.init();
+            });
+        },
         getLink(id) {
             if (this.selectingTag != id) {
                 return '/list?project=' + this.project + '&tag=' + id;
@@ -113,16 +119,20 @@ export default {
             }
             socket.emit("getList", query, (result) => {
                 this.list = result.data.reverse();
-                if (this.$route.query.id) {
+                if (this.selecting) {
+                    this.view(this.selecting.id || this.selecting);
+                } else if (this.$route.query.id) {
                     this.view(this.$route.query.id);
                 }
             });
         },
         view(id) {
+
             const target = this.list.find(li => li.id * 1 === id * 1);
+            console.log('view', id, target);
             if (target) {
                 this.$refs.todoPanel.view(target);
-                this.editing = target;
+                this.selecting = target.id || target;
                 // this.view(this.$route.params.id);
             }
         },
