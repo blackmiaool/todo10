@@ -1,20 +1,15 @@
 <template>
     <div class="list-page-wrap list-page">
-        <TodoPanel page="list" v-show="userName&&list.length&&selecting" ref="todoPanel" @watch="onWatch" @unwatch="unWatch"></TodoPanel>
+        <div style="width:360px;float:right;height:100%">
+            <TodoPanel page="list" v-show="userName&&list.length&&selecting" ref="todoPanel" @watch="onWatch" @unwatch="unWatch"></TodoPanel>
+        </div>
+    
         <!--<TodoList :list="list" ref="list" @select="onSelect"></TodoList>-->
         <div class="list-panel">
             <div class="projects-wrap">
                 <router-link :to="'/user?uid='+user.uid" class="clickable btn btn-primary" v-for="user in userMap" :key="user.uid">{{user.name}}</router-link>
             </div>
             <div class="list-panel-content" v-if="uid">
-                <header class="filter-wrap">
-                    <div class="tags">
-    
-                        <router-link :to="getLink(tag.id)" class="clickable" v-for="tag in projectInfo(project).tags" :key="tag.id">
-                            <span class="top-tag" :class="{'active':!selectingTag||selectingTag==tag.id}">{{tag.name}}</span>
-                        </router-link>
-                    </div>
-                </header>
                 <div class="todo-wrap">
                     <header class="list-header">
     
@@ -69,9 +64,6 @@ export default {
         userMap() {
             return store.state.userMap;
         },
-        projects() {
-            return store.state.projects;
-        },
         selectingTag() {
             return this.$route.query.tag;
         }
@@ -81,7 +73,6 @@ export default {
     },
     data() {
         return {
-            selecting: undefined,
             editing: undefined,
             project: undefined,
             tag: undefined,
@@ -120,25 +111,6 @@ export default {
                     this.view(this.$route.query.id);
                 }
             });
-        },
-        view(id) {
-
-            const target = this.list.find(li => li.id * 1 === id * 1);
-            console.log('view', id, target);
-            if (target) {
-                this.$refs.todoPanel.view(target);
-                this.selecting = target.id;
-            }
-        },
-        onSelect(item) {
-
-            if (item.id == this.selecting) {
-                this.selecting = undefined;
-                return;
-            }
-            this.$refs.todoPanel.view(item);
-            this.selecting = item.id;
-
         },
     },
     components: {

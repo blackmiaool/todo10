@@ -1,7 +1,8 @@
 <template>
     <div class="list-page-wrap list-page">
-        <TodoPanel page="list" v-show="userName&&list.length&&selecting" ref="todoPanel" @watch="onWatch" @unwatch="unWatch" @fork="onFork"></TodoPanel>
-        <!--<TodoList :list="list" ref="list" @select="onSelect"></TodoList>-->
+        <div style="width:360px;float:right;height:100%">
+            <TodoPanel page="list" v-show="userName&&list.length&&selecting" ref="todoPanel" @watch="onWatch" @unwatch="unWatch" @fork="onFork"></TodoPanel>
+        </div>
         <div class="list-panel">
             <div class="projects-wrap">
                 <router-link :to="'/list?project='+project.id" class="clickable btn btn-primary" v-for="project in projects" :key="project.id">{{project.name}}</router-link>
@@ -94,8 +95,6 @@ export default {
     },
     data() {
         return {
-            selecting: undefined,
-            editing: undefined,
             project: undefined,
             tag: undefined,
             list: [
@@ -153,14 +152,7 @@ export default {
 
             });
         },
-        view(id) {
-            const target = this.list.find(li => li.id * 1 === id * 1);
-            if (target) {
-                this.$refs.todoPanel.view(target);
-                this.editing = target;
-                // this.view(this.$route.params.id);
-            }
-        },
+
         onFork(item) {
             item = JSON.parse(JSON.stringify(item));
             delete item.id;
@@ -169,16 +161,6 @@ export default {
             setTimeout(() => {
                 this.$refs.todoPanel.set(item);
             });
-        },
-        onSelect(item) {
-
-            if (item.id == this.selecting) {
-                this.selecting = undefined;
-                return;
-            }
-            this.$refs.todoPanel.view(item);
-            this.selecting = item.id;
-
         },
         addProject() {
             const name = prompt('Give your project a name');
