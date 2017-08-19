@@ -9,7 +9,8 @@ module.exports = {
     },
     globals: {
         module: true,
-        require: true
+        require: true,
+        Promise: true
     },
     env: {
         browser: true

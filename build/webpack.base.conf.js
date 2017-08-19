@@ -28,6 +28,7 @@ module.exports = {
             'common': path.resolve(__dirname, '../common'),
             'assets': path.resolve(__dirname, '../src/assets'),
             'components': path.resolve(__dirname, '../src/components'),
+            'mixins': path.resolve(__dirname, '../src/mixins'),
             'config': path.resolve(__dirname, '../config'),
             'io': path.resolve(__dirname, '../src/io'),
             'eventHub': path.resolve(__dirname, '../src/eventHub'),

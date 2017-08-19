@@ -1,6 +1,6 @@
 <template>
     <div class="list-page-wrap list-page">
-        <TodoPanel page="list" v-show="userName&&list.length&&selecting" ref="todoPanel" @watch="onWatch"></TodoPanel>
+        <TodoPanel page="list" v-show="userName&&list.length&&selecting" ref="todoPanel" @watch="onWatch" @unwatch="unWatch"></TodoPanel>
         <!--<TodoList :list="list" ref="list" @select="onSelect"></TodoList>-->
         <div class="list-panel">
             <div class="projects-wrap">
@@ -40,9 +40,10 @@ import datepicker from 'vue-date';
 import TodoPanel from 'components/TodoPanel';
 import TodoLi from 'components/TodoLi';
 import store from 'store';
-
+import todoPanelMixin from 'mixins/todoPanelMixin';
 export default {
     name: 'List',
+    mixins: [todoPanelMixin],
     created() {
 
     },
@@ -94,12 +95,6 @@ export default {
         '$route': 'init'
     },
     methods: {
-        onWatch() {
-            console.log('this.selecting', this.selecting)
-            socket.emit('watch', { id: this.selecting.id || this.selecting }, () => {
-                this.init();
-            });
-        },
         getLink(id) {
             if (this.selectingTag != id) {
                 return '/list?project=' + this.project + '&tag=' + id;
@@ -120,7 +115,7 @@ export default {
             socket.emit("getList", query, (result) => {
                 this.list = result.data.reverse();
                 if (this.selecting) {
-                    this.view(this.selecting.id || this.selecting);
+                    this.view(this.selecting);
                 } else if (this.$route.query.id) {
                     this.view(this.$route.query.id);
                 }
@@ -132,8 +127,7 @@ export default {
             console.log('view', id, target);
             if (target) {
                 this.$refs.todoPanel.view(target);
-                this.selecting = target.id || target;
-                // this.view(this.$route.params.id);
+                this.selecting = target.id;
             }
         },
         onSelect(item) {

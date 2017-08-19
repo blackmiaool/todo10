@@ -23,7 +23,7 @@
                 <i class="fa fa-image"></i>
                 {{$t('Share as Image')}}
             </button>
-            <button v-if="mode==='View'&&page==='todo'" class="btn btn-warning submit" @click="share">
+            <button v-if="mode==='View'" class="btn btn-warning submit" @click="share">
                 <i class="fa fa-share-alt"></i>
                 {{$t('Share')}}
             </button>
@@ -43,7 +43,7 @@
                 <i class="fa fa-bookmark-o"></i>
                 {{$t('Watch')}}
             </button>
-            <button v-if="canUnwatch&&page==='view'" class="btn btn-danger submit" @click="$emit('unwatch')">
+            <button v-if="canUnwatch&&page!=='todo'" class="btn btn-danger submit" @click="$emit('unwatch')">
                 <i class="fa fa-bookmark"></i>
                 {{$t('Unwatch')}}
             </button>
