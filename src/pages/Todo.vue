@@ -1,10 +1,10 @@
 <template>
     <div class="top-page-wrap todo-page">
         <TodoPanel page="todo" v-if="userName" ref="todoPanel" @create="onCreate" :editing="editing" @save="onSave" @fork="onFork" @newOne="onNew" @transfer="onTransfer" @shareAsImage="onShareAsImage" @selectUser="onTodoPanelSelectUser"></TodoPanel>
-        <TodoList :list="list" ref="list" @select="onSelect" @finish="onFinish" @restore="onRestore" @destroy="onDestroy" @generateReport="onGenerateReport" @refresh="onRefresh" @new="onNew"></TodoList>
+        <TodoList :list="list" ref="list" @select="onSelect" @finish="onFinish" @restore="onRestore" @destroy="onDestroy" @generateReport="onGenerateReport" @refresh="onRefresh" @new="onNew" @deleteAll="deleteAll" :refreshing="refreshing"></TodoList>
         <Modal v-if="showingModal" @cancel="onModalCancel">
             <UserSelector v-if="modalMap.userSelector" @select="onSelectUser">
-    
+
             </UserSelector>
             <ReportViewer v-if="modalMap.reportViewer" :list="reportList">
             </ReportViewer>
@@ -67,6 +67,7 @@ export default {
             today: (new Date()).format("yyyy-MM-dd"),
             reportList: [],
             sharingImage: '',
+            refreshing: false,
         }
     },
     watch: {
@@ -213,8 +214,10 @@ export default {
             this.reportList = list;
         },
         onRefresh() {
-            store.commit('setTodoList', []);
+            this.refreshing = true;
+            // store.commit('setTodoList', []);
             socket.emit("getList", {}, (result) => {
+                this.refreshing = false;
                 store.commit('setTodoList', result.data);
             });
         },
@@ -241,12 +244,24 @@ export default {
                         // document.body.appendChild(img);
                         clean();
                     })
-                    .catch(function (error) {
+                    .catch(function(error) {
                         clean();
                         alert('failed');
                         console.error('oops, something went wrong!', error);
                     });
             }, 200);
+
+        },
+        deleteAll(list) {
+            console.log('del', list);
+            if (!confirm("Unwatch All?")) {
+                return;
+            }
+            list.forEach((item) => {
+                socket.emit('unwatch', { id: item.id }, ({ data: { list } }) => {
+                    store.commit('setTodoList', list);
+                });
+            });
 
         }
     },

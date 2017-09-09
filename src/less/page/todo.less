@@ -6,7 +6,10 @@ font-size:0px;
     height: 100%;
     display: inline-block;
     overflow-y: auto;
-    overflow-x: hidden;
+    overflow-x: hidden; // transition: 0.2s opacity;
+    &.refreshing {
+        opacity: 0.7;
+    }
 }
 
 .detail-panel {

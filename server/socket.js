@@ -77,24 +77,33 @@ wechat.bot.on('message', msg => {
     const name = wechat.bot.contacts[msg.FromUserName].getDisplayName();
 
     switch (msg.MsgType) {
-    case wechat.bot.CONF.MSGTYPE_TEXT:
-        if (msg.Content === '[Smile]') {
-            const user = topUserMap.getFromName(name);
-            if (!user) {
-                return;
+        case wechat.bot.CONF.MSGTYPE_TEXT:
+            if (msg.Content === '[Smile]') {
+                const user = topUserMap.getFromName(name);
+                if (!user) {
+                    return;
+                }
+                todo.filter((item) => item.confirmPending && item.owner == user.uid).forEach((item, i) => {
+                    setTimeout(() => {
+                        wechat.sendMessage(topUserMap.getName(item.requestor), `【${name}】接受了你创建的任务【${item.title}】`);
+                        item = todo.getTodo(item.id);
+                        item.confirmPending = false;
+                        todo.edit(item.id, item);
+                    }, i * 5000);
+                });
             }
-            todo.filter((item) => item.confirmPending && item.owner == user.uid).forEach((item, i) => {
-                setTimeout(() => {
-                    wechat.sendMessage(topUserMap.getName(item.requestor), `【${name}】接受了你创建的任务【${item.title}】`);
-                    item = todo.getTodo(item.id);
-                    item.confirmPending = false;
-                    todo.edit(item.id, item);
-                }, i * 5000);
-            });
-        }
+            break;
+        default:
+            break;
     }
 });
-
+function notify(uid, content) {
+    db.addMessage(uid, {
+        createTime: Date.now(),
+        content
+    });
+    // wechat.sendMessage(topUserMap.getName(uid), message);
+}
 function diff(source, target, uid) {
     console.log('diff', source, target);
     if (!target.history) {
@@ -133,7 +142,13 @@ function diff(source, target, uid) {
 function init(io) {
     io.on('connection', function (socket) {
         socket.context = {};
-        socket.on('upload', async({
+        socket.on('disconnect', function () {
+            if (!socket.context.user) {
+                return;
+            }
+            socket.context.user.disconnectClient(socket);
+        });
+        socket.on('upload', async ({
             data,
             name,
             id,
@@ -181,16 +196,16 @@ function init(io) {
                 }
             });
         }
-        $on('unwatch', async(data) => {
+        $on('unwatch', async (data) => {
             await todo.unwatch(data.id, socket.context.uid);
             return {
                 list: todo.getList(socket.context.uid)
             }
         }, true);
-        $on('watch', async(data) => {
+        $on('watch', async (data) => {
             await todo.watch(data.id, socket.context.uid);
         }, true);
-        $on('uploadUrl', async(data) => {
+        $on('uploadUrl', async (data) => {
             data = encodeURI(data);
             let url = await doUploadImage(request.get(data), data);
             if (data.match(/\.gif$/)) {
@@ -198,7 +213,7 @@ function init(io) {
             }
             return url;
         }, false);
-        $on('addProject', async(data) => {
+        $on('addProject', async (data) => {
             await db.addProject({
                 name: data.name
             });
@@ -211,12 +226,14 @@ function init(io) {
         }) {
             await todo.transfer(id, uid);
             const item = todo.getTodo(id);
-            wechat.sendMessage(topUserMap.getName(uid), `【${topUserMap.getName(socket.context.uid)}】把任务：【${item.title}】移交给了你。
-详情参见 ${getViewUrl(id)}`);
+            const message = `【${topUserMap.getName(socket.context.uid)}】把任务：【${item.title}】移交给了你。
+详情参见 ${getViewUrl(id)}`;
+            notify(uid, message);
             if (item.requestor != socket.context.uid) {
                 setTimeout(() => {
-                    wechat.sendMessage(topUserMap.getName(item.requestor), `【${topUserMap.getName(socket.context.uid)}】把任务：【${item.title}】移交给了【${topUserMap.getName(uid)}】。
-详情参见 ${getViewUrl(id)}`);
+                    const message = `【${topUserMap.getName(socket.context.uid)}】把任务：【${item.title}】移交给了【${topUserMap.getName(uid)}】。
+详情参见 ${getViewUrl(id)}`;
+                    notify(item.requestor, message);
                 }, 3000);
             }
 
@@ -234,9 +251,9 @@ function init(io) {
                     continue;
                 }
                 if (uid == item.requestor) {
-                    wechat.sendMessage(topUserMap.getName(uid), '你创建的' + message);
+                    notify(uid, '你创建的' + message);
                 } else {
-                    wechat.sendMessage(topUserMap.getName(uid), '你关注的' + message);
+                    notify(uid, '你关注的' + message);
                 }
             }
             await todo.edit(id, item);
@@ -273,11 +290,10 @@ function init(io) {
             await todo.edit(id, item);
             let message = `【${$requestor.name}】 给你分配了任务【${item.title}】
 详情参见 ${getViewUrl(id)}`;
-            if ($requestor.hasWechat) {
-                message += '\n回复[Smile]可以通知这人你接受了任务';
-            }
-
-            wechat.sendMessage($owner.name, message);
+            // if ($requestor.hasWechat) {
+            //     message += '\n回复[Smile]可以通知这人你接受了任务';
+            // }
+            notify(item.owner, message);
             const list = todo.getList(socket.context.uid);
             await new Promise((resolve) => {
                 const dir = `./public/files/${topUserMap.getName(socket.context.uid)}`;

@@ -68,6 +68,7 @@ const messages = {
         'Select a user': '选择一个用户',
         'Generate Report': '生成报告',
         'Refresh': '刷新',
+        'Share as Image': '生成分享图片',
         'Share Image': '分享图片',
         'Right click to copy': '右键点击图片复制分享',
         'Select a project first': '首先选择一个工程',
@@ -77,6 +78,7 @@ const messages = {
         'set': '设置',
         'Show': '显示',
         'Hide': '隐藏',
+        'Unwatch All': '全部取关',
     },
 };
 module.exports = messages;

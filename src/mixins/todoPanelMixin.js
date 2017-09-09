@@ -38,5 +38,8 @@ module.exports = {
             }
             this.view(item.id);
         },
+        inList(id) {
+            return this.list.find((item) => item.id * 1 === id * 1);
+        }
     }
 }

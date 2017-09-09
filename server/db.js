@@ -15,13 +15,13 @@ db.serialize(function () {
         Project INTEGER,     
         FOREIGN KEY (Project) REFERENCES project(id) 
         );
-    `, function (e) {});
+    `, function (e) { });
     db.run(`CREATE TABLE project (
         id INTEGER PRIMARY KEY,
         Name TEXT, 
         Data TEXT
         );
-    `, function (e) {});
+    `, function (e) { });
     db.run(`CREATE TABLE user (
         id INTEGER PRIMARY KEY,
         Name VARCHAT(32),
@@ -30,16 +30,40 @@ db.serialize(function () {
         Avatar TEXT,
         Source TEXT
         );
-    `, function (e) {});
+    `, function (e) { });
 
     db.run(`CREATE TABLE todo (
         id INTEGER PRIMARY KEY,
         Data TEXT,
         Active BOOLEAN
         );
-    `, function (e) {});
-});
+    `, function (e) { });
+    db.run(`CREATE TABLE message (
+        id INTEGER PRIMARY KEY,
+        uid INTEGER,
+        Data TEXT,
+        FOREIGN KEY (uid) REFERENCES user(id)
+        );
+    `, function (e) { });
 
+});
+function addMessage($uid, $data) {
+    return new Promise(function (resolve, reject) {
+        db.serialize(function () {
+            db.run(`INSERT INTO message (Data,uid) VALUES ($data,$uid);`, {
+                $uid,
+                $data: JSON.stringify($data)
+            }, function (e) {
+                if (e) {
+                    console.log(e);
+                    reject(e);
+                } else {
+                    resolve(this.lastID);
+                }
+            });
+        });
+    });
+}
 function getUserList() {
     return new Promise(function (resolve, reject) {
         db.serialize(function () {
@@ -314,5 +338,6 @@ export {
     getUserList,
     addProject,
     getProjects,
-    addTag
+    addTag,
+    addMessage
 }

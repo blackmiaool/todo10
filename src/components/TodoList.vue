@@ -1,5 +1,5 @@
 <template>
-    <div class="list-panel todo-list-component">
+    <div class="list-panel todo-list-component" :class={refreshing}>
         <div class="top-bar">
             <button class="btn btn-primary" @click="$emit('new')">
                 <i class="fa fa-plus-square-o"></i> {{$t('New')}}
@@ -15,7 +15,7 @@
             </h3>
             <div class="todo-wrap">
                 <header class="list-header">
-    
+
                 </header>
                 <section class="list-main">
                     <ul class="todo-list">
@@ -25,7 +25,7 @@
                 </section>
             </div>
         </section>
-    
+
         <section class="todoapp">
             <h3>
                 <i class="fa fa-feed"></i>
@@ -41,13 +41,16 @@
                 </section>
             </div>
         </section>
-    
+
         <section class="todoapp">
             <h3>
                 <i class="fa fa-trash"></i>
                 {{$t('Finished')}}
-                <button class="btn btn-primary btn-xs" @click="$emit('generateReport',[listPending,listDone])">
+                <button v-if="listDone.length" class="btn btn-primary btn-xs" @click="$emit('generateReport',[listPending,listDone])">
                     <i class="fa fa-file-text"></i> {{$t('Generate Report')}}</button>
+
+                <button v-if="listDone.length" class="btn btn-danger btn-xs" @click="$emit('deleteAll',listDone)">
+                    <i class="fa fa-trash"></i> {{$t('Unwatch All')}}</button>
             </h3>
             <div class="todo-wrap">
                 <header class="list-header"></header>
@@ -58,7 +61,7 @@
                     </ul>
                 </section>
             </div>
-    
+
         </section>
     </div>
 </template>
@@ -93,7 +96,7 @@ export default {
     mounted() {
 
     },
-    props: ['list'],
+    props: ['list', 'refreshing'],
     data() {
         return {
             selecting: "",

@@ -1,7 +1,7 @@
 <template>
     <div class="list-page-wrap list-page">
         <div style="width:360px;float:right;height:100%">
-            <TodoPanel page="list" v-show="userName&&list.length&&selecting" ref="todoPanel" @watch="onWatch" @unwatch="unWatch" @fork="onFork"></TodoPanel>
+            <TodoPanel page="list" v-show="userName&&list.length&&inList(selecting)" ref="todoPanel" @watch="onWatch" @unwatch="unWatch" @fork="onFork"></TodoPanel>
         </div>
         <div class="list-panel">
             <div class="projects-wrap">
@@ -22,10 +22,10 @@
                                 <i class="fa fa-plus"></i>
                             </button>
                         </label>
-    
+
                     </div>
                     <div class="tags">
-    
+
                         <router-link :to="getLink(tag.id)" class="clickable" v-for="tag in projectInfo(project).tags" :key="tag.id">
                             <span class="top-tag" :class="{'active':!selectingTag||selectingTag==tag.id}">{{tag.name}}</span>
                         </router-link>
@@ -33,7 +33,7 @@
                 </header>
                 <div class="todo-wrap">
                     <header class="list-header">
-    
+
                     </header>
                     <ul class="todo-list">
                         <TodoLi v-for="li in list" :info="li" :selected="li.id===selecting" :mutable="false" :key="li.id" @select="onSelect(li)">
@@ -41,7 +41,7 @@
                     </ul>
                 </div>
             </div>
-    
+
         </div>
     </div>
 </template>

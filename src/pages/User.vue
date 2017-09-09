@@ -1,7 +1,7 @@
 <template>
     <div class="list-page-wrap list-page">
         <div style="width:360px;float:right;height:100%">
-            <TodoPanel page="list" v-show="userName&&list.length&&selecting" ref="todoPanel" @watch="onWatch" @unwatch="unWatch"></TodoPanel>
+            <TodoPanel page="list" v-show="userName&&list.length&&inList(selecting)" ref="todoPanel" @watch="onWatch" @unwatch="unWatch"></TodoPanel>
         </div>
     
         <!--<TodoList :list="list" ref="list" @select="onSelect"></TodoList>-->

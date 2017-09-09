@@ -18,23 +18,22 @@ class User {
             clients: []
         }, info);
     }
-    connectClient(socket, info) {
-        const item = {
-            socket
-        };
-        Object.assign(item, info);
-        this.clients.push(item);
+    connectClient(socket) {
+        this.clients.push(socket);
     }
     disconnectClient(socket) {
         socket.emit("logged-out", function () {
 
         });
-        this.clients.some(function (item, i, arr) {
-            if (item.socket === socket) {
-                arr.splice(i, 1);
-                return true;
-            }
-        });
+        const index = this.clients.indexOf(socket);
+        if (index > -1) {
+            this.clients.splice(index, 1);
+        } else {
+            console.warn(`it's weird that we can't find the index of the disconnected client`);
+        }
+        if (!this.clients.length) {//remove the user then
+            delete userMap[socket.context.user.id];
+        }
     }
     static addUser(info) {
         if (!userMap[info.id]) {
@@ -93,10 +92,10 @@ async function doLogin(data, cb) {
         user = User.addUser(result);
 
         const ua = uaParser(this.handshake.headers['user-agent']);
-        user.connectClient(this, {
-            os: ua.os.name
-        });
+        this.context.os = ua.os.name;
+        user.connectClient(this);
         this.context.uid = user.id;
+        this.context.user = user;
         cb(successData({
             name: user.name,
             avatar: user.avatar,
@@ -185,7 +184,11 @@ async function register({
         }
     }
 }
+// setInterval(() => {
+//     console.log(Object.keys(userMap));
+// }, 1000);
 module.exports = {
     doLogin,
-    register
+    register,
+    userMap
 }
