@@ -1,7 +1,8 @@
 <template>
     <div class="top-page-wrap todo-page">
         <TodoPanel page="todo" v-if="userName" ref="todoPanel" @create="onCreate" :editing="editing" @save="onSave" @fork="onFork" @newOne="onNew" @transfer="onTransfer" @shareAsImage="onShareAsImage" @selectUser="onTodoPanelSelectUser"></TodoPanel>
-        <TodoList :list="list" ref="list" @select="onSelect" @finish="onFinish" @restore="onRestore" @destroy="onDestroy" @generateReport="onGenerateReport" @refresh="onRefresh" @new="onNew" @deleteAll="deleteAll" :refreshing="refreshing"></TodoList>
+        <TodoList :list="list" ref="list" @select="onSelect" @finish="onFinish" @restore="onRestore" @destroy="onDestroy" @generateReport="onGenerateReport" @refresh="onRefresh" @new="onNew" @deleteAll="deleteAll" @toggleMessageBox="toggleMessageBox" :refreshing="refreshing"></TodoList>
+        <MessageBox :active="showingMessageBox" @close="showingMessageBox=!showingMessageBox" />
         <Modal v-if="showingModal" @cancel="onModalCancel">
             <UserSelector v-if="modalMap.userSelector" @select="onSelectUser">
 
@@ -26,6 +27,7 @@ import ReportViewer from 'components/ReportViewer';
 import ImageShare from 'components/ImageShare';
 import socket from "../io";
 import domtoimage from 'dom-to-image';
+import MessageBox from 'components/MessageBox';
 export default {
     name: 'Todo',
     created() {
@@ -68,6 +70,7 @@ export default {
             reportList: [],
             sharingImage: '',
             refreshing: false,
+            showingMessageBox: false,
         }
     },
     watch: {
@@ -252,6 +255,9 @@ export default {
             }, 200);
 
         },
+        toggleMessageBox() {
+            this.showingMessageBox = !this.showingMessageBox;
+        },
         deleteAll(list) {
             console.log('del', list);
             if (!confirm("Unwatch All?")) {
@@ -271,7 +277,8 @@ export default {
         UserSelector,
         Modal,
         ReportViewer,
-        ImageShare
+        ImageShare,
+        MessageBox
     }
 
 }

@@ -341,7 +341,14 @@ function init(io) {
             const list = todo.getList(socket.context.uid, data);
             return list;
         }, true);
-
+        $on("getMessages", async function () {
+            return await db.getMessageList(socket.context.uid);
+        });
+        $on("deleteMessage", async function (id) {
+            await db.deleteMessage(id);
+            return await db.getMessageList(socket.context.uid);
+            // return await db.getMessageList(socket.context.uid)
+        });
         socket.on('register', register);
         socket.on('login', doLogin)
     });

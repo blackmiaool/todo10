@@ -1,11 +1,11 @@
 const sqlite3 = require('sqlite3').verbose();
 const db = new sqlite3.cached.Database('db');
-const config = require("../config.js");
-import {
-    errorMap,
-    getError,
-    successData
-} from "../common/error.js";
+// const config = require("../config.js");
+// import {
+//     errorMap,
+//     getError,
+//     successData
+// } from "../common/error.js";
 
 //create table
 db.serialize(function () {
@@ -15,13 +15,13 @@ db.serialize(function () {
         Project INTEGER,     
         FOREIGN KEY (Project) REFERENCES project(id) 
         );
-    `, function (e) { });
+    `, function () { });
     db.run(`CREATE TABLE project (
         id INTEGER PRIMARY KEY,
         Name TEXT, 
         Data TEXT
         );
-    `, function (e) { });
+    `, function () { });
     db.run(`CREATE TABLE user (
         id INTEGER PRIMARY KEY,
         Name VARCHAT(32),
@@ -30,27 +30,74 @@ db.serialize(function () {
         Avatar TEXT,
         Source TEXT
         );
-    `, function (e) { });
+    `, function () { });
 
     db.run(`CREATE TABLE todo (
         id INTEGER PRIMARY KEY,
         Data TEXT,
         Active BOOLEAN
         );
-    `, function (e) { });
+    `, function () { });
     db.run(`CREATE TABLE message (
-        id INTEGER PRIMARY KEY,
+        id TEXT PRIMARY KEY,
         uid INTEGER,
         Data TEXT,
         FOREIGN KEY (uid) REFERENCES user(id)
         );
-    `, function (e) { });
+    `, function () { });
 
 });
+
+
+function deleteMessage($id) {
+    return new Promise(function (resolve, reject) {
+        db.serialize(function () {
+            db.run(`DELETE FROM message WHERE id=$id`, {
+                $id
+            }, function (e) {
+                if (e) {
+                    console.log(e);
+                    reject(e);
+                } else {
+                    resolve();
+                }
+            });
+        });
+    });
+}
+
+function getNanoSecTime() {
+    return Date.now() + (process.hrtime()[1] % 1000).toString();
+}
+function getMessageList($uid) {
+    return new Promise(function (resolve, reject) {
+        db.serialize(function () {
+            db.all(`SELECT Data as data,id FROM message WHERE uid=$uid;`, {
+                $uid,
+            }, function (e, result) {
+                if (e) {
+                    console.log(e);
+                    reject(e);
+                } else {
+
+                    if (!result) {
+                        reject(true);
+                    } else {
+                        result.forEach((v) => {
+                            v.data = JSON.parse(v.data);
+                        });
+                        resolve(result);
+                    }
+                }
+            });
+        });
+    });
+}
 function addMessage($uid, $data) {
     return new Promise(function (resolve, reject) {
         db.serialize(function () {
-            db.run(`INSERT INTO message (Data,uid) VALUES ($data,$uid);`, {
+            db.run(`INSERT INTO message (Data,uid,id) VALUES ($data,$uid,$id);`, {
+                $id: getNanoSecTime(),
                 $uid,
                 $data: JSON.stringify($data)
             }, function (e) {
@@ -84,7 +131,7 @@ function getUserList() {
 }
 
 function edit($id, $data, $active) {
-    return new Promise(function (resolve, reject) {
+    return new Promise(function (resolve) {
         db.serialize(function () {
             db.run(`UPDATE todo SET Data=$data,Active=$active  WHERE id=$id;`, {
                 $id,
@@ -130,15 +177,15 @@ function getList($active) {
                     console.log(e);
                     reject(e);
                 } else {
-                    result.forEach((v) => {
-                        const parsed = JSON.parse(v.data);
-                        delete parsed.id;
-                        Object.assign(v, parsed);
-                        delete v.data;
-                    });
                     if (!result) {
                         reject(true);
                     } else {
+                        result.forEach((v) => {
+                            const parsed = JSON.parse(v.data);
+                            delete parsed.id;
+                            Object.assign(v, parsed);
+                            delete v.data;
+                        });
                         resolve(result);
                     }
                 }
@@ -208,7 +255,7 @@ async function getAvatar($name) {
 
 function register($name, $email, $password, $avatar, $source) {
     avatarCache = {};
-    return new Promise(function (resolve, reject) {
+    return new Promise(function (resolve) {
         db.serialize(function () {
             db.run(`INSERT INTO user (Name,Email,Password,Avatar,Source) VALUES ($name,$email,$password,$avatar,$source);`, {
                 $name,
@@ -266,7 +313,7 @@ function addTag({
     project,
     tag
 }) {
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
         db.run(`INSERT INTO tag (Name,Project) VALUES ($name,$project);`, {
             $name: tag,
             $project: project,
@@ -313,7 +360,7 @@ function getProjects() {
             }
         });
     });
-    return p1.then(() => p2).then(() => new Promise((resolve, reject) => {
+    return p1.then(() => p2).then(() => new Promise((resolve) => {
         const tagMap = {};
         tags.forEach((tag) => {
             if (!tagMap[tag.project]) {
@@ -339,5 +386,7 @@ export {
     addProject,
     getProjects,
     addTag,
-    addMessage
+    addMessage,
+    getMessageList,
+    deleteMessage,
 }

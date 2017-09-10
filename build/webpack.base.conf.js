@@ -54,13 +54,13 @@ module.exports = {
                 {
                     loader: 'css-loader',
                     options: {
-                        importLoaders: 1
+                        // importLoaders: 1
                     }
                 }, {
                     loader: "less-loader",
                     options: {
                         paths: [
-                            path.resolve(__dirname, "node_modules")
+                            // path.resolve(__dirname, "node_modules")
                         ]
                     }
                 }
@@ -105,38 +105,38 @@ module.exports = {
             }
         ],
         loaders: [{
-                test: /\.vue$/,
-                loader: 'vue'
-            },
-            {
-                test: /\.js$/,
-                loader: 'babel',
-                include: [
-                    path.join(projectRoot, 'src'), path.join(projectRoot, 'common')
-                ],
-                exclude: /node_modules/
-            },
-            {
-                test: /\.json$/,
-                loader: 'json'
-            },
-            {
-                test: /\.(png|jpe?g|gif|svg)(\?.*)?$/,
-                loader: 'url',
-                query: {
-                    limit: 10000,
-                    //          name: utils.assetsPath('img/[name].[ext]')
-                    name: utils.assetsPath('img/[name].[ext]')
-                }
-            },
-            {
-                test: /\.(woff2?|eot|ttf|otf)(\?.*)?$/,
-                loader: 'url',
-                query: {
-                    limit: 10000,
-                    name: utils.assetsPath('fonts/[name].[hash:7].[ext]')
-                }
+            test: /\.vue$/,
+            loader: 'vue'
+        },
+        {
+            test: /\.js$/,
+            loader: 'babel',
+            include: [
+                path.join(projectRoot, 'src'), path.join(projectRoot, 'common')
+            ],
+            exclude: /node_modules/
+        },
+        {
+            test: /\.json$/,
+            loader: 'json'
+        },
+        {
+            test: /\.(png|jpe?g|gif|svg)(\?.*)?$/,
+            loader: 'url',
+            query: {
+                limit: 10000,
+                //          name: utils.assetsPath('img/[name].[ext]')
+                name: utils.assetsPath('img/[name].[ext]')
             }
+        },
+        {
+            test: /\.(woff2?|eot|ttf|otf)(\?.*)?$/,
+            loader: 'url',
+            query: {
+                limit: 10000,
+                name: utils.assetsPath('fonts/[name].[hash:7].[ext]')
+            }
+        }
         ]
     },
     eslint: {

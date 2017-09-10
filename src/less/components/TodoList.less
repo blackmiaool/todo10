@@ -2,6 +2,9 @@
 & {
     padding: 20px 10px;
     position: relative;
+    &.mouseInBox {
+        overflow: hidden !important;
+    }
 }
 
 .todoapp {
@@ -15,8 +18,25 @@
     position: absolute;
     top: 0;
     left: 0;
+    right: 0;
     button {
         border-radius: 0;
         padding: 3px 10px;
+        vertical-align: top;
+    }
+    .mail-btn {
+        width: 50px;
+        height: 100px;
+        transform: rotate(-45deg);
+        position: absolute;
+        right: -9px;
+        top: -36px;
+        i {
+            transform: rotate(45deg);
+            position: absolute;
+            right: 16px;
+            top: 35px;
+            font-size: 24px;
+        }
     }
 }

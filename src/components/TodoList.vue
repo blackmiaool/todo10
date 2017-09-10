@@ -1,11 +1,14 @@
 <template>
-    <div class="list-panel todo-list-component" :class={refreshing}>
+    <div class="list-panel todo-list-component" :class="{refreshing}">
         <div class="top-bar">
             <button class="btn btn-primary" @click="$emit('new')">
                 <i class="fa fa-plus-square-o"></i> {{$t('New')}}
             </button>
             <button class="btn btn-default" @click="$emit('refresh')">
                 <i class="fa fa-refresh"></i> {{$t('Refresh')}}
+            </button>
+            <button class="btn btn-primary btn-lg mail-btn clickable" @click="$emit('toggleMessageBox')">
+                <i class="fa fa-envelope"></i>
             </button>
         </div>
         <section class="todoapp">
@@ -71,6 +74,7 @@
 import store from 'store';
 import TodoLi from 'components/TodoLi';
 
+
 function sortList(a, b) {
     if (a.priority === b.priority) {
         return a.name > b.name ? 1 : -1;
@@ -99,6 +103,7 @@ export default {
     props: ['list', 'refreshing'],
     data() {
         return {
+            showingMessageBox: false,
             selecting: "",
         };
     },
@@ -115,7 +120,8 @@ export default {
         },
     },
     components: {
-        TodoLi
+        TodoLi,
+
     }
 
 };
