@@ -121,8 +121,7 @@ export default {
                 return;
             }
             socket.emit("addTag", { project: projectId, tag: name }, (result) => {
-                console.log('result', result)
-                store.dispatch('getProjects').then((projects) => { });
+                store.dispatch('getProjects').then((projects) => { })
             });
         },
         projectInfo(project) {
@@ -171,7 +170,7 @@ export default {
                 return;
             }
             socket.emit('addProject', { name }, () => {
-
+                store.dispatch('getProjects').then((projects) => { })
             });
         },
 

@@ -1,9 +1,6 @@
 module.exports = {
     serverPort: 9013,
+    clientPort: 9014,
+    domain: "blackmiaool.jios.org",
     salt: "wsoefmslz.,2323lln",
-    firstRoom: {
-        name: "god",
-        bulletin: "Common room",
-        avatar: "/static/img/avatar.gif"
-    },
 }
