@@ -1,7 +1,9 @@
 #!/usr/bin/env node
-(function() {
+
+(function () {
     var childProcess = require("child_process");
     var oldSpawn = childProcess.spawn;
+
     function mySpawn() {
         //console.log('spawn called');
         //console.log(arguments);
@@ -12,4 +14,4 @@
 })();
 var current_path = process.cwd();
 
-require('runkoa')(current_path + '/bin/www' )
+require('runkoa')(current_path + '/bin/www')

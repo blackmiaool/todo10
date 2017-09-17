@@ -29,18 +29,10 @@ app.use(cors());
 app.use(convert(require('koa-static')(__dirname + '/public')));
 
 var avatar = require('./avatar-generator')({
-    //Optional settings. Default settings in 'settings.js'
-    order: 'background face clothes head hair eye mouth'.split(' '), //order in which sprites should be combined
-    //    images:require('path').join(__dirname,'./img'), // path to sprites
-    //    convert: 'convert' //Path to imagemagick convert
+    order: 'background face clothes head hair eye mouth'.split(' '), //order in which
 });
 
-//
-//avatar(Math.random() + "", 'male', 20)
-//    .toBuffer(function (err, buffer) {
-//        console.log(`data:image/png;base64,` + buffer.toString('base64'));
-//    });
-router.post('/avatar', async(ctx, next) => {
+router.post('/avatar', async (ctx, next) => {
     await new Promise(function (resolve) {
         avatar(Math.random() + "", 'male', 50)
             .toBuffer(function (err, buffer) {
@@ -54,13 +46,13 @@ router.post('/avatar', async(ctx, next) => {
 function getFileName(name) {
     return name.replace(/^[\.\/]+/, "").replace(/^[\.]+/, "");
 }
-router.get('/getFile', async(ctx, next) => {
+router.get('/getFile', async (ctx, next) => {
     const queryName = getFileName(ctx.request.query.name);
     const shortName = queryName.replace(/^\d+-/, "");
     ctx.body = fs.createReadStream(__dirname + '/public/files/' + queryName);
     ctx.attachment(shortName);
 });
-router.get('/getCode', async(ctx, next) => {
+router.get('/getCode', async (ctx, next) => {
     const name = getFileName(ctx.request.query.name);
     if (!name.match(/^[\w\.]+$/)) {
         ctx.status = 400;
@@ -68,7 +60,7 @@ router.get('/getCode', async(ctx, next) => {
     }
     ctx.body = fs.createReadStream(__dirname + '/public/code/' + name);
 });
-router.post('/login', async(ctx, next) => {
+router.post('/login', async (ctx, next) => {
     const name = ctx.request.body.name;
     const password = ctx.request.body.password;
     const checkResult = registerCheck("server", name, password);
@@ -102,7 +94,7 @@ router.post('/login', async(ctx, next) => {
 
     ctx.status = 200;
 });
-router.post('/register', async(ctx, next) => {
+router.post('/register', async (ctx, next) => {
     const name = ctx.request.body.name;
     const password = ctx.request.body.password;
     const avatar = ctx.request.body.avatar;
@@ -140,7 +132,7 @@ router.post('/register', async(ctx, next) => {
 
     ctx.status = 200;
 });
-app.use(async(ctx, next) => {
+app.use(async (ctx, next) => {
     ctx.set('Access-Control-Allow-Origin', '*');
     await next();
 });

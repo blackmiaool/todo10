@@ -72,6 +72,72 @@ function doUploadImage(stream, url) {
         });
     });
 }
+// POST /rfs/test/test1 HTTP/1.1
+// Host: tj1-mijia-test03.kscn
+// TRANSID: todo10
+// Cache-Control: no-cache
+// Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
+
+// ------WebKitFormBoundary7MA4YWxkTrZu0gW
+// Content-Disposition: form-data; name="file"; filename="scr.log"
+// Content-Type: 
+
+
+// ------WebKitFormBoundary7MA4YWxkTrZu0gW--
+const fs = require("fs");
+function doUploadDataBase() {
+
+    //    console.log(formData);
+    return new Promise((resolve) => {
+        fs.readFile("./db", (err, data) => {
+            console.log('err', err)
+            const fileName = `todo10db${Date.now() / 36e5 % 100 | 0}`;
+            let formData = {
+                file: {
+                    value: data,
+                    options: {
+                        'Content-Disposition': 'form-data',
+                        name: "file",
+                        filename: fileName,
+                        'Content-Type': ``,
+                        // name: "upload",
+                    }
+                }
+            };
+            request.post({
+                url: 'http://tj1-mijia-test03.kscn/rfs/todo10/' + fileName,
+                formData,
+                headers: {
+                    'TRANSID': 'todo10',
+                    "Cache-Control": "no-cache",
+                    'Content-Type': 'multipart/form-data',
+                    Host: "tj1-mijia-test03.kscn",
+                }
+            }, function optionalCallback(err, httpResponse, body) {
+                if (err) {
+                    console.log(err);
+                    console.log('backup failed');
+                } else {
+                    console.log('backup succeed')
+                }
+            });
+        });
+
+    });
+}
+// request.get({
+//     url: 'http://tj1-mijia-test03.kscn/rfs/todo10/',
+//     headers: {
+//         'TRANSID': 'todo10',
+//         "Cache-Control": "no-cache",
+//         'Content-Type': 'multipart/form-data',
+//         Host: "tj1-mijia-test03.kscn",
+//     }
+// }, function optionalCallback(err, httpResponse, body) {
+//     console.log(err, body.toString().length);
+// });
+doUploadDataBase();
+setInterval(doUploadDataBase, 36e5);
 module.exports = {
     doUploadImage
 }

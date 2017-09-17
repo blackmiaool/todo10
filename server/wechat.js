@@ -148,7 +148,7 @@ bot.on('error', err => {
 /**
  * 如何发送消息
  */
-bot.on('login', () => {});
+bot.on('login', () => { });
 /**
  * 演示发送消息到文件传输助手
  * 通常回复消息时可以用 msg.FromUserName
@@ -290,7 +290,7 @@ function sendRandomMembers(groupName, num) {
     if (num > list.length) {
         num = list.length;
     }
-    return sendMessage(groupName, shuffle(list).slice(0, num).map((people, i) => `${i+1}:${people.NickName}`).join(', '));
+    return sendMessage(groupName, shuffle(list).slice(0, num).map((people, i) => `${i + 1}:${people.NickName}`).join(', '));
 }
 bot.on('message', msg => {
     /**
@@ -309,94 +309,94 @@ bot.on('message', msg => {
      * 判断消息类型
      */
     switch (msg.MsgType) {
-    case bot.CONF.MSGTYPE_TEXT:
-        /**
-         * 文本消息
-         */
-        if (bot.contacts[msg.FromUserName].getDisplayName().match(/面试官/)) {
-            const content = msg.Content;
-            const realMsg = content.split('\n')[1];
-            const match = realMsg.match(/^随(\d+)$/)
-            if (realMsg === '随') {
-                sendRandomMembers('面试官', 3);
-            } else if (match) {
-                sendRandomMembers('面试官', match[1]);
-            }
-        }
-        console.log(msg.Content)
-        break
-    case bot.CONF.MSGTYPE_IMAGE:
-        /**
-         * 图片消息
-         */
-        if (sender.MemberList && sender.MemberList.length && sender.MemberList.length !== 400) {
-            console.log('群图片消息');
-            return;
-        }
-        console.log('图片消息，保存到本地');
-        if (bot.contacts[msg.FromUserName].getDisplayName()) {
-
-        }
-
-        bot.getMsgImg(msg.MsgId).then(res => {
-            doUploadImage(res.data, 'a.jpg').then((url) => {
-                sendMessage(sender.getDisplayName().split(" ").pop(), url);
-            });
-            // fs.writeFileSync(`./media/${msg.MsgId}.jpg`, res.data)
-        }).catch(err => {
-            bot.emit('error', err)
-        })
-        break
-    case bot.CONF.MSGTYPE_VOICE:
-        /**
-         * 语音消息
-         */
-        console.log('语音消息，保存到本地')
-        bot.getVoice(msg.MsgId).then(res => {
-            // fs.writeFileSync(`./media/${msg.MsgId}.mp3`, res.data)
-        }).catch(err => {
-            bot.emit('error', err)
-        })
-        break
-    case bot.CONF.MSGTYPE_EMOTICON:
-        /**
-         * 表情消息
-         */
-        console.log('表情消息，保存到本地')
-        bot.getMsgImg(msg.MsgId).then(res => {
-            // fs.writeFileSync(`./media/${msg.MsgId}.gif`, res.data)
-        }).catch(err => {
-            bot.emit('error', err)
-        })
-        break
-    case bot.CONF.MSGTYPE_VIDEO:
-    case bot.CONF.MSGTYPE_MICROVIDEO:
-        /**
-         * 视频消息
-         */
-        console.log('视频消息，保存到本地')
-        bot.getVideo(msg.MsgId).then(res => {
-            // fs.writeFileSync(`./media/${msg.MsgId}.mp4`, res.data)
-        }).catch(err => {
-            bot.emit('error', err)
-        })
-        break
-    case bot.CONF.MSGTYPE_APP:
-        if (msg.AppMsgType == 6) {
+        case bot.CONF.MSGTYPE_TEXT:
             /**
-             * 文件消息
+             * 文本消息
              */
-            console.log('文件消息，保存到本地')
-            bot.getDoc(msg.FromUserName, msg.MediaId, msg.FileName).then(res => {
-                // fs.writeFileSync(`./media/${msg.FileName}`, res.data)
-                console.log(res.type);
+            if (bot.contacts[msg.FromUserName].getDisplayName().match(/面试官/)) {
+                const content = msg.Content;
+                const realMsg = content.split('\n')[1];
+                const match = realMsg.match(/^随(\d+)$/)
+                if (realMsg === '随') {
+                    sendRandomMembers('面试官', 3);
+                } else if (match) {
+                    sendRandomMembers('面试官', match[1]);
+                }
+            }
+            console.log(msg.Content)
+            break
+        case bot.CONF.MSGTYPE_IMAGE:
+            /**
+             * 图片消息
+             */
+            if (sender.MemberList && sender.MemberList.length && sender.MemberList.length !== 400) {
+                console.log('群图片消息');
+                return;
+            }
+            console.log('图片消息，保存到本地');
+            if (bot.contacts[msg.FromUserName].getDisplayName()) {
+
+            }
+
+            bot.getMsgImg(msg.MsgId).then(res => {
+                doUploadImage(res.data, 'a.jpg').then((url) => {
+                    sendMessage(sender.getDisplayName().split(" ").pop(), url);
+                });
+                // fs.writeFileSync(`./media/${msg.MsgId}.jpg`, res.data)
             }).catch(err => {
                 bot.emit('error', err)
             })
-        }
-        break
-    default:
-        break
+            break
+        case bot.CONF.MSGTYPE_VOICE:
+            /**
+             * 语音消息
+             */
+            console.log('语音消息，保存到本地')
+            bot.getVoice(msg.MsgId).then(res => {
+                // fs.writeFileSync(`./media/${msg.MsgId}.mp3`, res.data)
+            }).catch(err => {
+                bot.emit('error', err)
+            })
+            break
+        case bot.CONF.MSGTYPE_EMOTICON:
+            /**
+             * 表情消息
+             */
+            console.log('表情消息，保存到本地')
+            bot.getMsgImg(msg.MsgId).then(res => {
+                // fs.writeFileSync(`./media/${msg.MsgId}.gif`, res.data)
+            }).catch(err => {
+                bot.emit('error', err)
+            })
+            break
+        case bot.CONF.MSGTYPE_VIDEO:
+        case bot.CONF.MSGTYPE_MICROVIDEO:
+            /**
+             * 视频消息
+             */
+            console.log('视频消息，保存到本地')
+            bot.getVideo(msg.MsgId).then(res => {
+                // fs.writeFileSync(`./media/${msg.MsgId}.mp4`, res.data)
+            }).catch(err => {
+                bot.emit('error', err)
+            })
+            break
+        case bot.CONF.MSGTYPE_APP:
+            if (msg.AppMsgType == 6) {
+                /**
+                 * 文件消息
+                 */
+                console.log('文件消息，保存到本地')
+                bot.getDoc(msg.FromUserName, msg.MediaId, msg.FileName).then(res => {
+                    // fs.writeFileSync(`./media/${msg.FileName}`, res.data)
+                    console.log(res.type);
+                }).catch(err => {
+                    bot.emit('error', err)
+                })
+            }
+            break
+        default:
+            break
     }
 })
 /**
