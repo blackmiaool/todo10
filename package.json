@@ -8,7 +8,7 @@
         "dev": "node build/dev-server.js",
         "build": "node build/build.js",
         "lint": "eslint --ext .js,.vue src",
-        "first": "cp config-default.js config.js && mkdir server/public/avatar && mkdir server/public/images && mkdir server/public/files && mkdir server/public/code && sudo apt-get install -y imagemagick && cd server/avatar-generator && npm i && cd ../..",
+        "first": "cp config-default.js config.js && cd server && mkdir public && mkdir public/avatar && mkdir public/images && mkdir public/files && mkdir public/code && sudo apt-get install -y imagemagick && cd avatar-generator && npm i && cd ../..",
         "deploy": "git pull && node build/build.js && cp -r ./dist /var/www/html"
     },
     "dependencies": {
