@@ -2,23 +2,23 @@
     <div class="todo-viewer" id="todo-viewer">
         <span class="id-detail">id:{{id}}</span>
         <div v-if="title" class="input-block">
-    
+
             <label for="new-todo-title">
                 <i class="fa fa-pencil"></i>
                 {{$t('Title')}}
             </label>
             <p>{{title}}</p>
-    
+
         </div>
-    
+
         <div v-if="description" class="input-block">
             <label for="new-todo-content">
                 <i class="fa fa-paint-brush"></i>
                 {{$t('Description')}}
             </label>
-            <pre>{{description}}</pre>
+            <RichText :data="description" />
         </div>
-    
+
         <div v-if="projects&&projects.length" class="input-block">
             <label>
                 <i class="fa fa-cube"></i>
@@ -28,7 +28,7 @@
                 <span :key="project" v-for="project in projects" class="selected-tag clickable" @click="goProject(project)">{{projectInfo(project).name}}</span>
             </div>
         </div>
-    
+
         <div v-if="tags&&tags.length" class="input-block">
             <label>
                 <i class="fa fa-tags"></i>
@@ -38,7 +38,7 @@
                 <span :key="tag" v-for="tag in tags" class="selected-tag clickable">{{tagInfo(tag).name}}</span>
             </div>
         </div>
-    
+
         <div class="input-block" v-if="priority">
             <label for="choose-priority">
                 <i class="fa fa-bomb"></i>
@@ -46,7 +46,7 @@
             </label>
             <p>{{$t('priorityMap['+priority+']')}}</p>
         </div>
-    
+
         <div v-if="formattedDeadline" class="input-block">
             <label for="choose-deadline">
                 <i class="fa fa-calendar-o"></i>
@@ -54,7 +54,7 @@
             </label>
             <p>{{formattedDeadline}}</p>
         </div>
-    
+
         <div class="input-block" style="display:inline-block;width:48%;">
             <label for="choose-assigner">
                 <i class="fa fa-user-o"></i>
@@ -70,7 +70,7 @@
             <p>{{ownerName}}</p>
             <i class="fa fa-long-arrow-right owner-arrow"></i>
         </div>
-    
+
         <div class="input-block" v-if="watchers&&Object.keys(watchers).length">
             <label for="choose-owner">
                 <i class="fa fa-group"></i>
@@ -79,9 +79,9 @@
             <div>
                 <span class="watcher" :key="watcher" v-for="watcher in handledWatchers">{{watcher}}</span>
             </div>
-    
+
         </div>
-    
+
         <div class="input-block" v-if="attachments&&attachments.length">
             <label for="choose-owner">
                 <i class="fa fa-file"></i>
@@ -89,7 +89,7 @@
             </label>
             <FileList v-model="attachments" mode="view"></FileList>
         </div>
-    
+
         <div class="input-block" v-if="history&&history.length">
             <label for="choose-owner">
                 <i class="fa fa-history"></i>
@@ -106,7 +106,7 @@
                         {{$t('set')}} {{$t(li.key)}}
                     </header>
                     <main :title="'previous: '+(li.source||'nothing')">
-    
+
                         <div v-if="li.key==='projects'" data-mode="View" class="selected-tags">
                             <span :key="project" v-for="project in li.target" class="selected-tag clickable" @click="goProject(project)">{{projectInfo(project).name}}</span>
                         </div>
@@ -119,7 +119,7 @@
                     </main>
                 </div>
             </div>
-    
+
         </div>
     </div>
 </template>
@@ -132,6 +132,8 @@ import eventHub from '../eventHub';
 import settings from '../settings';
 import store from 'store';
 import FileList from 'components/FileList';
+import RichText from 'components/RichText';
+
 const properties = {
     id: "",
     title: "",
@@ -243,7 +245,7 @@ export default {
         }
     },
     components: {
-        FileList
+        FileList, RichText
     }
 
 }

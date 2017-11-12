@@ -179,6 +179,7 @@ export default {
         },
         save() {
             this.unsaved = false;
+            this.$refs.editor.backup();
             this.$emit('save', this.$refs.editor.get());
         },
         create() {
@@ -208,7 +209,7 @@ export default {
                 if (item.kind === 'file') {
                     const reader = new FileReader();
                     const instance = this;
-                    reader.onloadend = function (e) {
+                    reader.onloadend = function(e) {
                         if (!that.$refs.editor) {
                             alert("You can just upload file in edit mode");
                             return;

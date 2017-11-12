@@ -7,7 +7,7 @@
             </div>
             <label>{{info.title}}</label>
             <button v-if="mutable&&canFinish" class=" tool finish clickable" title="finish" @click="emit('finish',$event)"></button>
-    
+
             <button v-if="mutable&&info.status==='done'" class=" tool restore clickable" title="restore" @click="emit('restore',$event)"></button>
             <button v-if="mutable" class=" tool destroy clickable" title="unwatch" @click="emit('destroy',$event)"></button>
         </header>
@@ -22,6 +22,8 @@
                 <span class="tags">
                     <span v-for="tag in info.tags" :key="tag" class="tag">{{tagInfo(tag).name}}</span>
                 </span>
+            </span>
+            <span class="deadline">
             </span>
         </main>
     </li>
@@ -40,13 +42,13 @@ export default {
 
     },
     computed: {
-        canFinish: function () {
+        canFinish: function() {
             return this.info.status === 'pending' && (this.info.requestor == store.state.user.uid || this.info.owner == store.state.user.uid)
         },
-        requestorName: function () {
+        requestorName: function() {
             return store.getters.uid2name(this.info.requestor);
         },
-        ownerName: function () {
+        ownerName: function() {
             return store.getters.uid2name(this.info.owner);
         },
 

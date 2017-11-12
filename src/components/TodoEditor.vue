@@ -79,7 +79,7 @@
                 {{$t('Owner')}}
             </label>
             <!--<v-select v-if="mode==='Create'" :value.sync="targetOwner" :options="userList" placeholder="search..." :onChange="onSelectOwner">
-                                        </v-select>-->
+                                                    </v-select>-->
             <div v-if="mode==='Edit'">{{uid2name(owner)}}</div>
             <input v-if="mode==='Create'" :value="owner?uid2name(owner):''" type="text" class="form-control" :placeholder="$t('Click to select')" readonly @click="selectOwner">
         </div>
@@ -132,14 +132,9 @@ export default {
         const storageKey = "todo10-backup"
         setInterval(() => {
             if (this.mode === 'Edit') {
-                const list = JSON.parse(localStorage.getItem(storageKey) || '[]');
-                list.push(this.get());
-                if (list.length > 10) {
-                    list.shift();
-                }
-                localStorage.setItem(storageKey, JSON.stringify(list));
+                this.backup();
             }
-        }, 6e4);
+        }, 3e4);
     },
 
     mounted() {
@@ -214,6 +209,14 @@ export default {
         }
     },
     methods: {
+        backup() {
+            const list = JSON.parse(localStorage.getItem(storageKey) || '[]');
+            list.push(this.get());
+            if (list.length > 30) {
+                list.shift();
+            }
+            localStorage.setItem(storageKey, JSON.stringify(list));
+        },
         tagInfo: (id) => store.getters.tagInfo(id),
         projectInfo: (id) => store.getters.projectInfo(id),
         uid2name(uid) {
