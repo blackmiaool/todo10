@@ -7,7 +7,7 @@
                 {{$t("Title")}}
             </label>
             <input type="text" id="new-todo-title" class="form-control" :placeholder="$t('TitlePlaceholder')" v-model="title">
-    
+
         </div>
         <div class="input-block">
             <label for="new-todo-content">
@@ -15,13 +15,13 @@
                 {{$t("Description")}}
             </label>
             <textarea type="text" id="new-todo-content" class="form-control" :placeholder="$t('DescriptionPlaceholder')" v-model="description"></textarea>
-    
+
         </div>
         <div class="input-block">
             <label>
                 <i class="fa fa-cubes"></i>
                 {{$t('Projects')}}
-    
+
             </label>
             <div data-mode="Edit" class="selected-tags" v-if="projects&&projects.length">
                 <span :key="project" v-for="project in projects" class="selected-tag clickable" @click="removeProject(project)">{{projectInfo(project).name}}</span>
@@ -42,7 +42,7 @@
             <div data-mode="Edit" class="common-tags">
                 <span :key="tag.id" v-for="tag in availableTags" class="common-tag clickable" @click="selectTag(tag.id)">{{tag.name}}</span>
             </div>
-    
+
         </div>
         <div class="input-block">
             <label for="choose-priority">
@@ -55,7 +55,7 @@
                 <option value="1">{{$t('priorityMap[1]')}}</option>
                 <option value="0">{{$t('priorityMap[0]')}}</option>
             </select>
-    
+
         </div>
         <div class="input-block">
             <label for="choose-deadline">
@@ -63,7 +63,7 @@
                 {{$t('Deadline (not recommended)')}}
             </label>
             <datepicker v-model="deadlineText"></datepicker>
-    
+
         </div>
         <div class="input-block">
             <label for="choose-assigner">
@@ -71,7 +71,7 @@
                 {{$t('Requestor')}}
             </label>
             <div>{{realRequestor}}</div>
-    
+
         </div>
         <div class="input-block">
             <label for="choose-owner">
@@ -79,7 +79,7 @@
                 {{$t('Owner')}}
             </label>
             <!--<v-select v-if="mode==='Create'" :value.sync="targetOwner" :options="userList" placeholder="search..." :onChange="onSelectOwner">
-                                </v-select>-->
+                                        </v-select>-->
             <div v-if="mode==='Edit'">{{uid2name(owner)}}</div>
             <input v-if="mode==='Create'" :value="owner?uid2name(owner):''" type="text" class="form-control" :placeholder="$t('Click to select')" readonly @click="selectOwner">
         </div>
@@ -122,14 +122,24 @@ const properties = {
     watchers: {},
     tags: [],
 }
-Vue.filter('url2fileName', function (value) {
+Vue.filter('url2fileName', function(value) {
     const arr = value.split('/');
     return arr[arr.length - 1];
 });
 export default {
     name: 'TodoEditor',
     created() {
-
+        const storageKey = "todo10-backup"
+        setInterval(() => {
+            if (this.mode === 'Edit') {
+                const list = JSON.parse(localStorage.getItem(storageKey) || '[]');
+                list.push(this.get());
+                if (list.length > 10) {
+                    list.shift();
+                }
+                localStorage.setItem(storageKey, JSON.stringify(list));
+            }
+        }, 6e4);
     },
 
     mounted() {
@@ -169,7 +179,7 @@ export default {
     computed: {
 
         userName: () => store.state.user.name,
-        realRequestor: function () {
+        realRequestor: function() {
             return this.mode === 'Edit' ? this.uid2name(this.requestor) : this.userName;
         },
         allProjects() {
@@ -322,7 +332,7 @@ export default {
                         this.attachments.push(url);
                     });
                 };
-                reader.onerror = function (error) {
+                reader.onerror = function(error) {
                     console.log('Error: ', error);
                 };
             }
