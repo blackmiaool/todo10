@@ -115,7 +115,6 @@ export default {
 
         },
         addTag(projectId) {
-            console.log('projectId', projectId);
             const name = prompt("New Tag Name");
             if (!name) {
                 return;
