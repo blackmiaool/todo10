@@ -35,7 +35,7 @@
                 {{$t('Tags')}}
             </label>
             <div data-mode="View" class="selected-tags">
-                <span :key="tag" v-for="tag in tags" class="selected-tag clickable">{{tagInfo(tag).name}}</span>
+                <span :key="tag" v-for="tag in tags" class="selected-tag clickable" @click="goTag(tag)">{{tagInfo(tag).name}}</span>
             </div>
         </div>
 
@@ -240,6 +240,15 @@ export default {
                 name: 'List',
                 query: {
                     project
+                }
+            });
+        },
+        goTag(tag) {
+            window.router.push({
+                name: 'List',
+                query: {
+                    project: store.getters.tagInfo(tag).project,
+                    tag
                 }
             });
         }

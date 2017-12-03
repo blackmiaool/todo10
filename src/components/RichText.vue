@@ -77,7 +77,6 @@ export default {
                 regexp: /(http)?s?:?\/\/[^) ），。,]+/g,
                 type: "a"
             }]);
-            console.log('ret', ret);
             return ret;
             // text = text.split('');
             // return [{ is: "span", data: text }];

@@ -79,7 +79,7 @@
                 {{$t('Owner')}}
             </label>
             <!--<v-select v-if="mode==='Create'" :value.sync="targetOwner" :options="userList" placeholder="search..." :onChange="onSelectOwner">
-                                                    </v-select>-->
+                                                            </v-select>-->
             <div v-if="mode==='Edit'">{{uid2name(owner)}}</div>
             <input v-if="mode==='Create'" :value="owner?uid2name(owner):''" type="text" class="form-control" :placeholder="$t('Click to select')" readonly @click="selectOwner">
         </div>
@@ -129,7 +129,7 @@ Vue.filter('url2fileName', function(value) {
 export default {
     name: 'TodoEditor',
     created() {
-        const storageKey = "todo10-backup"
+
         setInterval(() => {
             if (this.mode === 'Edit') {
                 this.backup();
@@ -210,6 +210,7 @@ export default {
     },
     methods: {
         backup() {
+            const storageKey = "todo10-backup";
             const list = JSON.parse(localStorage.getItem(storageKey) || '[]');
             list.push(this.get());
             if (list.length > 30) {

@@ -168,6 +168,11 @@ const store = new Vuex.Store({
                 return user.name;
             };
         },
+        tag2project(state) {
+            return (tag) => {
+                console.log(state.projects, tag);
+            }
+        },
         projectInfo(state) {
             return (id) => {
                 if (!id) {
