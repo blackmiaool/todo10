@@ -33,7 +33,7 @@
             <h3>
                 <i class="fa fa-feed"></i>
                 {{$t('Watching')}}
-                <button v-if="listDone.length" class="btn btn-danger btn-xs" @click="$emit('deleteAllFinished',listWatching)">
+                <button v-if="listFinished.length" class="btn btn-danger btn-xs" @click="$emit('deleteAll',listFinished)">
                     <i class="fa fa-trash"></i> {{$t('Unwatch Finished')}}</button>
             </h3>
             <div class="todo-wrap">
@@ -97,6 +97,9 @@ export default {
         },
         listDone() {
             return this.list.filter(item => item.owner == store.state.user.uid && item.status === 'done').sort(sortList);
+        },
+        listFinished() {
+            return this.listWatching.filter(li => li.status === 'done');
         }
     },
     mounted() {
