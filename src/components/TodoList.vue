@@ -33,6 +33,8 @@
             <h3>
                 <i class="fa fa-feed"></i>
                 {{$t('Watching')}}
+                <button v-if="listDone.length" class="btn btn-danger btn-xs" @click="$emit('deleteAllFinished',listWatching)">
+                    <i class="fa fa-trash"></i> {{$t('Unwatch Finished')}}</button>
             </h3>
             <div class="todo-wrap">
                 <header class="list-header"></header>

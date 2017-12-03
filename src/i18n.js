@@ -79,6 +79,7 @@ const messages = {
         'Show': '显示',
         'Hide': '隐藏',
         'Unwatch All': '全部取关',
+        'Unwatch Finished': '取关已完成的任务',
     },
 };
 module.exports = messages;
