@@ -79,7 +79,7 @@
                 {{$t('Owner')}}
             </label>
             <!--<v-select v-if="mode==='Create'" :value.sync="targetOwner" :options="userList" placeholder="search..." :onChange="onSelectOwner">
-                                                            </v-select>-->
+                                                                        </v-select>-->
             <div v-if="mode==='Edit'">{{uid2name(owner)}}</div>
             <input v-if="mode==='Create'" :value="owner?uid2name(owner):''" type="text" class="form-control" :placeholder="$t('Click to select')" readonly @click="selectOwner">
         </div>
@@ -201,7 +201,7 @@ export default {
 
         }
     },
-    props: ["change", 'mode', 'userList'],
+    props: ['mode', 'userList'],
     watch: {
         deadline(v) {
             console.log('v', v);

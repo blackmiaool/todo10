@@ -141,11 +141,8 @@ export default {
         onFork(item) {
             item = JSON.parse(JSON.stringify(item));
             delete item.id;
-            this.$refs.todoPanel.setMode("Create");
             this.$refs.list.clear();
-            setTimeout(() => {
-                this.$refs.todoPanel.set(item);
-            });
+            this.$refs.todoPanel.createNew(item);
         },
         onSelect(item) {
             this.$refs.todoPanel.view(item);
@@ -153,11 +150,8 @@ export default {
 
         },
         onNew() {
-            this.$refs.todoPanel.setMode('Create');
             this.$refs.list.clear();
-            setTimeout(() => {
-                this.$refs.todoPanel.set({});
-            })
+            this.$refs.todoPanel.createNew();
         },
         onModalCancel() {
             this.hideModal();

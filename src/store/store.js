@@ -127,8 +127,12 @@ const store = new Vuex.Store({
         logged: false,
         projects: {},
         list: [],
+        unsaved: false,
     },
     mutations: {
+        setUnsaved(state, unsaved) {
+            state.unsaved = unsaved;
+        },
         setLoginState(state, logged) {
             state.logged = logged;
         },

@@ -80,6 +80,8 @@ const messages = {
         'Hide': '隐藏',
         'Unwatch All': '全部取关',
         'Unwatch Finished': '取关已完成的任务',
+        'unsaved': '未保存',
+        'Restore Draft': '恢复草稿',
     },
 };
 module.exports = messages;

@@ -2,7 +2,12 @@
     <div ref="wrap" class="detail-panel todo-panel-component" @drop="drop" @dragenter="dragEnter" @dragleave="dragLeave" @dragexit="dragExit" @dragover="dragOver" @mouseover="dragClear">
         <h2 class="current-mode">
             <span>{{$t(mode)}}</span>
-            <span v-if="unsaved && mode==='Edit'" class="unsaved">(unsaved)</span>
+            <span v-if="unsaved" class="unsaved">({{$t('unsaved')}})
+                <span class="hide glyphicon glyphicon-trash clickable"></span>
+            </span>
+            <span class="btn btn-primary btn-xs" v-if="unsavedMap[info.id||0]" @click="restore()">
+                <span class="glyphicon glyphicon-edit clickable"></span> {{$t('Restore Draft')}}
+            </span>
         </h2>
         <TodoViewer :userList="userList" ref="viewer" v-if="mode==='View'"></TodoViewer>
         <TodoEditor :userList="userList" ref="editor" v-if="mode==='Edit'||mode==='Create'" @change="onChange" :mode="mode" @showUserSelector="$emit('selectUser')"></TodoEditor>
@@ -87,7 +92,7 @@ export default {
             info: {
 
             },
-            unsaved: false,
+            unsavedMap: {}
         }
     },
     computed: {
@@ -103,6 +108,7 @@ export default {
             }
             return list;
         },
+        unsaved: () => store.state.unsaved,
         logged: () => store.state.logged,
         canUnwatch() {
             return this.logged && this.info.watchers && this.info.watchers[store.state.user.uid];
@@ -114,10 +120,25 @@ export default {
     props: ["page"],
     watch: {
         mode() {
-            this.unsaved = false;
+            store.commit('setUnsaved', false);
         },
     },
     methods: {
+        restore() {
+            let id;
+            if (!this.info.id) {
+                this.mode = 'Create';
+                id = 0;
+            } else {
+                this.edit();
+                id = this.info.id;
+            }
+            setTimeout(() => {
+                this.set(this.unsavedMap[id]);
+                store.commit('setUnsaved', true);
+                delete this.unsavedMap[id];
+            });
+        },
         selectUser(uid) {
             this.$refs.editor.selectUserCb && this.$refs.editor.selectUserCb(uid);
         },
@@ -127,8 +148,20 @@ export default {
         shareAsImage() {
             this.$emit('shareAsImage', 'todo-viewer');
         },
+        unsavedBackup() {
+            if (store.state.unsaved) {
+                const editedInfo = this.$refs.editor.get();
+                if (editedInfo.id) {
+                    this.unsavedMap[editedInfo.id] = editedInfo;
+                } else {
+                    this.unsavedMap[0] = editedInfo;
+                }
+            }
+        },
         view(info) {
+            this.unsavedBackup();
             this.mode = 'View';
+
             setTimeout(() => {
                 this.set(info);
             });
@@ -140,7 +173,9 @@ export default {
             this.mode = mode;
         },
         onChange() {
-            this.unsaved = true;
+            // const content = this.$refs.editor.get();
+            // console.log(content);
+            store.commit('setUnsaved', true);
         },
         set(info = this.info) {
             info = JSON.parse(JSON.stringify(info));
@@ -150,8 +185,10 @@ export default {
             } else {
                 this.$refs.viewer && this.$refs.viewer.set(info);
             }
+            setTimeout(() => {
+                this.$refs.editor && this.$refs.editor.set(info);
+            });
 
-            this.$refs.editor && this.$refs.editor.set(info);
         },
         selectTag(tag) {
             const index = this.commonTags.indexOf(tag);
@@ -171,18 +208,32 @@ export default {
             this.mode = 'Edit';
             setTimeout(() => {
                 this.set();
-                this.unsaved = false;
+                store.commit('setUnsaved', false);
             });
         },
         fork() {
             this.$emit('fork', this.info);
         },
         save() {
-            this.unsaved = false;
+            store.commit('setUnsaved', false);
             this.$refs.editor.backup();
-            this.$emit('save', this.$refs.editor.get());
+            const info = this.$refs.editor.get();
+            if (info.id) {
+                delete this.unsavedMap[info.id];
+            } else {
+                delete this.unsavedMap[0];
+            }
+            this.$emit('save', info);
+        },
+        createNew(info = {}) {
+            this.unsavedBackup();
+            this.mode = 'Create';
+            setTimeout(() => {
+                this.set(info);
+            })
         },
         create() {
+
             const info = this.$refs.editor.get();
             if (!info.title) {
                 return alert(this.$t("Title is needed"));
@@ -190,6 +241,7 @@ export default {
             if (!info.owner) {
                 return alert(this.$t('Owner is needed'));
             }
+            delete this.unsavedMap[0];
             this.$emit('create', info);
         },
         transfer() {
