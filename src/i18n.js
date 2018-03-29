@@ -82,6 +82,7 @@ const messages = {
         'Unwatch Finished': '取关已完成的任务',
         'unsaved': '未保存',
         'Restore Draft': '恢复草稿',
+        'Assign to yourself': '分配给自己'
     },
 };
 module.exports = messages;
