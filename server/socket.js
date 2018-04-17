@@ -189,7 +189,7 @@ function init(io) {
                 cb(errorMap[13]);
                 return;
             }
-            data = data.replace(/^data:\w*\/?[\w\-+]*;base64,/, "");
+            data = data.replace(/^data:.+?\/(.+);base64,/, "");
             const buff = Buffer.from(data, 'base64');
             const dir1 = `./public`;
             if (!id) {
