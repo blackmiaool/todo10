@@ -10,7 +10,7 @@
             </span>
         </h2>
         <TodoViewer :userList="userList" ref="viewer" v-if="mode==='View'"></TodoViewer>
-        <TodoEditor :userList="userList" ref="editor" v-if="mode==='Edit'||mode==='Create'" @change="onChange" :mode="mode" @showUserSelector="$emit('selectUser')"></TodoEditor>
+        <TodoEditor :userList="userList" ref="editor" v-if="mode==='Edit'||mode==='Create'" @change="onChange" :mode="mode"></TodoEditor>
         <div>
             <button v-if="mode==='Create'" class="btn btn-success submit" @click="create">
                 <i class="fa fa-arrow-circle-o-up"></i>
@@ -24,32 +24,36 @@
                 <i class="fa fa-code-fork"></i>
                 {{$t('Fork')}}
             </button>
-            <button v-if="mode==='View'&&page==='todo'" class="btn btn-default submit" @click="shareAsImage">
-                <i class="fa fa-image"></i>
-                {{$t('Share as Image')}}
+            <button v-if="(mode==='View'||mode==='Edit')&&page==='todo'" class="btn btn-default submit" @click="invitePartner">
+                <i class="fa fa-wheelchair"></i>
+                {{$t('Add partner')}}
             </button>
-            <button v-if="mode==='View'" class="btn btn-warning submit" @click="share">
-                <i class="fa fa-share-alt"></i>
+            <!-- <button v-if="mode==='View' &&page==='todo' " class="btn btn-default submit " @click="shareAsImage ">
+                <i class="fa fa-image "></i>
+                {{$t('Share as Image')}}
+            </button> -->
+            <button v-if="mode==='View' " class="btn btn-warning submit " @click="share ">
+                <i class="fa fa-share-alt "></i>
                 {{$t('Share')}}
             </button>
-            <button v-if="mode==='Edit'" class="btn btn-success submit" @click="save">
-                <i class="fa fa-save"></i>
+            <button v-if="mode==='Edit' " class="btn btn-success submit " @click="save ">
+                <i class="fa fa-save "></i>
                 {{$t('Save')}}
             </button>
-            <button v-if="mode==='View'&&page==='todo'" class="btn btn-danger submit" @click="transfer">
-                <i class="fa fa-paper-plane"></i>
+            <button v-if="mode==='View' &&page==='todo' " class="btn btn-danger submit " @click="transfer ">
+                <i class="fa fa-paper-plane "></i>
                 {{$t('Transfer')}}
             </button>
-            <button v-if="mode==='View'&&page==='view'&&!logged" class="btn btn-success submit" @click="$emit('login')">
-                <i class="fa fa-save"></i>
+            <button v-if="mode==='View' &&page==='view' &&!logged " class="btn btn-success submit " @click="$emit( 'login') ">
+                <i class="fa fa-save "></i>
                 {{$t('goLogin')}}
             </button>
-            <button v-if="canWatch" class="btn btn-success submit" @click="$emit('watch')">
-                <i class="fa fa-bookmark-o"></i>
+            <button v-if="canWatch " class="btn btn-success submit " @click="$emit( 'watch') ">
+                <i class="fa fa-bookmark-o "></i>
                 {{$t('Watch')}}
             </button>
-            <button v-if="canUnwatch&&page!=='todo'" class="btn btn-danger submit" @click="$emit('unwatch')">
-                <i class="fa fa-bookmark"></i>
+            <button v-if="canUnwatch&&page!=='todo' " class="btn btn-danger submit " @click="$emit( 'unwatch') ">
+                <i class="fa fa-bookmark "></i>
                 {{$t('Unwatch')}}
             </button>
         </div>
@@ -60,23 +64,21 @@
 import $ from "jquery";
 import socket from "../io";
 
-import eventHub from '../eventHub';
-import settings from '../settings';
-import datepicker from 'vue-date';
-import TodoViewer from 'components/TodoViewer';
-import TodoEditor from 'components/TodoEditor';
-import store from 'store';
+import eventHub from "../eventHub";
+import settings from "../settings";
+import datepicker from "vue-date";
+import TodoViewer from "components/TodoViewer";
+import TodoEditor from "components/TodoEditor";
+import store from "store";
 
 export default {
-    name: 'TodoPanel',
-    created() {
-
-    },
+    name: "TodoPanel",
+    created() {},
     beforeRouteEnter(to, from, next) {
         next(vm => {
-            console.log('store.state.logged', store.state.logged)
+            console.log("store.state.logged", store.state.logged);
             if (!store.state.logged) {
-                router.replace("/login")
+                router.replace("/login");
                 return;
             }
         });
@@ -89,11 +91,9 @@ export default {
     data() {
         return {
             mode: "Create",
-            info: {
-
-            },
+            info: {},
             unsavedMap: {}
-        }
+        };
     },
     computed: {
         userList() {
@@ -103,31 +103,53 @@ export default {
                 const value = uid;
                 list.push({
                     label,
-                    value,
-                })
+                    value
+                });
             }
             return list;
         },
         unsaved: () => store.state.unsaved,
         logged: () => store.state.logged,
         canUnwatch() {
-            return this.logged && this.info.watchers && this.info.watchers[store.state.user.uid];
+            return (
+                this.logged &&
+                this.info.watchers &&
+                this.info.watchers[store.state.user.uid]
+            );
         },
         canWatch() {
-            return this.logged && this.info.watchers && !this.info.watchers[store.state.user.uid];
+            return (
+                this.logged &&
+                this.info.watchers &&
+                !this.info.watchers[store.state.user.uid]
+            );
         }
     },
     props: ["page"],
     watch: {
         mode() {
-            store.commit('setUnsaved', false);
-        },
+            store.commit("setUnsaved", false);
+        }
     },
     methods: {
+        invitePartner() {
+            this.$store.dispatch("selectUser").then(uid => {
+                socket.emit(
+                    "addPartner",
+                    {
+                        uid,
+                        id: this.info.id
+                    },
+                    ({ data: { list } }) => {
+                        store.commit("setTodoList", list);
+                    }
+                );
+            });
+        },
         restore() {
             let id;
             if (!this.info.id) {
-                this.mode = 'Create';
+                this.mode = "Create";
                 id = 0;
             } else {
                 this.edit();
@@ -135,18 +157,18 @@ export default {
             }
             setTimeout(() => {
                 this.set(this.unsavedMap[id]);
-                store.commit('setUnsaved', true);
+                store.commit("setUnsaved", true);
                 delete this.unsavedMap[id];
             });
         },
-        selectUser(uid) {
-            this.$refs.editor.selectUserCb && this.$refs.editor.selectUserCb(uid);
-        },
         share() {
-            prompt("Copy link to share", `${location.origin}/#/view?id=${this.info.id}`);
+            prompt(
+                "Copy link to share",
+                `${location.origin}/#/view?id=${this.info.id}`
+            );
         },
         shareAsImage() {
-            this.$emit('shareAsImage', 'todo-viewer');
+            this.$emit("shareAsImage", "todo-viewer");
         },
         unsavedBackup() {
             if (store.state.unsaved) {
@@ -160,14 +182,14 @@ export default {
         },
         view(info) {
             this.unsavedBackup();
-            this.mode = 'View';
+            this.mode = "View";
 
             setTimeout(() => {
                 this.set(info);
             });
         },
         setMode(mode) {
-            if (mode === 'Edit') {
+            if (mode === "Edit") {
                 this.edit();
             }
             this.mode = mode;
@@ -175,12 +197,12 @@ export default {
         onChange() {
             // const content = this.$refs.editor.get();
             // console.log(content);
-            store.commit('setUnsaved', true);
+            this.$store.commit("setUnsaved", true);
         },
         set(info = this.info) {
             info = JSON.parse(JSON.stringify(info));
             this.info = info;
-            if (store.state.list.find((li) => li.id == info.id)) {
+            if (store.state.list.find(li => li.id == info.id)) {
                 this.$refs.viewer && this.$refs.viewer.set(info.id);
             } else {
                 this.$refs.viewer && this.$refs.viewer.set(info);
@@ -188,7 +210,6 @@ export default {
             setTimeout(() => {
                 this.$refs.editor && this.$refs.editor.set(info);
             });
-
         },
         selectTag(tag) {
             const index = this.commonTags.indexOf(tag);
@@ -201,21 +222,30 @@ export default {
             this.selectedTags.splice(index, 1);
         },
         edit() {
-            if (this.info.requestor != store.state.user.uid && this.info.owner != store.state.user.uid) {
-                alert("Only requestor or owner can mutate it");
+            if (
+                this.info.requestor != store.state.user.uid &&
+                this.info.owner != store.state.user.uid &&
+                !(
+                    this.info.partners &&
+                    this.info.partners[store.state.user.uid]
+                )
+            ) {
+                alert(
+                    this.$t("Only requestor or owner or partners can mutate it")
+                );
                 return;
             }
-            this.mode = 'Edit';
+            this.mode = "Edit";
             setTimeout(() => {
                 this.set();
-                store.commit('setUnsaved', false);
+                store.commit("setUnsaved", false);
             });
         },
         fork() {
-            this.$emit('fork', this.info);
+            this.$emit("fork", this.info);
         },
         save() {
-            store.commit('setUnsaved', false);
+            store.commit("setUnsaved", false);
             this.$refs.editor.backup();
             const info = this.$refs.editor.get();
             if (info.id) {
@@ -223,29 +253,28 @@ export default {
             } else {
                 delete this.unsavedMap[0];
             }
-            this.$emit('save', info);
+            this.$emit("save", info);
         },
         createNew(info = {}) {
             this.unsavedBackup();
-            this.mode = 'Create';
+            this.mode = "Create";
             setTimeout(() => {
                 this.set(info);
-            })
+            });
         },
         create() {
-
             const info = this.$refs.editor.get();
             if (!info.title) {
                 return alert(this.$t("Title is needed"));
             }
             if (!info.owner) {
-                return alert(this.$t('Owner is needed'));
+                return alert(this.$t("Owner is needed"));
             }
             delete this.unsavedMap[0];
-            this.$emit('create', info);
+            this.$emit("create", info);
         },
         transfer() {
-            this.$emit('transfer', this.info.id);
+            this.$emit("transfer", this.info.id);
         },
         drop(e) {
             const dropEvent = e;
@@ -258,7 +287,7 @@ export default {
 
             const files = e.dataTransfer.files;
             items.forEach((item, index) => {
-                if (item.kind === 'file') {
+                if (item.kind === "file") {
                     const reader = new FileReader();
                     const instance = this;
                     reader.onloadend = function(e) {
@@ -266,7 +295,10 @@ export default {
                             alert("You can just upload file in edit mode");
                             return;
                         }
-                        that.$refs.editor.appendFile(files[index].name, this.result);
+                        that.$refs.editor.appendFile(
+                            files[index].name,
+                            this.result
+                        );
                     };
                     reader.readAsDataURL(item.getAsFile());
                 }
@@ -292,14 +324,12 @@ export default {
             e.stopPropagation();
             e.preventDefault();
             //               e.stopPropagation(); // e.preventDefault();
-        },
+        }
     },
     components: {
         datepicker,
         TodoViewer,
         TodoEditor
     }
-
-}
-
+};
 </script>

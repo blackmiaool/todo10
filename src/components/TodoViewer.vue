@@ -72,14 +72,22 @@
         </div>
 
         <div class="input-block" v-if="watchers&&Object.keys(watchers).length">
-            <label for="choose-owner">
+            <label>
                 <i class="fa fa-group"></i>
                 {{$t('Watchers')}}
             </label>
             <div>
                 <span class="watcher" :key="watcher" v-for="watcher in handledWatchers">{{watcher}}</span>
             </div>
-
+        </div>
+        <div class="input-block" v-if="partners&&Object.keys(partners).length">
+            <label>
+                <i class="fa fa-wheelchair"></i>
+                {{$t('Partners')}}
+            </label>
+            <div>
+                <span class="partner" :key="partner" v-for="partner in handledPartners">{{partner}}</span>
+            </div>
         </div>
 
         <div class="input-block" v-if="attachments&&attachments.length">
@@ -128,17 +136,18 @@
 import $ from "jquery";
 import socket from "../io";
 
-import eventHub from '../eventHub';
-import settings from '../settings';
-import store from 'store';
-import FileList from 'components/FileList';
-import RichText from 'components/RichText';
+import eventHub from "../eventHub";
+import settings from "../settings";
+import store from "store";
+import FileList from "components/FileList";
+import RichText from "components/RichText";
 
 const properties = {
     id: "",
     title: "",
     description: "",
     requestor: "",
+    partners: {},
     deadline: "",
     deadlineText: "",
     owner: "",
@@ -147,30 +156,28 @@ const properties = {
     commonTags: [],
     attachments: [],
     watchers: {},
+    partners: {},
     projects: [],
-    history: undefined,
-}
+    history: undefined
+};
 export default {
-    name: 'TodoViewer',
-    created(p) {
-    },
-    mounted() {
-
-    },
+    name: "TodoViewer",
+    created(p) {},
+    mounted() {},
 
     data() {
         return {
             ...properties,
             showHistory: false,
             priorityMap: {
-                3: '(C) delay it as u want~',
-                2: '(B) do it when u have time.',
-                1: '(A) do it as soon as possible!',
-                0: '(S) do it right now!!!',
+                3: "(C) delay it as u want~",
+                2: "(B) do it when u have time.",
+                1: "(A) do it as soon as possible!",
+                0: "(S) do it right now!!!"
             },
             selectingId: undefined,
             reactive: undefined
-        }
+        };
     },
     computed: {
         requestorName() {
@@ -183,12 +190,18 @@ export default {
             if (this.deadline) {
                 return new Date(this.deadline).format("yyyy-MM-dd hh:mm:ss");
             } else {
-                return ""
+                return "";
             }
-
         },
         descriptionHandled() {
-            return this.description.replace(/\n/g, "<br/>")
+            return this.description.replace(/\n/g, "<br/>");
+        },
+        handledPartners() {
+            const ret = [];
+            for (const uid in this.partners) {
+                ret.push(store.getters.uid2name(uid));
+            }
+            return ret;
         },
         handledWatchers() {
             const ret = [];
@@ -198,10 +211,10 @@ export default {
             return ret;
         },
         theInfo() {
-            return store.state.list.find((li) => li.id == this.selectingId);
+            return store.state.list.find(li => li.id == this.selectingId);
         }
     },
-    props: ['userList'],
+    props: ["userList"],
     watch: {
         theInfo() {
             if (this.reactive) {
@@ -214,30 +227,28 @@ export default {
             return store.getters.uid2name(uid);
         },
         time2str(time) {
-            return (new Date(time)).format('yyyy-MM-dd hh:mm')
+            return new Date(time).format("yyyy-MM-dd hh:mm");
         },
-        tagInfo: (id) => store.getters.tagInfo(id),
-        projectInfo: (id) => store.getters.projectInfo(id),
+        tagInfo: id => store.getters.tagInfo(id),
+        projectInfo: id => store.getters.projectInfo(id),
         set(id) {
             let info;
-            if (typeof id === 'object') {
+            if (typeof id === "object") {
                 this.reactive = false;
                 this.selectingId = id.id;
                 info = id;
-
             } else {
                 this.reactive = true;
                 this.selectingId = id;
-                info = store.state.list.find((li) => li.id == id);
+                info = store.state.list.find(li => li.id == id);
             }
 
             Object.assign(this, properties);
             Object.assign(this, info);
-
         },
         goProject(project) {
             window.router.push({
-                name: 'List',
+                name: "List",
                 query: {
                     project
                 }
@@ -245,7 +256,7 @@ export default {
         },
         goTag(tag) {
             window.router.push({
-                name: 'List',
+                name: "List",
                 query: {
                     project: store.getters.tagInfo(tag).project,
                     tag
@@ -254,9 +265,8 @@ export default {
         }
     },
     components: {
-        FileList, RichText
+        FileList,
+        RichText
     }
-
-}
-
+};
 </script>

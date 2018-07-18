@@ -1,30 +1,22 @@
-import Vuex from 'vuex';
-import Vue from 'vue';
-import port from 'port';
-import socket, {
-    loadLocal,
-    saveLocal,
-} from '../io';
+import Vuex from "vuex";
+import Vue from "vue";
+import port from "port";
+import socket, { loadLocal, saveLocal } from "../io";
+import eventHub from "../eventHub";
 
 Vue.use(Vuex);
 let loginPromise;
 
-function login({
-    email,
-    password,
-    data,
-    mode,
-    remember = true,
-} = {}) {
+function login({ email, password, data, mode, remember = true } = {}) {
     return new Promise((resolve, reject) => {
         let params;
         if (mode) {
             params = {
                 mode,
-                data,
+                data
             };
         } else if (!email) {
-            const local = loadLocal('todoAccount') || {};
+            const local = loadLocal("todoAccount") || {};
             email = local.email;
             password = local.password;
             if (!email) {
@@ -33,28 +25,28 @@ function login({
             } else {
                 params = {
                     email,
-                    password,
+                    password
                 };
             }
         } else {
             params = {
                 email,
-                password,
+                password
             };
         }
-        socket.emit('login', params, (result) => {
-            store.commit('setUser', result.data);
+        socket.emit("login", params, result => {
+            store.commit("setUser", result.data);
             if (result.code) {
                 reject(result);
                 loginPromise = undefined;
             } else {
                 if (remember) {
-                    saveLocal('todoAccount', {
+                    saveLocal("todoAccount", {
                         email: result.data.email,
-                        password: result.data.password,
+                        password: result.data.password
                     });
                 }
-                store.commit('setLoginState', true);
+                store.commit("setLoginState", true);
                 resolve(result);
                 loginPromise = undefined;
             }
@@ -64,15 +56,24 @@ function login({
 
 function list2map(list, key) {
     const map = {};
-    list.forEach((li) => {
+    list.forEach(li => {
         map[li[key]] = li;
     });
     return map;
 }
 const actions = {
-    login({
-        commit,
-    }, params) {
+    selectUser({ commit }) {
+        commit("setModal", "userSelector");
+        return new Promise((resolve, reject) => {
+            eventHub.$once("select-user", uid => {
+                resolve(uid);
+            });
+            eventHub.$once("modal-cancel", () => {
+                reject();
+            });
+        });
+    },
+    login({ commit }, params) {
         if (!params) {
             if (!loginPromise) {
                 loginPromise = login(params);
@@ -81,41 +82,31 @@ const actions = {
         }
         return login(params);
     },
-    getProjects({
-        commit,
-    }) {
-        return new Promise((resolve) => {
-            socket.emit('getProjects', {}, ({
-                data,
-            }) => {
+    getProjects({ commit }) {
+        return new Promise(resolve => {
+            socket.emit("getProjects", {}, ({ data }) => {
                 const tagMap = {};
-                const map = list2map(data, 'id');
-                data.forEach((project) => {
-                    project.tags.forEach((tag) => {
+                const map = list2map(data, "id");
+                data.forEach(project => {
+                    project.tags.forEach(tag => {
                         tagMap[tag.id] = tag;
                     });
                 });
-                commit('setTags', tagMap);
-                commit('setProjects', map);
+                commit("setTags", tagMap);
+                commit("setProjects", map);
                 resolve(map);
             });
         });
     },
-    getUserMap({
-        commit,
-    }) {
-        return new Promise((resolve) => {
-            socket.emit('getUserList', {}, ({
-                data: {
-                    list,
-                },
-            }) => {
-                const userMap = list2map(list, 'uid');
-                commit('setUserMap', userMap);
+    getUserMap({ commit }) {
+        return new Promise(resolve => {
+            socket.emit("getUserList", {}, ({ data: { list } }) => {
+                const userMap = list2map(list, "uid");
+                commit("setUserMap", userMap);
                 resolve(userMap);
             });
         });
-    },
+    }
 };
 const store = new Vuex.Store({
     state: {
@@ -128,8 +119,13 @@ const store = new Vuex.Store({
         projects: {},
         list: [],
         unsaved: false,
+        userSelector: false,
+        showingModal: null
     },
     mutations: {
+        setModal(state, value) {
+            state.showingModal = value;
+        },
         setUnsaved(state, unsaved) {
             state.unsaved = unsaved;
         },
@@ -156,52 +152,52 @@ const store = new Vuex.Store({
         },
         setTodoList(state, list) {
             state.list = list;
-        },
+        }
     },
     actions,
     getters: {
         uid2name(state) {
-            return (uid) => {
+            return uid => {
                 if (!uid) {
-                    return '';
+                    return "";
                 }
                 const user = state.userMap[uid];
                 if (!user) {
-                    return 'not found';
+                    return "not found";
                 }
                 return user.name;
             };
         },
         tag2project(state) {
-            return (tag) => {
+            return tag => {
                 console.log(state.projects, tag);
-            }
+            };
         },
         projectInfo(state) {
-            return (id) => {
+            return id => {
                 if (!id) {
                     return {};
                 }
                 const project = state.projects[id];
                 if (!project) {
-                    return 'not found';
+                    return "not found";
                 }
                 return project;
             };
         },
         tagInfo(state) {
-            return (id) => {
+            return id => {
                 if (!id) {
                     return {};
                 }
                 const tag = state.tags[id];
                 if (!tag) {
-                    return 'not found';
+                    return "not found";
                 }
                 return tag;
             };
-        },
-    },
+        }
+    }
 });
 window.ddd = () => {
     console.log(store.state);

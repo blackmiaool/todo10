@@ -1,31 +1,23 @@
-const db = require('./db.js');
+const db = require("./db.js");
 
 const mapCurrent = {};
 const mapAll = {};
 
-// db.getList(true).then((list) => {
-//     list.forEach((li) => {
-//         if (!li.attachments) {
-//             return;
-//         }
-//         li.attachments = li.attachments.map((att) => {
-//             if (att.match(/files\/\//)) {
-//                 console.log(li.id, att);
-//             }
-//             return att.replace(/files\/\//, `files\/${li.id}\/`);
-//         });
-//         console.log(li.attachments);
+// db.getList(true).then(list => {
+//     list.forEach(li => {
+//         li.partners = {};
+
 //         edit(li.id, li);
 //     });
 // });
-db.getList(true).then((list) => {
-    list.forEach((li) => {
+db.getList(true).then(list => {
+    list.forEach(li => {
         mapAll[li.id] = li;
         mapCurrent[li.id] = li;
     });
 });
-db.getList(false).then((list) => {
-    list.forEach((li) => {
+db.getList(false).then(list => {
+    list.forEach(li => {
         mapAll[li.id] = li;
     });
 });
@@ -58,7 +50,7 @@ function getList(uid, filter) {
                 }
             }
             if (uid) {
-                if (item.owner != uid || item.status !== 'pending') {
+                if (item.owner != uid || item.status !== "pending") {
                     continue;
                 }
             }
@@ -68,7 +60,6 @@ function getList(uid, filter) {
                 }
             }
             ret.push(item);
-
         }
     } else {
         for (const id in mapCurrent) {
@@ -122,14 +113,14 @@ async function transfer(id, uid) {
     await edit(id, info);
 }
 
-function filter(func, range = 'current') {
-    if (range === 'current') {
+function filter(func, range = "current") {
+    if (range === "current") {
         range = mapCurrent;
-    } else if (range = 'all') {
+    } else if ((range = "all")) {
         range = mapAll;
     } else {
-        console.warn('unknown range', range);
-        range = {}
+        console.warn("unknown range", range);
+        range = {};
     }
     const ret = [];
     for (const i in range) {
@@ -151,5 +142,5 @@ module.exports = {
     transfer,
     mapCurrent,
     mapAll,
-    filter,
-}
+    filter
+};
