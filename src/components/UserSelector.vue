@@ -3,6 +3,7 @@
         <header>{{$t("Select a user")}}</header>
         <div class="input-wrapper">
             <input type="text" :placeholder="$t('Search')" class="form-control" v-model="searchText">
+            <span v-if="searchText" class="glyphicon glyphicon-remove-circle clickable" @click="searchText=''"></span>
         </div>        
         <main>
             <ul>
@@ -55,5 +56,22 @@ export default {
   text-align: center;
   padding: 5px 0;
   margin: 0 20px;
+  position: relative;
+  input {
+    padding-right: 25px;
+  }
+}
+.glyphicon-remove-circle {
+  position: absolute;
+  right: 10px;
+  top: 2px;
+  bottom: 0;
+  margin: auto;
+  height: 15px;
+  font-size: 15px;
+  color: #aaa;
+  &:hover {
+    color: #555;
+  }
 }
 </style>
