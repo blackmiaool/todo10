@@ -306,7 +306,18 @@ function init(io) {
                     item.partners = {};
                 }
                 item.partners[uid] = true;
+                item.watchers[uid] = true;
                 await todo.edit(id, item);
+
+                const $assigner = topUserMap.getFromId(socket.context.uid);
+
+                await todo.edit(id, item);
+                let message = `【${$assigner.name}】 拉你加入了任务【${
+                    item.title
+                }】
+详情参见 ${getViewUrl(id)}`;
+                notify(uid, message, id);
+
                 const list = todo.getList(socket.context.uid);
                 return {
                     list
@@ -329,6 +340,8 @@ function init(io) {
                     }
                     if (uid == item.requestor) {
                         notify(uid, "你创建的" + message, id);
+                    } else if (item.partners[uid]) {
+                        notify(uid, "你参与的" + message, id);
                     } else {
                         notify(uid, "你关注的" + message, id);
                     }

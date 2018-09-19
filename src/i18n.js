@@ -86,7 +86,9 @@ const messages = {
         Search: "搜索",
         "Add partner": "添加参与者",
         "Only requestor or owner or partners can mutate it":
-            "只有任务的创建者、拥有者、参与者可以修改它"
+            "只有任务的创建者、拥有者、参与者可以修改它",
+        Partners: "参与者",
+        "Share url is copied to your clipboard.": "分享链接复制到了你的剪贴板"
     }
 };
 module.exports = messages;

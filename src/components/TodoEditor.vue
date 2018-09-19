@@ -354,7 +354,7 @@ export default {
         },
         selectOwner() {
             this.$store.dispatch("selectUser").then(uid => {
-                this.onSelectOwner({ value: id });
+                this.onSelectOwner({ value: uid });
             });
         },
         removeProject(project) {

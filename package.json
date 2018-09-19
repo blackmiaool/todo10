@@ -20,6 +20,7 @@
         "jquery": "^3.1.1",
         "md5": "^2.2.1",
         "socket.io-client": "^2.0.3",
+        "toastr": "^2.1.4",
         "vue": "^2.4.2",
         "vue-codemirror": "^2.1.8",
         "vue-date": "^1.1.7",

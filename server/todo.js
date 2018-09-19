@@ -71,9 +71,17 @@ function getList(uid, filter) {
     }
     return ret;
 }
+function finalValidate(info) {
+    if (!info.partners) {
+        info.partners = {};
+    }
 
+    delete info.partners[info.owner];
+    delete info.partners[info.requestor];
+}
 async function edit(id, info) {
     const active = Boolean(Object.keys(info.watchers).length);
+    finalValidate(info);
     await db.edit(id, JSON.stringify(info), active);
 
     if (!active) {

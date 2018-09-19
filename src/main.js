@@ -18,7 +18,11 @@ import store from "store";
 
 require("port");
 require("./less/style.less");
+const Clipboard = require("clipboard");
 const messages = require("./i18n");
+
+new Clipboard("[data-clipboard-text]");
+
 /* eslint-disable no-new */
 Date.prototype.format = function(format) {
     const zeros = ["", "0", "00", "000"];

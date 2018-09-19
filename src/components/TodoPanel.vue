@@ -32,7 +32,7 @@
                 <i class="fa fa-image "></i>
                 {{$t('Share as Image')}}
             </button> -->
-            <button v-if="mode==='View' " class="btn btn-warning submit " @click="share ">
+            <button v-if="mode==='View' " class="btn btn-warning submit " @click="share" :data-clipboard-text="shareUrl">
                 <i class="fa fa-share-alt "></i>
                 {{$t('Share')}}
             </button>
@@ -70,7 +70,8 @@ import datepicker from "vue-date";
 import TodoViewer from "components/TodoViewer";
 import TodoEditor from "components/TodoEditor";
 import store from "store";
-
+import toastr from "toastr";
+require("toastr/build/toastr.css");
 export default {
     name: "TodoPanel",
     created() {},
@@ -123,6 +124,9 @@ export default {
                 this.info.watchers &&
                 !this.info.watchers[store.state.user.uid]
             );
+        },
+        shareUrl() {
+            return `${location.origin}/#/view?id=${this.info.id}`;
         }
     },
     props: ["page"],
@@ -162,9 +166,25 @@ export default {
             });
         },
         share() {
-            prompt(
-                "Copy link to share",
-                `${location.origin}/#/view?id=${this.info.id}`
+            toastr.options = {
+                closeButton: false,
+                debug: false,
+                newestOnTop: false,
+                progressBar: false,
+                positionClass: "toast-bottom-left",
+                preventDuplicates: false,
+                onclick: null,
+                showDuration: "300",
+                hideDuration: "1000",
+                timeOut: "5000",
+                extendedTimeOut: "1000",
+                showEasing: "swing",
+                hideEasing: "linear",
+                showMethod: "fadeIn",
+                hideMethod: "fadeOut"
+            };
+            toastr["success"](
+                this.$t("Share url is copied to your clipboard.")
             );
         },
         shareAsImage() {
