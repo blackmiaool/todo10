@@ -189,9 +189,7 @@ function init(io) {
                     console.error(err);
                 } else {
                     const saveUrl = `${dir1}${dir2}/${name}`;
-                    const fileUrl = `//${config.domain}:${
-                        config.serverPort
-                    }${dir2}/${name}`;
+                    const fileUrl = `${dir2}/${name}`;
                     fs.writeFile(saveUrl, buff, () => {
                         cb(fileUrl);
                     });

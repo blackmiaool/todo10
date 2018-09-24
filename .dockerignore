@@ -1,0 +1,5 @@
+node_modules
+server/node_modules
+server/public/files
+server/public/images
+mount

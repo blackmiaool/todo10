@@ -1,6 +1,6 @@
 const sqlite3 = require("sqlite3").verbose();
 const db = new sqlite3.cached.Database("db");
-// const config = require("../config.js");
+const config = require("../config.js");
 // import {
 //     errorMap,
 //     getError,
@@ -220,6 +220,10 @@ function getList($active) {
                             reject(true);
                         } else {
                             result.forEach(v => {
+                                v.data = v.data.replace(
+                                    /(http:)?\/\/blackmiaool\.jios\.org/,
+                                    "//" + config.domain
+                                );
                                 const parsed = JSON.parse(v.data);
                                 delete parsed.id;
                                 Object.assign(v, parsed);

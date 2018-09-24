@@ -16,19 +16,19 @@
 </template>
 
 <script>
-import store from 'store';
+import store from "store";
 export default {
-    name: 'ReportViewer',
+    name: "ReportViewer",
     computed: {
-        requestorName: function () {
+        requestorName: function() {
             return store.getters.uid2name(this.li.requestor);
         },
-        ownerName: function () {
+        ownerName: function() {
             return store.getters.uid2name(this.li.owner);
         },
         href() {
             if (this.attachHref !== undefined) {
-                return 'http://blackmiaool.jios.org:9014/#/view?id=' + this.li.id;
+                return location.origin + "/#/view?id=" + this.li.id;
             } else {
                 return undefined;
             }
@@ -38,10 +38,10 @@ export default {
         prevent(e) {
             e.preventDefault();
         },
-        projectInfo: (id) => store.getters.projectInfo(id),
-        tagInfo: (id) => store.getters.tagInfo(id),
+        projectInfo: id => store.getters.projectInfo(id),
+        tagInfo: id => store.getters.tagInfo(id)
     },
-    props: ['li', 'attachHref'],
+    props: ["li", "attachHref"],
     data() {
         return {
             titleStyle: `
@@ -63,9 +63,8 @@ export default {
             border-radius: 100px;
             padding: 3px 10px;
             margin-right: 5px;
-            `,
-        }
-    },
-}
-
+            `
+        };
+    }
+};
 </script>
