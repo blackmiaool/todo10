@@ -169,5 +169,5 @@ console.log(new Date().toLocaleTimeString(), `listen on ${config.serverPort}`);
 var server = require("http").createServer(app.callback());
 var io = require("socket.io")(server);
 socket.init(io);
-server.listen(80);
+server.listen(9013);
 module.exports = app;
