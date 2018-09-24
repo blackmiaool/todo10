@@ -10,7 +10,8 @@
         "build": "node build/build.js",
         "lint": "eslint --ext .js,.vue src",
         "first": "cp config-default.js config.js && cd server && mkdir public && mkdir public/avatar && mkdir public/images && mkdir public/files && mkdir public/code && sudo apt-get install -y imagemagick && cd avatar-generator && npm i && cd ../..",
-        "deploy": "git pull && node build/build.js && cp -r ./dist /var/www/html"
+        "deploy": "git pull && node build/build.js && cp -r ./dist /var/www/html",
+        "docker": "docker build -t blackmiaool/todo10 . && docker run -it blackmiaool/todo10"
     },
     "dependencies": {
         "babel": "^6.23.0",
