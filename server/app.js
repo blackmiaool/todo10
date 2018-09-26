@@ -139,18 +139,15 @@ serveDirectory("code");
 serveDirectory("files");
 serveDirectory("avatar");
 serveDirectory("images");
-router.get(`/`, async ctx => {
+async function indexCb(ctx) {
     await send(ctx, ctx.path, {
         root: __dirname + "/../dist/",
         index: "index.html"
     });
-});
-router.get(`/static/*`, async ctx => {
-    await send(ctx, ctx.path, {
-        root: __dirname + "/../dist/",
-        index: "index.html"
-    });
-});
+}
+router.get(`/`, indexCb);
+router.get(`/index.html`, indexCb);
+router.get(`/static/*`, indexCb);
 
 app.use(async (ctx, next) => {
     ctx.set("Access-Control-Allow-Origin", "*");
