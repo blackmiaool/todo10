@@ -5,10 +5,11 @@ RUN apt-get update && apt-get install -yq imagemagick sqlite3 g++ gcc
 COPY package*.json ./ 
 RUN mkdir server/
 COPY ./server/package*.json ./server/
-RUN npm install --only=production
-RUN cd server && npm install --only=production
-RUN npm i -g pm2
+RUN npm install
 COPY . .
-EXPOSE 9013
+RUN npm run build
+RUN cd server && npm install --only=production
+
+EXPOSE 9016
 CMD cd server && node bin/run
-#CMD [ "npm", "start" ]
+

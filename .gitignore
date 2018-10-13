@@ -7,3 +7,5 @@ public/
 config.js
 server/sync-data.json 
 server/media
+.history
+server/db-journal

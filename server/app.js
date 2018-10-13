@@ -16,7 +16,9 @@ const config = require("../config.js");
 const fs = require("fs");
 const cors = require("kcors");
 
-import { registerCheck } from "../common/check.js";
+import {
+    registerCheck
+} from "../common/check.js";
 // middlewares
 app.use(convert(bodyparser));
 app.use(convert(json()));
@@ -29,8 +31,8 @@ var avatar = require("./avatar-generator")({
 });
 
 router.post("/avatar", async (ctx, next) => {
-    await new Promise(function(resolve) {
-        avatar(Math.random() + "", "male", 50).toBuffer(function(err, buffer) {
+    await new Promise(function (resolve) {
+        avatar(Math.random() + "", "male", 50).toBuffer(function (err, buffer) {
             ctx.body = `data:image/png;base64,` + buffer.toString("base64");
             ctx.status = 200;
             resolve();
@@ -128,6 +130,7 @@ router.post("/register", async (ctx, next) => {
 
     ctx.status = 200;
 });
+
 function serveDirectory(dir) {
     router.get(`/${dir}/*`, async ctx => {
         await send(ctx, ctx.path, {
@@ -157,14 +160,15 @@ app.use(async (ctx, next) => {
 app.use(router.routes()).use(router.allowedMethods());
 // response
 
-app.on("error", function(err, ctx) {
+app.on("error", function (err, ctx) {
     console.log(err);
     //    logger.error('server error', err, ctx);
 });
 
-console.log(new Date().toLocaleTimeString(), `listen on ${config.serverPort}`);
+const port = config.serverPort;
+console.log(new Date().toLocaleTimeString(), `listen on ${port}`);
 var server = require("http").createServer(app.callback());
 var io = require("socket.io")(server);
 socket.init(io);
-server.listen(9013);
+server.listen(port);
 module.exports = app;

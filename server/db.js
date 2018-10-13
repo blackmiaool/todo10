@@ -1,6 +1,9 @@
 const sqlite3 = require("sqlite3").verbose();
 const db = new sqlite3.cached.Database("db");
 const config = require("../config.js");
+const mongoose = require("mongoose");
+mongoose.set('useCreateIndex', true);
+mongoose.set('useFindAndModify', false);
 // import {
 //     errorMap,
 //     getError,
@@ -8,7 +11,188 @@ const config = require("../config.js");
 // } from "../common/error.js";
 
 //create table
-db.serialize(function() {
+mongoose.connect("mongodb://localhost/todo10", {
+    useNewUrlParser: true
+});
+var mdb = mongoose.connection;
+mdb.on('error', console.error.bind(console, 'connection error:'));
+mdb.once('open', function () {
+
+    console.log("we're connected!")
+});
+const toObjectTransform = {
+    transform: (doc, ret) => {
+        delete ret.__v;
+        delete ret._id;
+    },
+};
+
+
+var CounterSchema = mongoose.Schema({
+    name: {
+        type: String,
+        unique: true
+    },
+    cnt: Number
+});
+const counter = mongoose.model('counter', CounterSchema);
+// (new counter({
+//     name: 'project',
+//     cnt: 31
+// })).save();
+// (new counter({
+//     name: 'tag',
+//     cnt: 51
+// })).save();
+// (new counter({
+//     name: 'user',
+//     cnt: 75
+// })).save();
+// (new counter({
+//     name: 'todo',
+//     cnt: 615
+// })).save();
+
+function pre(name, key = 'id') {
+    return async function () {
+        var doc = this;
+        const {
+            cnt
+        } = await counter.findOneAndUpdate({
+            name
+        }, {
+            $inc: {
+                cnt: 1
+            }
+        });
+        if (doc[key]) {
+            return;
+        }
+        doc[key] = cnt;
+    }
+}
+
+
+var messageSchema = new mongoose.Schema({
+    id: {
+        type: Number,
+        sparse: true,
+    },
+    uid: Number,
+    createTime: Date,
+    content: String,
+}, {
+    toObject: toObjectTransform
+});
+
+
+// mySchema.set('toJSON', {
+//     virtuals: true,
+//     transform: (doc, ret, options) => {
+//         delete ret.__v;
+//         ret.id = ret._id.toString();
+//         delete ret._id;
+//     },
+// });
+const tagSchema = new mongoose.Schema({
+    id: {
+        type: Number,
+        unique: true,
+    },
+    name: String,
+}, {
+    toObject: toObjectTransform
+});
+tagSchema.pre('save', pre('tag'));
+var todoSchema = new mongoose.Schema({
+    id: {
+        type: Number,
+        unique: true,
+    },
+    active: Boolean,
+    title: String,
+    description: String,
+    deadline: Date,
+    priority: String,
+    projects: [Number],
+    tags: [Number],
+    requestor: Number,
+    owner: Number,
+    watchers: [Number],
+    attachments: [{
+        url: String,
+        type: {
+            type: String
+        }
+    }],
+    status: String,
+    history: [{
+        source: String, //JSON
+        target: String, //JSON
+        key: String,
+        uid: Number,
+        time: Date,
+    }],
+    partners: [Number]
+}, {
+    toObject: toObjectTransform
+});
+todoSchema.pre('save', pre('todo'));
+var projectSchema = new mongoose.Schema({
+    id: {
+        type: Number,
+        unique: true,
+    },
+    name: String,
+    tags: [Number]
+}, {
+    toObject: toObjectTransform
+});
+projectSchema.pre('save', pre('project'));
+var userSchema = new mongoose.Schema({
+    uid: {
+        type: Number,
+        unique: true,
+    },
+    name: String,
+    email: String,
+    password: String,
+    avatar: String,
+    active: Boolean
+}, {
+    toObject: toObjectTransform
+});
+userSchema.pre('save', pre('user', 'uid'));
+
+const todoModel = mongoose.model('todo', todoSchema);
+const projectModel = mongoose.model('project', projectSchema);
+const userModel = mongoose.model('user', userSchema);
+const messageModel = mongoose.model('message', messageSchema);
+const tagModel = mongoose.model('tag', tagSchema);
+
+// messageModel.find().then((list) => {
+//     console.log('list', list)
+// });
+// messageModel.find(function (err, result) {
+//     if (err) return console.error(err);
+//     console.log(result);
+// })
+// var fluffy = new Kitten({
+//     name: 'fluffy'
+// });
+
+// fluffy.save(function (err, fluffy) {
+//     if (err) return console.error(err);
+//     console.log(1, fluffy);
+// });
+
+// setTimeout(() => {
+//     Kitten.find(function (err, kittens) {
+//         if (err) return console.error(err);
+//         console.log(kittens);
+//     })
+// }, 500);
+db.serialize(function () {
     db.run(
         `CREATE TABLE tag (
         id INTEGER PRIMARY KEY,
@@ -17,7 +201,7 @@ db.serialize(function() {
         FOREIGN KEY (Project) REFERENCES project(id) 
         );
     `,
-        function() {}
+        function () {}
     );
     db.run(
         `CREATE TABLE project (
@@ -26,7 +210,7 @@ db.serialize(function() {
         Data TEXT
         );
     `,
-        function() {}
+        function () {}
     );
     db.run(
         `CREATE TABLE user (
@@ -38,7 +222,7 @@ db.serialize(function() {
         Source TEXT
         );
     `,
-        function() {}
+        function () {}
     );
 
     db.run(
@@ -48,7 +232,7 @@ db.serialize(function() {
         Active BOOLEAN
         );
     `,
-        function() {}
+        function () {}
     );
     db.run(
         `CREATE TABLE message (
@@ -58,395 +242,422 @@ db.serialize(function() {
         FOREIGN KEY (uid) REFERENCES user(id)
         );
     `,
-        function() {}
+        function () {}
     );
+    // db.all(
+    //     `SELECT id,uid,Data FROM message;`, {},
+    //     function (e, result) {
+    //         if (e) {
+    //             console.log(e);
+    //         } else {
+    //             for (let i = 0; i < result.length; i++) {
+    //                 const v = result[i];
+    //                 const data = JSON.parse(v.Data);
+    //                 var a = new messageModel({
+    //                     id: v.id,
+    //                     uid: v.uid,
+    //                     createTime: data.createTime,
+    //                     content: data.content,
+    //                 });
+    //                 a.save();
+    //             };
+    //         }
+    //     });
+
+    // var todoSchema = new mongoose.Schema({
+    //     id: {
+    //         type: Number,
+    //         unique: true,
+    //     },
+    //     active: Boolean,
+    //     title: String,
+    //     description: String,
+    //     deadline: Date,
+    //     priority: String,
+    //     projects: [Number],
+    //     tags: [Number],
+    //     requestor: Number,
+    //     watchers: [Number],
+    //     history: [{
+    //         source: String, //JSON
+    //         target: String, //JSON
+    //         key: String,
+    //         uid: Number,
+    //         time: Date,
+    //     }],
+    //     partners: [Number]
+    // });
+    // db.all(
+    //     `SELECT Name,id,Email,Password,Avatar,Active FROM user;`, {},
+    //     function (e, result) {
+    //         if (e) {
+    //             console.log(e);
+    //         } else {
+    //             for (let i = 0; i < result.length; i++) {
+    //                 const v = result[i];
+    //                 var a = new userModel({
+    //                     uid: v.id,
+    //                     name: v.Name,
+    //                     email: v.Email,
+    //                     password: v.Password,
+    //                     avatar: v.Avatar,
+    //                     active: !Boolean(v.Active)
+    //                 });
+    //                 a.save();
+    //             }
+    //         }
+    //     });
+
+    function getTags(projectId) {
+        return new Promise((resolve) => {
+            db.all(
+                `SELECT id,Name FROM tag WHERE Project=$proj;`, {
+                    $proj: projectId
+                },
+                async function (e, result) {
+                    resolve(result)
+                });
+        });
+
+    }
+    // transferProject();
+
+    function transferProject() {
+        db.all(
+            `SELECT id,Name FROM project;`, {},
+            async function (e, result) {
+                if (e) {
+                    console.log(e);
+                } else {
+                    for (let i = 0; i < result.length; i++) {
+                        const v = result[i];
+                        var a = new projectModel({
+                            id: v.id,
+                            name: v.Name,
+                            tags: (await getTags(v.id)).map((tag) => {
+                                return tag.id
+                            })
+                        });
+                        await a.save();
+                    }
+                }
+            });
+    }
+
+    function transferUser() {
+        db.all(
+            `SELECT Name,id,Email,Password,Avatar,Active FROM user;`, {},
+            async function (e, result) {
+                if (e) {
+                    console.log(e);
+                } else {
+                    for (let i = 0; i < result.length; i++) {
+                        const v = result[i];
+                        var a = new userModel({
+                            uid: v.id,
+                            name: v.Name,
+                            email: v.Email,
+                            password: v.Password,
+                            avatar: v.Avatar,
+                            active: !Boolean(v.Active)
+                        });
+                        await a.save();
+                    }
+                }
+            });
+    }
+
+    function transferMessage() {
+        db.all(
+            `SELECT id,uid,Data FROM message;`, {},
+            async function (e, result) {
+                if (e) {
+                    console.log(e);
+                } else {
+                    for (let i = 0; i < result.length; i++) {
+                        const v = result[i];
+                        const data = JSON.parse(v.Data);
+                        var a = new messageModel({
+                            id: v.id,
+                            uid: v.uid,
+                            createTime: data.createTime,
+                            content: data.content,
+                        });
+                        await a.save();
+                    };
+                }
+            });
+    }
+    // transferTag();
+
+    function transferTag() {
+        db.all(
+            `SELECT id,Name FROM tag;`, {},
+            async function (e, result) {
+                if (e) {
+                    console.log(e);
+                } else {
+                    for (let i = 0; i < result.length; i++) {
+                        const v = result[i];
+                        var a = new tagModel({
+                            id: v.id,
+                            name: v.Name
+                        });
+                        await a.save();
+                    }
+                }
+            });
+    }
+    // transferTodo()
+
+    function transferTodo() {
+        db.all(
+            `SELECT Active,id,Data FROM todo;`, {},
+            async function (e, result) {
+                if (e) {
+                    console.log(e);
+                } else {
+                    for (let i = 0; i < result.length; i++) {
+                        const v = result[i];
+
+                        if (v.Data) {
+                            v.data = JSON.parse(v.Data);
+                        } else {
+                            v.data = {};
+                        }
+                        Object.assign(v, v.data);
+
+                        let watchers = Object.keys(v.watchers || {}).map(a => a * 1);
+                        watchers = watchers.filter((w) => {
+                            return !isNaN(w)
+                        });
+
+                        let attachments = (v.attachments || []).map((a) => {
+                            const url = a.replace(
+                                /(http:)?\/\/blackmiaool\.jios\.org(:\d+)?/g,
+                                "");
+                            let type = 'file';
+                            if (url.match(/\.jpg|\.jpeg|\.png|\.gif/)) {
+                                type = 'image';
+                            } else if (url.match(/\.js|\.go|\.html|\.css|\.java|\.c|\.ts/)) {
+                                type = 'code'
+                            }
+                            return {
+                                type,
+                                url
+                            }
+                        }); //todo
+                        const msg = new todoModel({
+                            ...v,
+                            active: v.Active,
+                            id: v.id,
+                            watchers: watchers,
+                            partners: Object.keys(v.partners || {}).map(a => a * 1),
+                            attachments,
+                            history: (v.history || []).map((his) => ({
+                                ...his,
+                                source: JSON.stringify(his.source),
+                                target: JSON.stringify(his.target),
+                            }))
+                        });
+                        delete v.Data;
+                        delete v.data;
+                        await msg.save();
+                    };
+                }
+                // console.log(result)
+            }
+        );
+    }
+
 });
 
 function deleteMessage($id) {
-    return new Promise(function(resolve, reject) {
-        db.serialize(function() {
-            db.run(
-                `DELETE FROM message WHERE id=$id`,
-                {
-                    $id
-                },
-                function(e) {
-                    if (e) {
-                        console.log(e);
-                        reject(e);
-                    } else {
-                        resolve();
-                    }
-                }
-            );
-        });
+    return messageModel.deleteOne({
+        id: $id
     });
 }
 
 function getNanoSecTime() {
     return Date.now() + (process.hrtime()[1] % 1000).toString();
 }
+
+
 function getMessageList($uid) {
-    return new Promise(function(resolve, reject) {
-        db.serialize(function() {
-            db.all(
-                `SELECT Data as data,id FROM message WHERE uid=$uid;`,
-                {
-                    $uid
-                },
-                function(e, result) {
-                    if (e) {
-                        console.log(e);
-                        reject(e);
-                    } else {
-                        if (!result) {
-                            reject(true);
-                        } else {
-                            result.forEach(v => {
-                                v.data = JSON.parse(v.data);
-                            });
-                            resolve(result);
-                        }
-                    }
-                }
-            );
+    return messageModel.find({
+        uid: $uid
+    }).then((list) => {
+        return list.map((v) => {
+            v = v.toObject();
+            const data = {
+                createTime: v.createTime,
+                content: v.content,
+            }
+            v.data = data;
+            return v;
         });
     });
 }
+
 function addMessage($uid, $data) {
-    return new Promise(function(resolve, reject) {
-        db.serialize(function() {
-            db.run(
-                `INSERT INTO message (Data,uid,id) VALUES ($data,$uid,$id);`,
-                {
-                    $id: getNanoSecTime(),
-                    $uid,
-                    $data: JSON.stringify($data)
-                },
-                function(e) {
-                    if (e) {
-                        console.log(e);
-                        reject(e);
-                    } else {
-                        resolve(this.lastID);
-                    }
-                }
-            );
-        });
+    const msg = new messageModel({
+        id: getNanoSecTime(),
+        uid: $uid,
+        createTime: $data.createTime,
+        content: $data.content
     });
+    return msg.save();
 }
+
 function getUserList() {
-    return new Promise(function(resolve, reject) {
-        db.serialize(function() {
-            db.all(
-                `SELECT id as uid,Name as name,Email as email,Avatar as avatar FROM user;`,
-                {},
-                function(e, result) {
-                    if (e) {
-                        console.log(e);
-                        reject(e);
-                    } else {
-                        if (!result) {
-                            reject(true);
-                        } else {
-                            resolve(result);
-                        }
-                    }
-                }
-            );
+    return userModel.find();
+}
+
+function getTodo(data) {
+    data = JSON.parse(data);
+    data.watchers = Object.keys(data.watchers || {}).map(a => a * 1);
+    data.partners = Object.keys(data.partners || {}).map(a => a * 1);
+    (data.history || []).forEach((h) => {
+        h.source = JSON.stringify(h.source);
+        h.target = JSON.stringify(h.target)
+    });
+    return data;
+}
+
+async function edit($id, $data, $active) {
+    await todoModel.updateOne({
+        id: $id
+    }, {
+        active: $active,
+        ...getTodo($data)
+    });
+    return false;
+}
+
+async function create($data) {
+    const todo = new todoModel({
+        ...getTodo($data),
+        active: true,
+    });
+    await todo.save();
+    return todo.id;
+}
+
+async function getList($active) {
+    const list = await todoModel.find({
+        active: $active
+    })
+    return list.map((v) => {
+        v = v.toObject();
+        const watchers = {};
+        v.watchers.forEach((uid) => {
+            watchers[uid] = true;
         });
+        const partners = {};
+        v.partners.forEach((uid) => {
+            partners[uid] = true;
+        });
+        v.watchers = watchers;
+        v.partners = partners;
+        v.history.forEach((item) => {
+            if (item.source) {
+                item.source = JSON.parse(item.source);
+            }
+            if (item.target) {
+                item.target = JSON.parse(item.target);
+            }
+        });
+
+        return v;
     });
 }
 
-function edit($id, $data, $active) {
-    return new Promise(function(resolve) {
-        db.serialize(function() {
-            db.run(
-                `UPDATE todo SET Data=$data,Active=$active  WHERE id=$id;`,
-                {
-                    $id,
-                    $data,
-                    $active
-                },
-                function(e) {
-                    if (e) {
-                        console.log(e);
-                        resolve(e);
-                    } else {
-                        resolve(false);
-                    }
-                }
-            );
-        });
-    });
-}
 
-function create($data) {
-    return new Promise(function(resolve, reject) {
-        db.serialize(function() {
-            db.run(
-                `INSERT INTO todo (Data,Active) VALUES ($data,$active);`,
-                {
-                    $data,
-                    $active: true
-                },
-                function(e) {
-                    if (e) {
-                        console.log(e);
-                        reject(e);
-                    } else {
-                        resolve(this.lastID);
-                    }
-                }
-            );
-        });
+function login({
+    email: $email,
+    password: $password,
+    mode
+}) {
+    return userModel.findOne({
+        email: $email
+    }).then((user) => {
+        if (!user) {
+            throw -1;
+        }
+        user = user.toObject();
+        user.id = user.uid;
+        delete user.uid;
+        if (user.password === $password || mode) {
+            return user;
+        } else {
+            throw -2;
+        }
     });
 }
-
-function getList($active) {
-    return new Promise(function(resolve, reject) {
-        db.serialize(function() {
-            db.all(
-                `SELECT Data as data,id FROM todo WHERE Active=$active;`,
-                {
-                    $active
-                },
-                function(e, result) {
-                    if (e) {
-                        console.log(e);
-                        reject(e);
-                    } else {
-                        if (!result) {
-                            reject(true);
-                        } else {
-                            result.forEach(v => {
-                                v.data = v.data.replace(
-                                    /(http:)?\/\/blackmiaool\.jios\.org/,
-                                    "//" + config.domain
-                                );
-                                const parsed = JSON.parse(v.data);
-                                delete parsed.id;
-                                Object.assign(v, parsed);
-                                delete v.data;
-                                if (!v.partners) {
-                                    v.partners = {};
-                                }
-                            });
-                            resolve(result);
-                        }
-                    }
-                }
-            );
-        });
-    });
-}
-
-function login({ email: $email, password: $password, mode }) {
-    return new Promise(function(resolve, reject) {
-        db.serialize(function() {
-            db.get(
-                `SELECT id,Name as name,Email as email,Password as password,Avatar as avatar FROM user WHERE Email=$email;`,
-                {
-                    $email
-                },
-                function(e, result) {
-                    if (e) {
-                        console.log(e);
-                        reject(e);
-                    } else {
-                        if (!result) {
-                            reject(-1); //no user
-                        } else if (result.password === $password || mode) {
-                            resolve(result);
-                        } else {
-                            reject(-2); //wrong pwd
-                        }
-                    }
-                }
-            );
-        });
-    });
-}
-let avatarCache = {};
 
 async function getAvatar($name) {
-    const cache = avatarCache[$name];
-    if (cache) {
-        if (typeof cache === "object") {
-            return cache;
-        } else {
-            return await cache;
+    const user = await userModel.findOne({
+        name: $name
+    })
+    return user.avatar;
+}
+async function register($name, $email, $password, $avatar, $source) {
+    const user = new userModel({
+        name: $name,
+        email: $email,
+        password: $password,
+        avatar: $avatar
+    });
+    await user.save();
+    return false;
+}
+
+function addProject({
+    name: $name
+}) {
+    const proj = new projectModel({
+        name: $name,
+        tags: []
+    });
+    return proj.save();
+}
+
+async function addTag({
+    project,
+    tag
+}) {
+    const tagO = new tagModel({
+        name: tag
+    });
+
+    await tagO.save();
+
+    await projectModel.findOneAndUpdate({
+        id: project,
+    }, {
+        $push: {
+            tags: tagO.id
         }
-    }
-
-    const promise = new Promise(function(resolve, reject) {
-        db.get(
-            `SELECT Avatar as avatar FROM user WHERE Name = $name`,
-            {
-                $name
-            },
-            function(e, data) {
-                if (e) {
-                    console.log(e);
-                    reject(e);
-                } else {
-                    if (data) {
-                        avatarCache[$name] = data.avatar;
-                        resolve(data.avatar);
-                    } else {
-                        resolve("");
-                    }
-                }
-            }
-        );
     });
-    avatarCache[$name] = promise;
-    return await promise;
+    return false;
 }
 
-function register($name, $email, $password, $avatar, $source) {
-    avatarCache = {};
-    return new Promise(function(resolve) {
-        db.serialize(function() {
-            db.run(
-                `INSERT INTO user (Name,Email,Password,Avatar,Source) VALUES ($name,$email,$password,$avatar,$source);`,
-                {
-                    $name,
-                    $password,
-                    $avatar,
-                    $email,
-                    $source
-                },
-                function(e) {
-                    if (e) {
-                        console.log(e);
-                        resolve(e);
-                    } else {
-                        resolve(false);
-                    }
-                }
-            );
+async function getProjects() {
+    let projects = await projectModel.find();
+    const tags = await tagModel.find()
+
+    const tagMap = {};
+    tags.forEach(tag => {
+        tagMap[tag.id] = tag;
+    });
+    projects = projects.map(project => {
+        project = project.toObject();
+        project.tags = project.tags.map((id) => {
+            return tagMap[id]
         });
+        return project;
     });
-}
-
-function addProject({ name: $name }) {
-    return new Promise(function(resolve, reject) {
-        db.get(
-            `SELECT id FROM project WHERE Name=$name;`,
-            {
-                $name
-            },
-            function(e, result) {
-                if (e) {
-                    console.log(e);
-                    reject(e);
-                } else {
-                    if (!result) {
-                        db.serialize(function() {
-                            db.run(
-                                `INSERT INTO project (Name,Data) VALUES ($name,$data);`,
-                                {
-                                    $name,
-                                    $data: JSON.stringify({})
-                                },
-                                function(e) {
-                                    if (e) {
-                                        console.log(e);
-                                        reject(e);
-                                    } else {
-                                        resolve(false);
-                                    }
-                                }
-                            );
-                        });
-                    } else {
-                        console.log(result, "duplicated");
-                        reject("duplicated");
-                    }
-                }
-            }
-        );
-    });
-}
-
-function addTag({ project, tag }) {
-    return new Promise(resolve => {
-        db.run(
-            `INSERT INTO tag (Name,Project) VALUES ($name,$project);`,
-            {
-                $name: tag,
-                $project: project
-            },
-            function(e) {
-                if (e) {
-                    console.log(e);
-                    resolve(e);
-                } else {
-                    resolve(false);
-                }
-            }
-        );
-    });
-}
-
-function getProjects() {
-    let projects;
-    let tags;
-    const p1 = new Promise((resolve, reject) => {
-        db.all(
-            `SELECT Data as data,Name as name,id FROM project;`,
-            {},
-            function(e, result) {
-                if (e) {
-                    console.log(e);
-                    reject(e);
-                } else {
-                    if (!result) {
-                        reject(true);
-                    }
-
-                    projects = result;
-                    resolve(result);
-                }
-            }
-        );
-    });
-    const p2 = new Promise((resolve, reject) => {
-        db.all(
-            `SELECT Project as project,Name as name,id FROM tag;`,
-            {},
-            function(e, result) {
-                if (e) {
-                    console.log(e);
-                    reject(e);
-                } else {
-                    if (!result) {
-                        reject(true);
-                    }
-                    tags = result;
-                    resolve(result);
-                }
-            }
-        );
-    });
-    return p1.then(() => p2).then(
-        () =>
-            new Promise(resolve => {
-                const tagMap = {};
-                tags.forEach(tag => {
-                    if (!tagMap[tag.project]) {
-                        tagMap[tag.project] = [];
-                    }
-                    tagMap[tag.project].push(tag);
-                });
-                projects.forEach(project => {
-                    project.data = JSON.parse(project.data);
-                    project.tags = tagMap[project.id] || [];
-                });
-                resolve(projects);
-            })
-    );
+    return projects;
 }
 export {
     register,

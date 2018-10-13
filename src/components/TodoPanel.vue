@@ -231,16 +231,6 @@ export default {
                 this.$refs.editor && this.$refs.editor.set(info);
             });
         },
-        selectTag(tag) {
-            const index = this.commonTags.indexOf(tag);
-            this.selectedTags.push(tag);
-            this.commonTags.splice(index, 1);
-        },
-        removeTag(tag) {
-            const index = this.selectedTags.indexOf(tag);
-            this.commonTags.push(tag);
-            this.selectedTags.splice(index, 1);
-        },
         edit() {
             if (
                 this.info.requestor != store.state.user.uid &&
