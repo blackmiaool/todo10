@@ -38,19 +38,19 @@ var CounterSchema = mongoose.Schema({
 const counter = mongoose.model('counter', CounterSchema);
 // (new counter({
 //     name: 'project',
-//     cnt: 31
+//     cnt: 30
 // })).save();
 // (new counter({
 //     name: 'tag',
-//     cnt: 51
+//     cnt: 58
 // })).save();
 // (new counter({
 //     name: 'user',
-//     cnt: 75
+//     cnt: 77
 // })).save();
 // (new counter({
 //     name: 'todo',
-//     cnt: 615
+//     cnt: 653
 // })).save();
 
 function pre(name, key = 'id') {
@@ -346,7 +346,7 @@ db.serialize(function () {
 
     function transferUser() {
         db.all(
-            `SELECT Name,id,Email,Password,Avatar,Active FROM user;`, {},
+            `SELECT Name,id,Email,Password,Avatar FROM user;`, {},
             async function (e, result) {
                 if (e) {
                     console.log(e);
@@ -359,7 +359,7 @@ db.serialize(function () {
                             email: v.Email,
                             password: v.Password,
                             avatar: v.Avatar,
-                            active: !Boolean(v.Active)
+                            active: true
                         });
                         await a.save();
                     }
@@ -469,7 +469,11 @@ db.serialize(function () {
             }
         );
     }
-
+    // transferMessage();
+    // transferProject();
+    // transferTag();
+    // transferTodo();
+    // transferUser();
 });
 
 function deleteMessage($id) {
@@ -553,6 +557,7 @@ async function getList($active) {
         v.watchers.forEach((uid) => {
             watchers[uid] = true;
         });
+        v.deadline = (new Date(v.deadline)).getTime();
         const partners = {};
         v.partners.forEach((uid) => {
             partners[uid] = true;

@@ -124,7 +124,7 @@ const properties = {
     tags: []
 };
 Vue.filter("url2fileName", function(value) {
-    const arr = value.split("/");
+    const arr = value.url.split("/");
     return arr[arr.length - 1];
 });
 export default {
