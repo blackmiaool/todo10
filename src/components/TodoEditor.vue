@@ -337,7 +337,20 @@ export default {
                 reader.onload = () => {
                     this.doUpload(this.id, file.name, reader.result).then(
                         url => {
-                            this.attachments.push(url);
+                            let type = "file";
+                            if (url.match(/\.jpg|\.jpeg|\.png|\.gif/)) {
+                                type = "image";
+                            } else if (
+                                url.match(
+                                    /\.js|\.go|\.html|\.css|\.java|\.c|\.ts/
+                                )
+                            ) {
+                                type = "code";
+                            }
+                            this.attachments.push({
+                                type,
+                                url
+                            });
                         }
                     );
                 };
